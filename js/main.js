@@ -99,16 +99,16 @@ function addFunctionality() {
 }
 
 function playerMove(player) {
-  if (jQuery.gameQuery.keyTracker[65] && player == 1 ||
-      jQuery.gameQuery.keyTracker[37] && player == 2) {
+  if (($.gameQuery.keyTracker[65] && player == 1) ||
+      ($.gameQuery.keyTracker[37] && player == 2)) {
     // this is left!
     var nextpos = parseInt($('#player' + player).x()) - 2;
     if (nextpos > 0) {
       $('#player' + player).x(nextpos);
     }
   }
-  if (jQuery.gameQuery.keyTracker[68] && player == 1 ||
-      jQuery.gameQuery.keyTracker[39] && player == 2) {
+  if (($.gameQuery.keyTracker[68] && player == 1) ||
+      ($.gameQuery.keyTracker[39] && player == 2)) {
     //this is right! (d)
     var nextpos = parseInt($('#player' + player).x()) + 2;
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
