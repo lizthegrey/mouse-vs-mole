@@ -111,59 +111,57 @@ function playerMove(player) {
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
     // this is left
-    var nextpos = parseInt($(p(player)).x()) - MOVE_VELOCITY;
+    var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     // TODO: Collision Detector
     if (nextpos > 0) {
-      $(p(player)).x(nextpos);
+      p(player).x(nextpos);
     }
   }
   if (($.gameQuery.keyTracker[68] && player == 1) ||
       ($.gameQuery.keyTracker[39] && player == 2)) {
     //this is right (d)
-    var nextpos = parseInt($(p(player)).x()) + MOVE_VELOCITY;
+    var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
     // TODO: Collision Detector
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
-      $(p(player)).x(nextpos);
+      p(player).x(nextpos);
     }
   }
   if (($.gameQuery.keyTracker[87] && player == 1) ||
-  	   ($.gameQuery.keyTracker[38] && player == 2)) {
-  	 // TODO: Collision Detector (for a floor)
-  	 if (!validMovement(parseInt($(p(player)).y()) + 1)) {
-  	   $(p(player))[0].player.yVel = JUMP_VELOCITY;
-  	 }
+      ($.gameQuery.keyTracker[38] && player == 2)) {
+    // TODO: Collision Detector (for a floor)
+    if (!validMovement(parseInt(p(player).y()) + 1)) {
+      p(player)[0].player.yVel = JUMP_VELOCITY;
+    }
   }
 }
 
 function verticalMovement(player) {
-	// TODO: Collision Detector 
-   while (!validMovement(parseInt($(p(player)).y())
-          + $(p(player))[0].player.yVel)) {
-     if ($(p(player))[0].player.yVel > 0) {
-       if ($(p(player))[0].player.yVel > DEATH_VELOCITY) {
-         // TODO: someone dies. Hurray!
-       }
-       $(p(player))[0].player.yVel -= GRAVITY_ACCEL;
-     }
-     else {
-       $(p(player))[0].player.yVel += GRAVITY_ACCEL;
-     }
-   }
-   var nextpos = parseInt($(p(player)).y()
-                 + $(p(player))[0].player.yVel);
-   $(p(player)).y(nextpos);
-   
-   $(p(player))[0].player.yVel += GRAVITY_ACCEL;
+  // TODO: Collision Detector
+  while (!validMovement(parseInt(p(player).y()) +
+         p(player)[0].player.yVel)) {
+    if (p(player)[0].player.yVel > 0) {
+      if (p(player)[0].player.yVel > DEATH_VELOCITY) {
+        // TODO: someone dies. Hurray!
+      }
+      p(player)[0].player.yVel -= GRAVITY_ACCEL;
+    } else {
+      p(player)[0].player.yVel += GRAVITY_ACCEL;
+    }
+  }
+  var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
+  p(player).y(nextpos);
+  p(player)[0].player.yVel += GRAVITY_ACCEL;
 }
 
 // TODO: Replace function with collision detector
-function validMovement(y) { 
-   return (y <= START_YPOS);
-   //seriously, didn't care about this function because it's a placeholder =.="
+function validMovement(y) {
+  return (y <= START_YPOS);
+  //seriously, didn't care about this function because it's a placeholder =.="
 }
 
+// Returns the player object associated with a player number.
 function p(n) {
-   return '#player'+n;
+  return $('#player' + n);
 }
 
 $(document).ready(function() {
