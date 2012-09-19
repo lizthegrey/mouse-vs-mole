@@ -1,0 +1,25 @@
+Notes - 9/17 - High Level Game Mechanics
+
+Block destruction / resources:
+-should be able to change amount of time it takes to destroy a block, to speed up or slow down game
+-resources should not be present in all blocks, but in certain blocks, and are "dropped" when blocks are destroyed
+	-must walk over resource to collect
+	-forces players to run around map
+-blocks don't fall
+
+Game field:
+-should be able to change size of game map
+-should be able to change # of block colors used (or size of clusters, depending on algorithm)
+-5 minute time limit, be changeable if we decide game should run for more or less time
+
+Art assets:
+-largest at 40x40px, scale down to 20x20, scale down further if necessary
+-stretch goal: allow borders to be added to blocks depending on whether they are adjacent to another block of the same color, or a differently-colored block (make clusters look more smooth and borders between clusters more visible)
+
+Player actions:
+-player is allowed to jump
+-player holds down a key to do break blocks in the direction they're facing/walking
+-if a block is immediately above player, player can continuously pick at it without stopping because they're "too low", and they don't need to jump to hit the block
+
+
+
