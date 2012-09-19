@@ -9,12 +9,21 @@ var PLAYGROUND_WIDTH = BLOCK_SIZE * GRID_WIDTH;
 var PLAYGROUND_HEIGHT = BLOCK_SIZE * GRID_HEIGHT;
 
 // Where is the mystery +5 coming from? -lizf
+// I wanted it to be symmetric starting locations (for START_XPOS_P2),
+// and for the players to start on a block instead of about to fall onto one.
+// Fixed now, you can see where the +5 came from. --fluffy
 var START_XCOORD_P1 = 2;
 var START_XPOS_P1 = START_XCOORD_P1 * BLOCK_SIZE;
 var START_XCOORD_P2 = 37;
-var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + 5;
+var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE-PLAYER_SIZE);
 var START_YCOORD = 14;
-var START_YPOS = BLOCK_SIZE * START_YCOORD + 5;
+var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE-PLAYER_SIZE);
+
+var GRAVITY_ACCEL = 0.5; // pixels/s^2 (down is positive)
+var JUMP_VELOCITY = -7;   // pixels/s
+var MOVE_VELOCITY = 2;
+
+var DEATH_VELOCITY = 9;
 
 function buildPlayground() {
   $('#game').playground({
@@ -78,7 +87,7 @@ function addActors() {
           animation: thisBlock,
           height: BLOCK_SIZE, width: BLOCK_SIZE,
           posx: x * BLOCK_SIZE, posy: y * BLOCK_SIZE});
-    }
+    } 
   }
 }
 
@@ -94,27 +103,67 @@ function player(node, playerNum, xpos, ypos) {
 function addFunctionality() {
   $.playground().registerCallback(function() {
         playerMove(1);
-        playerMove(2);},
+        playerMove(2);
+        verticalMovement(1);
+        verticalMovement(2);},
       30);
 }
 
 function playerMove(player) {
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
-    // this is left!
-    var nextpos = parseInt($('#player' + player).x()) - 2;
+    // this is left
+    var nextpos = parseInt($('#player' + player).x()) - MOVE_VELOCITY;
+    // replace with collision detector
     if (nextpos > 0) {
       $('#player' + player).x(nextpos);
     }
   }
   if (($.gameQuery.keyTracker[68] && player == 1) ||
       ($.gameQuery.keyTracker[39] && player == 2)) {
-    //this is right! (d)
-    var nextpos = parseInt($('#player' + player).x()) + 2;
+    //this is right (d)
+    var nextpos = parseInt($('#player' + player).x()) + MOVE_VELOCITY;
+    //replace with collision detector
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
       $('#player' + player).x(nextpos);
     }
   }
+  if (($.gameQuery.keyTracker[87] && player == 1) ||
+  	   ($.gameQuery.keyTracker[38] && player == 2)) {
+  	 // the following condition should be replaced with collision detector
+  	 // (checking below the player to make sure there's a floor)
+  	 if (!validMovement(parseInt($('#player' + player).y()) + 1)) {
+  	   $('#player' + player)[0].player.yVel = JUMP_VELOCITY;
+  	 }
+  }
+}
+
+function verticalMovement(player) {
+	// replace the condition with collision detection
+   while (!validMovement(parseInt($('#player' + player).y()) +
+          $('#player' + player)[0].player.yVel)) {
+     if ($('#player' + player)[0].player.yVel > 0) {
+       if ($('#player' + player)[0].player.yVel > DEATH_VELOCITY) {
+         //player crashed into ground, insert player death here
+       }
+       $('#player' + player)[0].player.yVel -= GRAVITY_ACCEL;
+     }
+     else {
+       $('#player' + player)[0].player.yVel += GRAVITY_ACCEL;
+     }
+   }
+   var nextpos = parseInt($('#player' + player).y()
+                 + $('#player' + player)[0].player.yVel);
+   $('#player' + player).y(nextpos);
+   
+   $('#player' + player)[0].player.yVel += GRAVITY_ACCEL;
+}
+
+// Replace this entire function with collision detection.
+// This is intended ONLY AS AN EXAMPLE (for jumping purposes).
+function validMovement(y) { 
+   if (y > START_YPOS) return false;
+   return true;
 }
 
 $(document).ready(function() {
