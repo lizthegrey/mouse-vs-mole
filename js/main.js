@@ -111,55 +111,59 @@ function playerMove(player) {
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
     // this is left
-    var nextpos = parseInt($('#player' + player).x()) - MOVE_VELOCITY;
+    var nextpos = parseInt($(p(player)).x()) - MOVE_VELOCITY;
     // TODO: Collision Detector
     if (nextpos > 0) {
-      $('#player' + player).x(nextpos);
+      $(p(player)).x(nextpos);
     }
   }
   if (($.gameQuery.keyTracker[68] && player == 1) ||
       ($.gameQuery.keyTracker[39] && player == 2)) {
     //this is right (d)
-    var nextpos = parseInt($('#player' + player).x()) + MOVE_VELOCITY;
+    var nextpos = parseInt($(p(player)).x()) + MOVE_VELOCITY;
     // TODO: Collision Detector
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
-      $('#player' + player).x(nextpos);
+      $(p(player)).x(nextpos);
     }
   }
   if (($.gameQuery.keyTracker[87] && player == 1) ||
   	   ($.gameQuery.keyTracker[38] && player == 2)) {
   	 // TODO: Collision Detector (for a floor)
-  	 if (!validMovement(parseInt($('#player' + player).y()) + 1)) {
-  	   $('#player' + player)[0].player.yVel = JUMP_VELOCITY;
+  	 if (!validMovement(parseInt($(p(player)).y()) + 1)) {
+  	   $(p(player))[0].player.yVel = JUMP_VELOCITY;
   	 }
   }
 }
 
 function verticalMovement(player) {
 	// TODO: Collision Detector 
-   while (!validMovement(parseInt($('#player' + player).y()) +
-          $('#player' + player)[0].player.yVel)) {
-     if ($('#player' + player)[0].player.yVel > 0) {
-       if ($('#player' + player)[0].player.yVel > DEATH_VELOCITY) {
+   while (!validMovement(parseInt($(p(player)).y())
+          + $(p(player))[0].player.yVel)) {
+     if ($(p(player))[0].player.yVel > 0) {
+       if ($(p(player))[0].player.yVel > DEATH_VELOCITY) {
          // TODO: someone dies. Hurray!
        }
-       $('#player' + player)[0].player.yVel -= GRAVITY_ACCEL;
+       $(p(player))[0].player.yVel -= GRAVITY_ACCEL;
      }
      else {
-       $('#player' + player)[0].player.yVel += GRAVITY_ACCEL;
+       $(p(player))[0].player.yVel += GRAVITY_ACCEL;
      }
    }
-   var nextpos = parseInt($('#player' + player).y()
-                 + $('#player' + player)[0].player.yVel);
-   $('#player' + player).y(nextpos);
+   var nextpos = parseInt($(p(player)).y()
+                 + $(p(player))[0].player.yVel);
+   $(p(player)).y(nextpos);
    
-   $('#player' + player)[0].player.yVel += GRAVITY_ACCEL;
+   $(p(player))[0].player.yVel += GRAVITY_ACCEL;
 }
 
 // TODO: Replace function with collision detector
 function validMovement(y) { 
    return (y <= START_YPOS);
    //seriously, didn't care about this function because it's a placeholder =.="
+}
+
+function p(n) {
+   return '#player'+n;
 }
 
 $(document).ready(function() {
