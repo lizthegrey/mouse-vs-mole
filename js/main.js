@@ -23,6 +23,8 @@ var MOVE_VELOCITY = 2;
 
 var DEATH_VELOCITY = 9;
 
+var levelGrid; // 2D array storing block objects
+
 function buildPlayground() {
   $('#game').playground({
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH,
@@ -72,7 +74,10 @@ function addActors() {
 
   var rand = 0;
   var thisBlock = block_sprites[0];
+
+  levelGrid = new Array(GRID_WIDTH);
   for (var x = 0; x < GRID_WIDTH; x++) {
+    levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
@@ -81,12 +86,20 @@ function addActors() {
       }
       rand = Math.floor(Math.random() * 4);
       thisBlock = block_sprites[rand];
+
+      levelGrid[x][y] = new block(rand, 0);
+
       $('#actors').addSprite('block' + x + ',' + y, {
           animation: thisBlock,
           height: BLOCK_SIZE, width: BLOCK_SIZE,
           posx: x * BLOCK_SIZE, posy: y * BLOCK_SIZE});
     }
   }
+}
+
+function block(blockType, damage) {
+  this.blockType = blockType;
+  this.damage = damage;
 }
 
 function player(node, playerNum, xpos, ypos) {
