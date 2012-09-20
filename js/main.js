@@ -23,7 +23,7 @@ var MOVE_VELOCITY = 2;
 
 var DEATH_VELOCITY = 9;
 
-var levelGrid; // 2D array storing block objects
+var levelGrid; // 2D array containing block objects
 
 function buildPlayground() {
   $('#game').playground({
@@ -51,6 +51,7 @@ function addActors() {
   $('#actors').addGroup('player2', {
       posx: START_XPOS_P2, posy: START_YPOS,
       width: PLAYER_SIZE, height: PLAYER_SIZE});
+  $('#actors').addGroup('blocks');
   var player1 = new player($('#player1'), 1,
                            START_XPOS_P1, START_YPOS);
   var player2 = new player($('#player2'), 2,
@@ -81,23 +82,26 @@ function addActors() {
     for (var y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
-        // Player start position
+        levelGrid[x][y] = new block(null, null, null);
         continue;
       }
       rand = Math.floor(Math.random() * 4);
       thisBlock = block_sprites[rand];
 
-      levelGrid[x][y] = new block(rand, 0);
-
-      $('#actors').addSprite('block' + x + ',' + y, {
+      $('#blocks').addSprite('block' + x + y, {
           animation: thisBlock,
           height: BLOCK_SIZE, width: BLOCK_SIZE,
           posx: x * BLOCK_SIZE, posy: y * BLOCK_SIZE});
+
+      levelGrid[x][y] = new block($('#block'+x+y), rand, 0);
     }
   }
+
+  return levelGrid;
 }
 
-function block(blockType, damage) {
+function block(node, blockType, damage) {
+  this.node = node;
   this.blockType = blockType;
   this.damage = damage;
 }
@@ -108,6 +112,15 @@ function player(node, playerNum, xpos, ypos) {
   this.yVel = 0;
   this.player = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
+
+  this.getX = function() {
+      return Math.round((this.node.x()) / BLOCK_SIZE);
+  };
+
+  this.getY = function() {
+      return Math.round((this.node.y()) / BLOCK_SIZE);
+  };
+
   return true;
 }
 
@@ -120,13 +133,28 @@ function addFunctionality() {
       30);
 }
 
+function checkCollision(player, x, y) {
+  var collided = false;
+  if (levelGrid[x][y].node != null) {
+      var collisions = p(player).collision('#' + levelGrid[x][y]
+                  .node.attr('id') + ',#blocks,#actors');
+      if (collisions.size() > 0) {
+          collided = true;
+      }
+  }
+
+  return collided;
+}
+
 function playerMove(player) {
+  var x = p(player)[0].player.getX();
+  var y = p(player)[0].player.getY();
+
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
-    // this is left
-    var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
-    // TODO: Collision Detector
-    if (nextpos > 0) {
+        // this is left
+        var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
+    if (nextpos > 0 && !checkCollision(player, x-1, y, levelGrid)) {
       p(player).x(nextpos);
     }
   }
@@ -134,8 +162,7 @@ function playerMove(player) {
       ($.gameQuery.keyTracker[39] && player == 2)) {
     //this is right (d)
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
-    // TODO: Collision Detector
-    if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
+    if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE && !checkCollision(player, x+1, y, levelGrid)) {
       p(player).x(nextpos);
     }
   }
