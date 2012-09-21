@@ -23,6 +23,8 @@ var MOVE_VELOCITY = 2;
 
 var DEATH_VELOCITY = 9;
 
+var levelGrid; // 2D array containing block objects
+
 function buildPlayground() {
   $('#game').playground({
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH,
@@ -49,6 +51,7 @@ function addActors() {
   $('#actors').addGroup('player2', {
       posx: START_XPOS_P2, posy: START_YPOS,
       width: PLAYER_SIZE, height: PLAYER_SIZE});
+  $('#actors').addGroup('blocks');
   var player1 = new player($('#player1'), 1,
                            START_XPOS_P1, START_YPOS);
   var player2 = new player($('#player2'), 2,
@@ -72,21 +75,35 @@ function addActors() {
 
   var rand = 0;
   var thisBlock = block_sprites[0];
+
+  levelGrid = new Array(GRID_WIDTH);
   for (var x = 0; x < GRID_WIDTH; x++) {
+    levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
-        // Player start position
+        levelGrid[x][y] = new block(null, null, null);
         continue;
       }
       rand = Math.floor(Math.random() * 4);
       thisBlock = block_sprites[rand];
-      $('#actors').addSprite('block' + x + ',' + y, {
+
+      $('#blocks').addSprite('block' + x + '-' + y, {
           animation: thisBlock,
           height: BLOCK_SIZE, width: BLOCK_SIZE,
           posx: x * BLOCK_SIZE, posy: y * BLOCK_SIZE});
+
+      levelGrid[x][y] = new block($('#block' + x + '-' + y), rand, 0);
     }
   }
+
+  return levelGrid;
+}
+
+function block(node, blockType, damage) {
+  this.node = node;
+  this.blockType = blockType;
+  this.damage = damage;
 }
 
 function player(node, playerNum, xpos, ypos) {
@@ -95,7 +112,20 @@ function player(node, playerNum, xpos, ypos) {
   this.yVel = 0;
   this.player = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
+
+  this.getX = function() {
+      return posToGrid(this.node.x());
+  };
+
+  this.getY = function() {
+      return posToGrid(this.node.y());
+  };
+
   return true;
+}
+
+function posToGrid(pos) {
+    return Math.round(pos / BLOCK_SIZE);
 }
 
 function addFunctionality() {
@@ -107,56 +137,83 @@ function addFunctionality() {
       30);
 }
 
+function checkCollision(player, x, y) {
+  var collided = false;
+  if (levelGrid[x][y].node != null) {
+      var collisions = p(player).collision('#' + levelGrid[x][y]
+                  .node.attr('id') + ',#blocks,#actors');
+      if (collisions.size() > 0) {
+          collided = true;
+      }
+  }
+
+  return collided;
+}
+
 function playerMove(player) {
+  var x = p(player)[0].player.getX();
+  var y = p(player)[0].player.getY();
+
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
-    // this is left
-    var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
-    // TODO: Collision Detector
+        // this is left
+        var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     if (nextpos > 0) {
-      p(player).x(nextpos);
+      if (!levelGrid[x - 1][y].node ||
+         nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE)
+          p(player).x(nextpos);
+      else
+          p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
     }
   }
   if (($.gameQuery.keyTracker[68] && player == 1) ||
       ($.gameQuery.keyTracker[39] && player == 2)) {
     //this is right (d)
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
-    // TODO: Collision Detector
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
-      p(player).x(nextpos);
+      if (!levelGrid[x + 1][y].node ||
+         nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE)
+          p(player).x(nextpos);
+      else
+          p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
     }
   }
   if (($.gameQuery.keyTracker[87] && player == 1) ||
       ($.gameQuery.keyTracker[38] && player == 2)) {
-    // TODO: Collision Detector (for a floor)
-    if (!validMovement(parseInt(p(player).y()) + 1)) {
-      p(player)[0].player.yVel = JUMP_VELOCITY;
+    if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node &&
+       p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+         p(player)[0].player.yVel = JUMP_VELOCITY;
     }
   }
 }
 
 function verticalMovement(player) {
-  // TODO: Collision Detector
-  while (!validMovement(parseInt(p(player).y()) +
-         p(player)[0].player.yVel)) {
-    if (p(player)[0].player.yVel > 0) {
-      if (p(player)[0].player.yVel > DEATH_VELOCITY) {
-        // TODO: someone dies. Hurray!
-      }
-      p(player)[0].player.yVel -= GRAVITY_ACCEL;
-    } else {
-      p(player)[0].player.yVel += GRAVITY_ACCEL;
-    }
-  }
-  var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
-  p(player).y(nextpos);
-  p(player)[0].player.yVel += GRAVITY_ACCEL;
-}
+  var x = p(player)[0].player.getX();
+  var y = p(player)[0].player.getY();
 
-// TODO: Replace function with collision detector
-function validMovement(y) {
-  return (y <= START_YPOS);
-  //seriously, didn't care about this function because it's a placeholder =.="
+  var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
+  if (p(player)[0].player.yVel >= 0) {
+      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+          nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+            p(player).y(nextpos);
+            p(player)[0].player.yVel += GRAVITY_ACCEL;
+      }
+      else {
+          p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
+          p(player)[0].player.yVel = 0;
+      }
+  }
+  else {
+      if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
+          nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
+            p(player).y(nextpos);
+            p(player)[0].player.yVel += GRAVITY_ACCEL;
+      }
+      else {
+          p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
+          p(player)[0].player.yVel = 0;
+      }
+  }
 }
 
 // Returns the player object associated with a player number.
