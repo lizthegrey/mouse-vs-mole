@@ -93,7 +93,7 @@ function addActors() {
           height: BLOCK_SIZE, width: BLOCK_SIZE,
           posx: x * BLOCK_SIZE, posy: y * BLOCK_SIZE});
 
-      levelGrid[x][y] = new block($('#block'+x+y), rand, 0);
+      levelGrid[x][y] = new block($('#block' + x + y), rand, 0);
     }
   }
 
@@ -159,10 +159,11 @@ function playerMove(player) {
         // this is left
         var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     if (nextpos > 0) {
-      if (!levelGrid[x-1][y].node || nextpos > levelGrid[x-1][y].node.x()+BLOCK_SIZE)
+      if (!levelGrid[x - 1][y].node ||
+         nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE)
           p(player).x(nextpos);
       else
-          p(player).x(levelGrid[x-1][y].node.x()+BLOCK_SIZE);
+          p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
     }
   }
   if (($.gameQuery.keyTracker[68] && player == 1) ||
@@ -170,16 +171,17 @@ function playerMove(player) {
     //this is right (d)
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
-      if (!levelGrid[x+1][y].node || nextpos < levelGrid[x+1][y].node.x()-PLAYER_SIZE)
+      if (!levelGrid[x + 1][y].node ||
+         nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE)
           p(player).x(nextpos);
       else
-          p(player).x(levelGrid[x+1][y].node.x()-PLAYER_SIZE);
+          p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
     }
   }
   if (($.gameQuery.keyTracker[87] && player == 1) ||
       ($.gameQuery.keyTracker[38] && player == 2)) {
-    if(levelGrid[x][y+1] && levelGrid[x][y+1].node &&
-       p(player).y() == levelGrid[x][y+1].node.y() - PLAYER_SIZE) {
+    if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node &&
+       p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
          p(player)[0].player.yVel = JUMP_VELOCITY;
     }
   }
@@ -191,24 +193,24 @@ function verticalMovement(player) {
 
   var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
   if (p(player)[0].player.yVel >= 0) {
-      if (!levelGrid[x][y+1] || !levelGrid[x][y+1].node ||
-          nextpos < levelGrid[x][y+1].node.y() - PLAYER_SIZE) {
+      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+          nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
             p(player).y(nextpos);
             p(player)[0].player.yVel += GRAVITY_ACCEL;
       }
       else {
-          p(player).y(levelGrid[x][y+1].node.y() - PLAYER_SIZE)
+          p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
           p(player)[0].player.yVel = 0;
       }
   }
   else {
-      if (!levelGrid[x][y-1] || !levelGrid[x][y-1].node ||
-          nextpos > levelGrid[x][y-1].node.y() + BLOCK_SIZE) {
+      if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
+          nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
             p(player).y(nextpos);
             p(player)[0].player.yVel += GRAVITY_ACCEL;
       }
       else {
-          p(player).y(levelGrid[x][y-1].node.y() + BLOCK_SIZE)
+          p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
           p(player)[0].player.yVel = 0;
       }
   }
