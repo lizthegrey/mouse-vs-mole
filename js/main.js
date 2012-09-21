@@ -88,12 +88,12 @@ function addActors() {
       rand = Math.floor(Math.random() * 4);
       thisBlock = block_sprites[rand];
 
-      $('#blocks').addSprite('block' + x + y, {
+      $('#blocks').addSprite('block' + x + '-' + y, {
           animation: thisBlock,
           height: BLOCK_SIZE, width: BLOCK_SIZE,
           posx: x * BLOCK_SIZE, posy: y * BLOCK_SIZE});
 
-      levelGrid[x][y] = new block($('#block' + x + y), rand, 0);
+      levelGrid[x][y] = new block($('#block' + x + '-' + y), rand, 0);
     }
   }
 
