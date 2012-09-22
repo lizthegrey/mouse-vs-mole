@@ -287,27 +287,30 @@ function resourceRefresh() {
   for (var n = 0; n < nonEmptyResources.length; n++) {
     var resourceLoc = nonEmptyResources[n];
     var resource = resourceGrid[resourceLoc[0]][resourceLoc[1]];
-    var x = resource.node.x();
-    var y = resource.node.y();
+    var x = resource.getX();
+    var y = resource.getY();
     
     var nextpos = parseInt(resource.node.y() + resource.yVel);
     if (resource.yVel >= 0) {
-//        if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-  //          nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
+        if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+            nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
               resource.node.y(nextpos);
               resource.yVel += GRAVITY_ACCEL;
-  //      }
-    /*    else {
+        }
+        else {
             resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
             p(player)[0].player.yVel = 0;
-        } */
+        }
     }
+    
+    var rx = resource.node.x();
+    var ry = resource.node.y();
     
     var popped = false;
     for (var pn = 1; pn <=2; pn++) {
       var px = p(pn).x();
       var py = p(pn).y();
-      if (resourceGet(x,y,px,py)) {
+      if (resourceGet(rx,ry,px,py)) {
         if (!popped) {
           if (n < 0.5 * nonEmptyResources.length) { // optimize list fuckage!
             for (var m = n; m > 0; m--) {
