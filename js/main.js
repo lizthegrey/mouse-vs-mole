@@ -299,7 +299,7 @@ function resourceRefresh() {
         }
         else {
             resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
-            p(player)[0].player.yVel = 0;
+            resource.yVel = 0;
         }
     }
     
