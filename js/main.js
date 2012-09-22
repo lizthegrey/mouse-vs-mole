@@ -23,6 +23,14 @@ var MOVE_VELOCITY = 2;
 
 var DEATH_VELOCITY = 9;
 
+var BG_MUSIC = 'sounds/casual_bg.ogg';
+var PLAYER1_RUN = 'sounds/running.ogg';
+var PLAYER2_RUN = 'sounds/running_diff.ogg';
+var BLOCK_BREAK = 'sounds/crunches.ogg';
+
+var PLAYER1_RUNNING = false;
+var PLAYER2_RUNNING = false;
+
 var levelGrid; // 2D array containing block objects
 
 function buildPlayground() {
@@ -100,6 +108,18 @@ function addActors() {
   return levelGrid;
 }
 
+/* Block initializes sounds in gameworld */
+function addSounds(){
+  var bgMusic = new $.gameQuery.SoundWrapper(BG_MUSIC, true);
+  var player1Run = new $.gameQuery.SoundWrapper(PLAYER1_RUN, true);
+  var player2Run = new $.gameQuery.SoundWrapper(PLAYER2_RUN, true);
+  var blockBreak = new $.gameQuery.SoundWrapper(BLOCK_BREAK, true);
+  $('#background').addSound(bgMusic, false);
+  $('#player1').addSound(player1Run, false);
+  $('#player2').addSound(player2Run, false);
+  // We will want another object to play block breaking sounds
+}
+
 function block(node, blockType, damage) {
   this.node = node;
   this.blockType = blockType;
@@ -130,11 +150,13 @@ function posToGrid(pos) {
 
 function addFunctionality() {
   $.playground().registerCallback(function() {
-        playerMove(1);
-        playerMove(2);
-        verticalMovement(1);
-        verticalMovement(2);},
-      30);
+    playerMove(1);
+    playerMove(2);
+    playerStop(1);
+	  playerStop(2);
+    verticalMovement(1);
+    verticalMovement(2);},
+  30);
 }
 
 function checkCollision(player, x, y) {
@@ -153,7 +175,9 @@ function checkCollision(player, x, y) {
 function playerMove(player) {
   var x = p(player)[0].player.getX();
   var y = p(player)[0].player.getY();
-
+  var p1IsRunning = false;
+  var p2IsRunning = false;
+  
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
         // this is left
@@ -165,6 +189,10 @@ function playerMove(player) {
       else
           p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
     }
+    if (player == 1)
+      p1IsRunning = true;
+    else
+      p2IsRunning = true;
   }
   if (($.gameQuery.keyTracker[68] && player == 1) ||
       ($.gameQuery.keyTracker[39] && player == 2)) {
@@ -177,6 +205,10 @@ function playerMove(player) {
       else
           p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
     }
+    if (player == 1)
+      p1IsRunning = true;
+    else
+      p2IsRunning = true;
   }
   if (($.gameQuery.keyTracker[87] && player == 1) ||
       ($.gameQuery.keyTracker[38] && player == 2)) {
@@ -184,6 +216,20 @@ function playerMove(player) {
        p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
          p(player)[0].player.yVel = JUMP_VELOCITY;
     }
+    if (player == 1)
+      p1IsRunning = true;
+    else
+      p2IsRunning = true;
+  }
+  if (p1IsRunning && !PLAYER1_RUNNING){
+    //console.log("Player 1 begun walking");
+    $('#player1').playSound();
+    PLAYER1_RUNNING = true;
+  }
+  if (p2IsRunning && !PLAYER2_RUNNING){
+    //console.log("Player 2 begun walking");
+    $('#player2').playSound();
+    PLAYER2_RUNNING = true;
   }
 }
 
@@ -216,6 +262,26 @@ function verticalMovement(player) {
   }
 }
 
+/* Function to stop sound upon player no longer moving */
+function playerStop(player){
+  if (player == 1 && PLAYER1_RUNNING){
+    if (!$.gameQuery.keyTracker[65] && 
+        !$.gameQuery.keyTracker[68] &&
+        !$.gameQuery.keyTracker[87]){
+          PLAYER1_RUNNING = false;
+          $('#player1').pauseSound();
+    }
+  }
+  else if (player == 2 && PLAYER2_RUNNING) {
+    if (!$.gameQuery.keyTracker[37] &&
+        !$.gameQuery.keyTracker[38] &&
+        !$.gameQuery.keyTracker[39]){
+          PLAYER2_RUNNING = false;
+          $('#player2').pauseSound();
+    }
+  }
+}
+
 // Returns the player object associated with a player number.
 function p(n) {
   return $('#player' + n);
@@ -225,6 +291,9 @@ $(document).ready(function() {
   buildPlayground();
   addBackground();
   addActors();
+  addSounds();
   addFunctionality();
   $.playground().startGame();
+  //$('#background').playSound();
+  //console.log("testing sound");
 });
