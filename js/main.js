@@ -1,5 +1,6 @@
 var BLOCK_SIZE = 20;
 var PLAYER_SIZE = 15;
+var RESOURCE_SIZE = 20;
 var NUM_COLORS = 4;
 
 var GRID_WIDTH = 40;
@@ -23,7 +24,13 @@ var MOVE_VELOCITY = 2;
 
 var DEATH_VELOCITY = 9;
 
+var RESOURCE_PROBABILITY = 0.1; // probably any block has a resource in it
+
 var levelGrid; // 2D array containing block objects
+
+var resourceGrid; //2D array containing resource objects
+
+var nonEmptyResources; //1D Array containing resourceGrid locations
 
 function buildPlayground() {
   $('#game').playground({
@@ -52,6 +59,7 @@ function addActors() {
       posx: START_XPOS_P2, posy: START_YPOS,
       width: PLAYER_SIZE, height: PLAYER_SIZE});
   $('#actors').addGroup('blocks');
+  $('#actors').addGroup('resources');
   var player1 = new player($('#player1'), 1,
                            START_XPOS_P1, START_YPOS);
   var player2 = new player($('#player2'), 2,
@@ -75,11 +83,14 @@ function addActors() {
 
   var rand = 0;
   var thisBlock = block_sprites[0];
+  
+  var x;
+  var y;
 
   levelGrid = new Array(GRID_WIDTH);
-  for (var x = 0; x < GRID_WIDTH; x++) {
+  for (x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
-    for (var y = 0; y < GRID_HEIGHT; y++) {
+    for (y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
         levelGrid[x][y] = new block(null, null, null);
@@ -96,8 +107,39 @@ function addActors() {
       levelGrid[x][y] = new block($('#block' + x + '-' + y), rand, 0);
     }
   }
+  
+  var resource_sprite = new $.gameQuery.Animation({
+          imageURL: 'sprites/Resource.png'});
+  
+  resourceGrid = new Array(GRID_WIDTH);
+  nonEmptyResources = []
+  for (x = 0; x < GRID_WIDTH; x++) {
+    resourceGrid[x] = new Array(GRID_HEIGHT);
+    for (y = 0; y < GRID_HEIGHT; y++) {
+      if (y == START_YCOORD &&
+          (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
+        resourceGrid[x][y] = new resource(null);
+        continue;
+      }
+      rand = Math.random();
+      if (rand > RESOURCE_PROBABILITY) {
+        resourceGrid[x][y] = new resource(null);
+        continue;
+      }
+      
+      $('#resources').addSprite('resource' + x + '-' + y, {
+          animation: resource_sprite,
+          height: RESOURCE_SIZE, width: RESOURCE_SIZE,
+          posx: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE),
+          posy: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE)});
+      
+      resourceGrid[x][y] = new resource($('#resource' + x + '-' + y));
+      
+      nonEmptyResources.push([x,y]);
+    }
+  }
 
-  return levelGrid;
+  return;
 }
 
 function block(node, blockType, damage) {
@@ -106,10 +148,22 @@ function block(node, blockType, damage) {
   this.damage = damage;
 }
 
+function resource(node) {
+  this.node = node;
+  this.yVel = 0;
+  this.getX = function() {
+      return posToGrid(this.node.x());
+  }
+  this.getY = function() {
+      return posToGrid(this.node.y());
+  };
+}
+
 function player(node, playerNum, xpos, ypos) {
   this.node = node;
   this.playerNum = playerNum;
   this.yVel = 0;
+  this.points = 0;
   this.player = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
 
@@ -133,7 +187,8 @@ function addFunctionality() {
         playerMove(1);
         playerMove(2);
         verticalMovement(1);
-        verticalMovement(2);},
+        verticalMovement(2);
+        resourceRefresh();},
       30);
 }
 
@@ -150,6 +205,18 @@ function checkCollision(player, x, y) {
   return collided;
 }
 
+//did a player get the resource we are updating?
+function resourceGet(rx, ry, px, py) { // screw the engine, I doubt this is any slower than theirs.
+  if ((px + PLAYER_SIZE >= rx && px <= rx + RESOURCE_SIZE) ||
+     (px <= rx + RESOURCE_SIZE && px + PLAYER_SIZE >= rx)) {
+      if ((py + PLAYER_SIZE >= ry && py <= ry + RESOURCE_SIZE) ||
+         (py <= ry + RESOURCE_SIZE && py + PLAYER_SIZE >= ry)) {
+          return true;
+      }
+  }
+  return false;
+}
+
 function playerMove(player) {
   var x = p(player)[0].player.getX();
   var y = p(player)[0].player.getY();
@@ -157,7 +224,7 @@ function playerMove(player) {
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
         // this is left
-        var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
+    var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     if (nextpos > 0) {
       if (!levelGrid[x - 1][y].node ||
          nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE)
@@ -213,6 +280,58 @@ function verticalMovement(player) {
           p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
           p(player)[0].player.yVel = 0;
       }
+  }
+}
+
+function resourceRefresh() {
+  for (var n = 0; n < nonEmptyResources.length; n++) {
+    var resourceLoc = nonEmptyResources[n];
+    var resource = resourceGrid[resourceLoc[0]][resourceLoc[1]];
+    var x = resource.node.x();
+    var y = resource.node.y();
+    
+    var nextpos = parseInt(resource.node.y() + resource.yVel);
+    if (resource.yVel >= 0) {
+//        if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+  //          nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
+              resource.node.y(nextpos);
+              resource.yVel += GRAVITY_ACCEL;
+  //      }
+    /*    else {
+            resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
+            p(player)[0].player.yVel = 0;
+        } */
+    }
+    
+    var popped = false;
+    for (var pn = 1; pn <=2; pn++) {
+      var px = p(pn).x();
+      var py = p(pn).y();
+      if (resourceGet(x,y,px,py)) {
+        if (!popped) {
+          if (n < 0.5 * nonEmptyResources.length) { // optimize list fuckage!
+            for (var m = n; m > 0; m--) {
+              nonEmptyResources[m] = nonEmptyResources[m - 1];
+            }
+            nonEmptyResources.shift();
+          } 
+          else { // err, that is, optimize for least list fuckage
+            for (var m = n; m < nonEmptyResources.length - 1; m++) {
+              nonEmptyResources[m] = nonEmptyResources[m + 1];
+            }
+            nonEmptyResources.pop();
+          }
+        }
+        p(pn)[0].player.points++;
+        popped = true;
+        // I thought about having a break statement in here, but if the players
+        // are occupying the same space, they both deserve the points for a
+        // resource as it falls on them.
+      }
+      if (popped) {
+        resource.node.x(PLAYGROUND_WIDTH + 1); // move if off-screen
+      } // it won't update anymore anyway, and I don't know how to kill it
+    }
   }
 }
 
