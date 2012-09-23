@@ -83,14 +83,11 @@ function addActors() {
 
   var rand = 0;
   var thisBlock = block_sprites[0];
-  
-  var x;
-  var y;
 
   levelGrid = new Array(GRID_WIDTH);
-  for (x = 0; x < GRID_WIDTH; x++) {
+  for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
-    for (y = 0; y < GRID_HEIGHT; y++) {
+    for (var y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
         levelGrid[x][y] = new block(null, null, null);
@@ -113,9 +110,9 @@ function addActors() {
   
   resourceGrid = new Array(GRID_WIDTH);
   nonEmptyResources = []
-  for (x = 0; x < GRID_WIDTH; x++) {
+  for (var x = 0; x < GRID_WIDTH; x++) {
     resourceGrid[x] = new Array(GRID_HEIGHT);
-    for (y = 0; y < GRID_HEIGHT; y++) {
+    for (var y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
         resourceGrid[x][y] = new resource(null);
@@ -209,8 +206,8 @@ function checkCollision(player, x, y) {
 function resourceGet(rx, ry, px, py) { // screw the engine, I doubt this is any slower than theirs.
   if ((px + PLAYER_SIZE > rx && px < rx + RESOURCE_SIZE) ||
      (px < rx + RESOURCE_SIZE && px + PLAYER_SIZE >= rx)) {
-      if ((py + PLAYER_SIZE > ry && py < ry + RESOURCE_SIZE) ||
-         (py < ry + RESOURCE_SIZE && py + PLAYER_SIZE > ry)) {
+      if ((py + PLAYER_SIZE >= ry && py <= ry + RESOURCE_SIZE) ||
+         (py <= ry + RESOURCE_SIZE && py + PLAYER_SIZE >= ry)) {
           return true;
       }
   }
@@ -307,9 +304,9 @@ function resourceRefresh() {
     var ry = resource.node.y();
     
     var popped = false;
-    for (var pn = 1; pn <=2; pn++) {
-      var px = p(pn).x();
-      var py = p(pn).y();
+    for (var playerNum = 1; playerNum <=2; playerNum++) {
+      var px = p(playerNum).x();
+      var py = p(playerNum).y();
       if (resourceGet(rx,ry,px,py)) {
         if (!popped) {
           if (n < 0.5 * nonEmptyResources.length) { // optimize list fuckage!
@@ -325,7 +322,7 @@ function resourceRefresh() {
             nonEmptyResources.pop();
           }
         }
-        p(pn)[0].player.points++;
+        p(playerNum)[0].player.points++;
         popped = true;
         // I thought about having a break statement in here, but if the players
         // are occupying the same space, they both deserve the points for a
