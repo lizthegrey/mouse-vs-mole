@@ -309,18 +309,7 @@ function resourceRefresh() {
       var py = p(playerNum).y();
       if (resourceGet(rx,ry,px,py)) {
         if (!popped) {
-          if (n < 0.5 * nonEmptyResources.length) { // optimize list fuckage!
-            for (var m = n; m > 0; m--) {
-              nonEmptyResources[m] = nonEmptyResources[m - 1];
-            }
-            nonEmptyResources.shift();
-          } 
-          else { // err, that is, optimize for least list fuckage
-            for (var m = n; m < nonEmptyResources.length - 1; m++) {
-              nonEmptyResources[m] = nonEmptyResources[m + 1];
-            }
-            nonEmptyResources.pop();
-          }
+          nonEmptyResources.splice(m,1);
         }
         p(playerNum)[0].player.points++;
         popped = true;
