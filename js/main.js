@@ -207,10 +207,10 @@ function checkCollision(player, x, y) {
 
 //did a player get the resource we are updating?
 function resourceGet(rx, ry, px, py) { // screw the engine, I doubt this is any slower than theirs.
-  if ((px + PLAYER_SIZE >= rx && px <= rx + RESOURCE_SIZE) ||
-     (px <= rx + RESOURCE_SIZE && px + PLAYER_SIZE >= rx)) {
-      if ((py + PLAYER_SIZE >= ry && py <= ry + RESOURCE_SIZE) ||
-         (py <= ry + RESOURCE_SIZE && py + PLAYER_SIZE >= ry)) {
+  if ((px + PLAYER_SIZE > rx && px < rx + RESOURCE_SIZE) ||
+     (px < rx + RESOURCE_SIZE && px + PLAYER_SIZE >= rx)) {
+      if ((py + PLAYER_SIZE > ry && py < ry + RESOURCE_SIZE) ||
+         (py < ry + RESOURCE_SIZE && py + PLAYER_SIZE > ry)) {
           return true;
       }
   }
