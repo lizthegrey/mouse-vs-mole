@@ -308,19 +308,17 @@ function resourceRefresh() {
       var px = p(playerNum).x();
       var py = p(playerNum).y();
       if (resourceGet(rx,ry,px,py)) {
-        if (!popped) {
-          nonEmptyResources.splice(m,1);
-        }
+        if (!popped) nonEmptyResources.splice(n,1);
         p(playerNum)[0].player.points++;
         popped = true;
         // I thought about having a break statement in here, but if the players
         // are occupying the same space, they both deserve the points for a
         // resource as it falls on them.
       }
-      if (popped) {
-        resource.node.x(PLAYGROUND_WIDTH + 1); // move if off-screen
-      } // it won't update anymore anyway, and I don't know how to kill it
     }
+    if (popped) {
+      resource.node.x(PLAYGROUND_WIDTH + 1); // move if off-screen
+    } // it won't update anymore anyway, and I don't know how to kill it 
   }
 }
 
