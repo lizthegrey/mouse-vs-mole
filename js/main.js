@@ -112,12 +112,12 @@ function addActors() {
       levelGrid[x][y] = new block($('#block' + x + '-' + y), rand, 0);
     }
   }
-  
+
   var resource_sprite = new $.gameQuery.Animation({
-          imageURL: 'sprites/Resource.png'});
-  
+      imageURL: 'sprites/Resource.png'});
+
   resourceGrid = new Array(GRID_WIDTH);
-  nonEmptyResources = []
+  nonEmptyResources = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
     resourceGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
@@ -131,24 +131,22 @@ function addActors() {
         resourceGrid[x][y] = new resource(null);
         continue;
       }
-      
+
       $('#resources').addSprite('resource' + x + '-' + y, {
           animation: resource_sprite,
           height: RESOURCE_SIZE, width: RESOURCE_SIZE,
           posx: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE),
           posy: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE)});
-      
+
       resourceGrid[x][y] = new resource($('#resource' + x + '-' + y));
-      
-      nonEmptyResources.push([x,y]);
+
+      nonEmptyResources.push([x, y]);
     }
   }
-
-  return;
 }
 
 /* Block initializes sounds in gameworld */
-function addSounds(){
+function addSounds() {
   var bgMusic = new $.gameQuery.SoundWrapper(BG_MUSIC, true);
   var player1Run = new $.gameQuery.SoundWrapper(PLAYER1_RUN, true);
   var player2Run = new $.gameQuery.SoundWrapper(PLAYER2_RUN, true);
@@ -169,10 +167,10 @@ function resource(node) {
   this.node = node;
   this.yVel = 0;
   this.getX = function() {
-      return posToGrid(this.node.x());
+    return posToGrid(this.node.x());
   }
   this.getY = function() {
-      return posToGrid(this.node.y());
+    return posToGrid(this.node.y());
   };
 }
 
@@ -185,18 +183,18 @@ function player(node, playerNum, xpos, ypos) {
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
 
   this.getX = function() {
-      return posToGrid(this.node.x());
+    return posToGrid(this.node.x());
   };
 
   this.getY = function() {
-      return posToGrid(this.node.y());
+    return posToGrid(this.node.y());
   };
 
   return true;
 }
 
 function posToGrid(pos) {
-    return Math.round(pos / BLOCK_SIZE);
+  return Math.round(pos / BLOCK_SIZE);
 }
 
 function addFunctionality() {
@@ -214,84 +212,90 @@ function addFunctionality() {
 function checkCollision(player, x, y) {
   var collided = false;
   if (levelGrid[x][y].node != null) {
-      var collisions = p(player).collision('#' + levelGrid[x][y]
-                  .node.attr('id') + ',#blocks,#actors');
-      if (collisions.size() > 0) {
-          collided = true;
-      }
+    var collisions = p(player).collision(
+        '#' + levelGrid[x][y].node.attr('id') +
+        ',#blocks,#actors');
+    if (collisions.size() > 0) {
+      collided = true;
+    }
   }
 
   return collided;
 }
 
 //did a player get the resource we are updating?
-function resourceGet(rx, ry, px, py) { // screw the engine, I doubt this is any slower than theirs.
+function resourceGet(rx, ry, px, py) {
+  // screw the engine, I doubt this is any slower than theirs.
   if ((px + PLAYER_SIZE > rx && px < rx + RESOURCE_SIZE) ||
-     (px < rx + RESOURCE_SIZE && px + PLAYER_SIZE >= rx)) {
-      if ((py + PLAYER_SIZE >= ry && py <= ry + RESOURCE_SIZE) ||
-         (py <= ry + RESOURCE_SIZE && py + PLAYER_SIZE >= ry)) {
-          return true;
-      }
+      (px < rx + RESOURCE_SIZE && px + PLAYER_SIZE >= rx)) {
+    if ((py + PLAYER_SIZE >= ry && py <= ry + RESOURCE_SIZE) ||
+        (py <= ry + RESOURCE_SIZE && py + PLAYER_SIZE >= ry)) {
+      return true;
+    }
   }
   return false;
 }
 
 function playerMove(player) {
+  var left = 0;
+  var right = 0;
+  var up = 0;
+  switch (player) {
+   case 1:
+    left = 65;
+    right = 68;
+    up = 87;
+    break;
+   case 2:
+    left = 37;
+    right = 39;
+    up = 38;
+    break;
+  }
+
   var x = p(player)[0].player.getX();
   var y = p(player)[0].player.getY();
-  var p1IsRunning = false;
-  var p2IsRunning = false;
-  
-  if (($.gameQuery.keyTracker[65] && player == 1) ||
-      ($.gameQuery.keyTracker[37] && player == 2)) {
-        // this is left
+
+  var isRunning = false;
+
+  if ($.gameQuery.keyTracker[left]) {
     var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     if (nextpos > 0) {
       if (!levelGrid[x - 1][y].node ||
-         nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE)
-          p(player).x(nextpos);
-      else
-          p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
+          nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE) {
+        p(player).x(nextpos);
+      } else {
+        p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
+      }
     }
-    if (player == 1)
-      p1IsRunning = true;
-    else
-      p2IsRunning = true;
+    isRunning = true;
   }
-  if (($.gameQuery.keyTracker[68] && player == 1) ||
-      ($.gameQuery.keyTracker[39] && player == 2)) {
-    //this is right (d)
+  if ($.gameQuery.keyTracker[right]) {
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
       if (!levelGrid[x + 1][y].node ||
-         nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE)
-          p(player).x(nextpos);
-      else
-          p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
+          nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE) {
+        p(player).x(nextpos);
+      } else {
+        p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
+      }
     }
-    if (player == 1)
-      p1IsRunning = true;
-    else
-      p2IsRunning = true;
+    isRunning = true;
   }
-  if (($.gameQuery.keyTracker[87] && player == 1) ||
-      ($.gameQuery.keyTracker[38] && player == 2)) {
+  if ($.gameQuery.keyTracker[up]) {
     if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node &&
-       p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
-         p(player)[0].player.yVel = JUMP_VELOCITY;
+        p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+      p(player)[0].player.yVel = JUMP_VELOCITY;
     }
-    if (player == 1)
-      p1IsRunning = true;
-    else
-      p2IsRunning = true;
+    isRunning = true;
   }
-  if (p1IsRunning && !PLAYER1_RUNNING){
-    //console.log("Player 1 begun walking");
+  if (player == 1 && isRunning && !PLAYER1_RUNNING) {
+    // console.log("Player 1 begun walking");
     $('#player1').playSound();
     PLAYER1_RUNNING = true;
   }
-  if (p2IsRunning && !PLAYER2_RUNNING){
-    //console.log("Player 2 begun walking");
+  if (player == 2 && isRunning && !PLAYER2_RUNNING) {
+    // console.log("Player 2 begun walking");
     $('#player2').playSound();
     PLAYER2_RUNNING = true;
   }
@@ -303,45 +307,41 @@ function verticalMovement(player) {
 
   var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
   if (p(player)[0].player.yVel >= 0) {
-      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-          nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
-            p(player).y(nextpos);
-            p(player)[0].player.yVel += GRAVITY_ACCEL;
-      }
-      else {
-          p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
-          p(player)[0].player.yVel = 0;
-      }
-  }
-  else {
-      if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
-          nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
-            p(player).y(nextpos);
-            p(player)[0].player.yVel += GRAVITY_ACCEL;
-      }
-      else {
-          p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
-          p(player)[0].player.yVel = 0;
-      }
+    if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+        nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+      p(player).y(nextpos);
+      p(player)[0].player.yVel += GRAVITY_ACCEL;
+    } else {
+      p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
+      p(player)[0].player.yVel = 0;
+    }
+  } else {
+    if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
+        nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
+      p(player).y(nextpos);
+      p(player)[0].player.yVel += GRAVITY_ACCEL;
+    } else {
+      p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
+      p(player)[0].player.yVel = 0;
+    }
   }
 }
 
 /* Function to stop sound upon player no longer moving */
-function playerStop(player){
-  if (player == 1 && PLAYER1_RUNNING){
-    if (!$.gameQuery.keyTracker[65] && 
+function playerStop(player) {
+  if (player == 1 && PLAYER1_RUNNING) {
+    if (!$.gameQuery.keyTracker[65] &&
         !$.gameQuery.keyTracker[68] &&
-        !$.gameQuery.keyTracker[87]){
-          PLAYER1_RUNNING = false;
-          $('#player1').pauseSound();
+        !$.gameQuery.keyTracker[87]) {
+      PLAYER1_RUNNING = false;
+      $('#player1').pauseSound();
     }
-  }
-  else if (player == 2 && PLAYER2_RUNNING) {
+  } else if (player == 2 && PLAYER2_RUNNING) {
     if (!$.gameQuery.keyTracker[37] &&
         !$.gameQuery.keyTracker[38] &&
-        !$.gameQuery.keyTracker[39]){
-          PLAYER2_RUNNING = false;
-          $('#player2').pauseSound();
+        !$.gameQuery.keyTracker[39]) {
+      PLAYER2_RUNNING = false;
+      $('#player2').pauseSound();
     }
   }
 }
@@ -352,29 +352,30 @@ function resourceRefresh() {
     var resource = resourceGrid[resourceLoc[0]][resourceLoc[1]];
     var x = resource.getX();
     var y = resource.getY();
-    
+
     var nextpos = parseInt(resource.node.y() + resource.yVel);
     if (resource.yVel >= 0) {
-        if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-            nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
-              resource.node.y(nextpos);
-              resource.yVel += GRAVITY_ACCEL;
-        }
-        else {
-            resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
-            resource.yVel = 0;
-        }
+      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+          nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
+        resource.node.y(nextpos);
+        resource.yVel += GRAVITY_ACCEL;
+      } else {
+        resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
+        resource.yVel = 0;
+      }
     }
-    
+
     var rx = resource.node.x();
     var ry = resource.node.y();
-    
+
     var popped = false;
-    for (var playerNum = 1; playerNum <=2; playerNum++) {
+    for (var playerNum = 1; playerNum <= 2; playerNum++) {
       var px = p(playerNum).x();
       var py = p(playerNum).y();
-      if (resourceGet(rx,ry,px,py)) {
-        if (!popped) nonEmptyResources.splice(n,1);
+      if (resourceGet(rx, ry, px, py)) {
+        if (!popped) {
+          nonEmptyResources.splice(n, 1);
+        }
         p(playerNum)[0].player.points++;
         popped = true;
         // I thought about having a break statement in here, but if the players
@@ -383,8 +384,8 @@ function resourceRefresh() {
       }
     }
     if (popped) {
-      resource.node.x(PLAYGROUND_WIDTH + 1); // move if off-screen
-    } // it won't update anymore anyway, and I don't know how to kill it 
+      resource.node.remove();
+    }
   }
 }
 
