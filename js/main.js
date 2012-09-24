@@ -1,7 +1,7 @@
 var BLOCK_SIZE = 20;
 var PLAYER_SIZE = 15;
 var RESOURCE_SIZE = 20;
-var NUM_COLORS = 4;
+var NUM_COLORS = 3;
 
 var GRID_WIDTH = 40;
 var GRID_HEIGHT = 30;
@@ -18,8 +18,8 @@ var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_SIZE);
 var START_YCOORD = 14;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_SIZE);
 
-var GRAVITY_ACCEL = 0.5; // pixels/s^2 (down is positive)
-var JUMP_VELOCITY = -7;   // pixels/s
+var GRAVITY_ACCEL = 1.0; // pixels/s^2 (down is positive)
+var JUMP_VELOCITY = -9;   // pixels/s
 var MOVE_VELOCITY = 2;
 
 var DEATH_VELOCITY = 9;
@@ -103,7 +103,7 @@ function addActors() {
         levelGrid[x][y] = new block(null, null, null);
         continue;
       }
-      rand = Math.floor(Math.random() * 4);
+      rand = Math.floor(Math.random() * NUM_COLORS);
       thisBlock = block_sprites[rand];
 
       $('#blocks').addSprite('block' + x + '-' + y, {
