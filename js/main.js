@@ -114,7 +114,7 @@ function addActors() {
   }
 
   var resource_sprite = new $.gameQuery.Animation({
-          imageURL: 'sprites/Resource.png'});
+      imageURL: 'sprites/Resource.png'});
 
   resourceGrid = new Array(GRID_WIDTH);
   nonEmptyResources = [];
@@ -143,8 +143,6 @@ function addActors() {
       nonEmptyResources.push([x, y]);
     }
   }
-
-  return;
 }
 
 /* Block initializes sounds in gameworld */
@@ -169,10 +167,10 @@ function resource(node) {
   this.node = node;
   this.yVel = 0;
   this.getX = function() {
-      return posToGrid(this.node.x());
+    return posToGrid(this.node.x());
   }
   this.getY = function() {
-      return posToGrid(this.node.y());
+    return posToGrid(this.node.y());
   };
 }
 
@@ -185,18 +183,18 @@ function player(node, playerNum, xpos, ypos) {
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
 
   this.getX = function() {
-      return posToGrid(this.node.x());
+    return posToGrid(this.node.x());
   };
 
   this.getY = function() {
-      return posToGrid(this.node.y());
+    return posToGrid(this.node.y());
   };
 
   return true;
 }
 
 function posToGrid(pos) {
-    return Math.round(pos / BLOCK_SIZE);
+  return Math.round(pos / BLOCK_SIZE);
 }
 
 function addFunctionality() {
@@ -214,11 +212,12 @@ function addFunctionality() {
 function checkCollision(player, x, y) {
   var collided = false;
   if (levelGrid[x][y].node != null) {
-      var collisions = p(player).collision('#' + levelGrid[x][y]
-                  .node.attr('id') + ',#blocks,#actors');
-      if (collisions.size() > 0) {
-          collided = true;
-      }
+    var collisions = p(player).collision(
+        '#' + levelGrid[x][y].node.attr('id') +
+        ',#blocks,#actors');
+    if (collisions.size() > 0) {
+      collided = true;
+    }
   }
 
   return collided;
@@ -245,14 +244,14 @@ function playerMove(player) {
 
   if (($.gameQuery.keyTracker[65] && player == 1) ||
       ($.gameQuery.keyTracker[37] && player == 2)) {
-        // this is left
+    // this is left
     var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     if (nextpos > 0) {
       if (!levelGrid[x - 1][y].node ||
-         nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE) {
-          p(player).x(nextpos);
+          nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE) {
+        p(player).x(nextpos);
       } else {
-          p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
+        p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
       }
     }
     if (player == 1) {
@@ -267,10 +266,10 @@ function playerMove(player) {
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
       if (!levelGrid[x + 1][y].node ||
-         nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE) {
-          p(player).x(nextpos);
+          nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE) {
+        p(player).x(nextpos);
       } else {
-          p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
+        p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
       }
     }
     if (player == 1) {
@@ -282,8 +281,8 @@ function playerMove(player) {
   if (($.gameQuery.keyTracker[87] && player == 1) ||
       ($.gameQuery.keyTracker[38] && player == 2)) {
     if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node &&
-       p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
-         p(player)[0].player.yVel = JUMP_VELOCITY;
+        p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+      p(player)[0].player.yVel = JUMP_VELOCITY;
     }
     if (player == 1) {
       p1IsRunning = true;
@@ -309,23 +308,23 @@ function verticalMovement(player) {
 
   var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
   if (p(player)[0].player.yVel >= 0) {
-      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-          nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
-            p(player).y(nextpos);
-            p(player)[0].player.yVel += GRAVITY_ACCEL;
-      } else {
-          p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
-          p(player)[0].player.yVel = 0;
-      }
+    if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+        nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+      p(player).y(nextpos);
+      p(player)[0].player.yVel += GRAVITY_ACCEL;
+    } else {
+      p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
+      p(player)[0].player.yVel = 0;
+    }
   } else {
-      if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
-          nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
-            p(player).y(nextpos);
-            p(player)[0].player.yVel += GRAVITY_ACCEL;
-      } else {
-          p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
-          p(player)[0].player.yVel = 0;
-      }
+    if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
+        nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
+      p(player).y(nextpos);
+      p(player)[0].player.yVel += GRAVITY_ACCEL;
+    } else {
+      p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
+      p(player)[0].player.yVel = 0;
+    }
   }
 }
 
@@ -335,15 +334,15 @@ function playerStop(player) {
     if (!$.gameQuery.keyTracker[65] &&
         !$.gameQuery.keyTracker[68] &&
         !$.gameQuery.keyTracker[87]) {
-          PLAYER1_RUNNING = false;
-          $('#player1').pauseSound();
+      PLAYER1_RUNNING = false;
+      $('#player1').pauseSound();
     }
   } else if (player == 2 && PLAYER2_RUNNING) {
     if (!$.gameQuery.keyTracker[37] &&
         !$.gameQuery.keyTracker[38] &&
         !$.gameQuery.keyTracker[39]) {
-          PLAYER2_RUNNING = false;
-          $('#player2').pauseSound();
+      PLAYER2_RUNNING = false;
+      $('#player2').pauseSound();
     }
   }
 }
@@ -357,14 +356,14 @@ function resourceRefresh() {
 
     var nextpos = parseInt(resource.node.y() + resource.yVel);
     if (resource.yVel >= 0) {
-        if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-            nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
-              resource.node.y(nextpos);
-              resource.yVel += GRAVITY_ACCEL;
-        } else {
-            resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
-            resource.yVel = 0;
-        }
+      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
+          nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
+        resource.node.y(nextpos);
+        resource.yVel += GRAVITY_ACCEL;
+      } else {
+        resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
+        resource.yVel = 0;
+      }
     }
 
     var rx = resource.node.x();
