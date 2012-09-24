@@ -24,6 +24,8 @@ var MOVE_VELOCITY = 2;
 
 var DEATH_VELOCITY = 9;
 
+var DAMAGE_TO_EXPLODE = 4;
+
 var RESOURCE_PROBABILITY = 0.1; // probably any block has a resource in it
 
 var BG_MUSIC = 'sounds/casual_bg.ogg';
@@ -203,6 +205,7 @@ function addFunctionality() {
     playerMove(2);
     playerStop(1);
     playerStop(2);
+    removeDestroyed();
     verticalMovement(1);
     verticalMovement(2);
     resourceRefresh();
@@ -245,11 +248,13 @@ function playerMove(player) {
     left = 65;
     right = 68;
     up = 87;
+    dig = 83;
     break;
    case 2:
     left = 37;
     right = 39;
     up = 38;
+    dig = 40;
     break;
   }
 
@@ -265,6 +270,9 @@ function playerMove(player) {
           nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE) {
         p(player).x(nextpos);
       } else {
+        if (levelGrid[x - 1][y] && levelGrid[x - 1][y].node) {
+          levelGrid[x - 1][y].damage++;
+        }
         p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
       }
     }
@@ -277,6 +285,9 @@ function playerMove(player) {
           nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE) {
         p(player).x(nextpos);
       } else {
+        if (levelGrid[x + 1][y] && levelGrid[x + 1][y].node) {
+          levelGrid[x + 1][y].damage++;
+        }
         p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
       }
     }
@@ -288,6 +299,12 @@ function playerMove(player) {
       p(player)[0].player.yVel = JUMP_VELOCITY;
     }
     isRunning = true;
+  }
+  if ($.gameQuery.keyTracker[dig]) {
+    // Dig down.
+    if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node) {
+      levelGrid[x][y + 1].damage++;
+    }
   }
   if (player == 1 && isRunning && !PLAYER1_RUNNING) {
     // console.log("Player 1 begun walking");
@@ -321,6 +338,9 @@ function verticalMovement(player) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
     } else {
+      if (levelGrid[x][y - 1] && levelGrid[x][y - 1].node) {
+        levelGrid[x][y - 1].damage++;
+      }
       p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
       p(player)[0].player.yVel = 0;
     }
@@ -352,6 +372,11 @@ function resourceRefresh() {
     var resource = resourceGrid[resourceLoc[0]][resourceLoc[1]];
     var x = resource.getX();
     var y = resource.getY();
+
+    if (levelGrid[x][y] && levelGrid[x][y].node) {
+      // Elements inside an unbroken block can neither fall nor be picked up.
+      continue;
+    }
 
     var nextpos = parseInt(resource.node.y() + resource.yVel);
     if (resource.yVel >= 0) {
@@ -392,6 +417,37 @@ function resourceRefresh() {
 // Returns the player object associated with a player number.
 function p(n) {
   return $('#player' + n);
+}
+
+function maybeChain(x, y, type) {
+  if (levelGrid[x] && levelGrid[x][y] &&
+      levelGrid[x][y].blockType == type) {
+    levelGrid[x][y].damage = DAMAGE_TO_EXPLODE;
+  }
+}
+
+// Removes fully damaged blocks from the board.
+function removeDestroyed() {
+  var evaluateChainReaction = true;
+  while (evaluateChainReaction) {
+    evaluateChainReaction = false;
+    for (var x = 0; x < GRID_WIDTH; x++) {
+      for (var y = 0; y < GRID_HEIGHT; y++) {
+        if (levelGrid[x][y].damage &&
+            levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
+          evaluateChainReaction = true;
+          var type = levelGrid[x][y].blockType;
+          levelGrid[x][y].node.remove();
+          levelGrid[x][y] = new block(null, null, null);
+
+          maybeChain(x + 1, y, type);
+          maybeChain(x - 1, y, type);
+          maybeChain(x, y + 1, type);
+          maybeChain(x, y - 1, type);
+        }
+      }
+    }
+  }
 }
 
 $(document).ready(function() {
