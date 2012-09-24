@@ -237,14 +237,28 @@ function resourceGet(rx, ry, px, py) {
 }
 
 function playerMove(player) {
+  var left = 0;
+  var right = 0;
+  var up = 0;
+  switch (player) {
+   case 1:
+    left = 65;
+    right = 68;
+    up = 87;
+    break;
+   case 2:
+    left = 37;
+    right = 39;
+    up = 38;
+    break;
+  }
+
   var x = p(player)[0].player.getX();
   var y = p(player)[0].player.getY();
-  var p1IsRunning = false;
-  var p2IsRunning = false;
 
-  if (($.gameQuery.keyTracker[65] && player == 1) ||
-      ($.gameQuery.keyTracker[37] && player == 2)) {
-    // this is left
+  var isRunning = false;
+
+  if ($.gameQuery.keyTracker[left]) {
     var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     if (nextpos > 0) {
       if (!levelGrid[x - 1][y].node ||
@@ -254,15 +268,9 @@ function playerMove(player) {
         p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
       }
     }
-    if (player == 1) {
-      p1IsRunning = true;
-    } else {
-      p2IsRunning = true;
-    }
+    isRunning = true;
   }
-  if (($.gameQuery.keyTracker[68] && player == 1) ||
-      ($.gameQuery.keyTracker[39] && player == 2)) {
-    //this is right (d)
+  if ($.gameQuery.keyTracker[right]) {
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
       if (!levelGrid[x + 1][y].node ||
@@ -272,31 +280,22 @@ function playerMove(player) {
         p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
       }
     }
-    if (player == 1) {
-      p1IsRunning = true;
-    } else {
-      p2IsRunning = true;
-    }
+    isRunning = true;
   }
-  if (($.gameQuery.keyTracker[87] && player == 1) ||
-      ($.gameQuery.keyTracker[38] && player == 2)) {
+  if ($.gameQuery.keyTracker[up]) {
     if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node &&
         p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
       p(player)[0].player.yVel = JUMP_VELOCITY;
     }
-    if (player == 1) {
-      p1IsRunning = true;
-    } else {
-      p2IsRunning = true;
-    }
+    isRunning = true;
   }
-  if (p1IsRunning && !PLAYER1_RUNNING) {
-    //console.log("Player 1 begun walking");
+  if (player == 1 && isRunning && !PLAYER1_RUNNING) {
+    // console.log("Player 1 begun walking");
     $('#player1').playSound();
     PLAYER1_RUNNING = true;
   }
-  if (p2IsRunning && !PLAYER2_RUNNING) {
-    //console.log("Player 2 begun walking");
+  if (player == 2 && isRunning && !PLAYER2_RUNNING) {
+    // console.log("Player 2 begun walking");
     $('#player2').playSound();
     PLAYER2_RUNNING = true;
   }
