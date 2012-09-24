@@ -384,8 +384,8 @@ function resourceRefresh() {
       }
     }
     if (popped) {
-      resource.node.x(PLAYGROUND_WIDTH + 1); // move if off-screen
-    } // it won't update anymore anyway, and I don't know how to kill it
+      resource.node.remove();
+    }
   }
 }
 
