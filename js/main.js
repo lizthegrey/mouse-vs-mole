@@ -24,12 +24,13 @@ var MOVE_VELOCITY = 2;
 
 var WINNING_POINTS = 35;
 
-var OUCH_VELOCITY = 12;
+var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
 var DAMAGE_TO_EXPLODE = 4;
 
-var RESOURCE_PROBABILITY = 0.1; // probably any block has a resource in it
+var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
+var NUM_RESOURCES = 0;
 
 var BG_MUSIC = 'sounds/casual_bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -144,6 +145,7 @@ function addActors() {
           posy: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE)});
 
       resourceGrid[x][y] = new resource($('#resource' + x + '-' + y));
+      NUM_RESOURCES += 1;
 
       nonEmptyResources.push([x, y]);
     }
@@ -430,7 +432,7 @@ function updatePoints(playerNum, pointsInc) {
       points = 0;
 
   $('#pts'+playerNum).animate({'height':
-      (100 - (points/WINNING_POINTS)*100)+'%'}, 300);
+      (100 - (points/NUM_RESOURCES)*100)+'%'}, 300);
 
   p(playerNum)[0].player.points = points;
 }
