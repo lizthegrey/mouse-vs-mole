@@ -22,7 +22,10 @@ var GRAVITY_ACCEL = 1.0; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -9;   // pixels/s
 var MOVE_VELOCITY = 2;
 
-var DEATH_VELOCITY = 9;
+var WINNING_POINTS = 35;
+
+var OUCH_VELOCITY = 12;
+var OUCH_DIVIDER = 3;
 
 var DAMAGE_TO_EXPLODE = 4;
 
@@ -330,6 +333,11 @@ function verticalMovement(player) {
       p(player)[0].player.yVel += GRAVITY_ACCEL;
     } else {
       p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
+
+      if (Math.abs(p(player)[0].player.yVel) > OUCH_VELOCITY) {
+          updatePoints(player, -1*Math.abs(p(player)[0].player.yVel)/(OUCH_DIVIDER));
+      }
+
       p(player)[0].player.yVel = 0;
     }
   } else {
@@ -401,7 +409,7 @@ function resourceRefresh() {
         if (!popped) {
           nonEmptyResources.splice(n, 1);
         }
-        p(playerNum)[0].player.points++;
+        updatePoints(playerNum, 1);
         popped = true;
         // I thought about having a break statement in here, but if the players
         // are occupying the same space, they both deserve the points for a
@@ -412,6 +420,19 @@ function resourceRefresh() {
       resource.node.remove();
     }
   }
+}
+
+function updatePoints(playerNum, pointsInc) {
+  points = p(playerNum)[0].player.points + pointsInc;
+  if (points > WINNING_POINTS)
+      points = WINNING_POINTS;
+  else if (points < 0)
+      points = 0;
+
+  $('#pts'+playerNum).animate({'height':
+      (100 - (points/WINNING_POINTS)*100)+'%'}, 300);
+
+  p(playerNum)[0].player.points = points;
 }
 
 // Returns the player object associated with a player number.

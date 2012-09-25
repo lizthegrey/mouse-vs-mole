@@ -1,5 +1,33 @@
 #game
 {
-    width: 500px;
-    height: 500px;
+    width: 800px;
+    height: 600px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+#gamewrapper
+{
+    width: 900px;
+    height: 600px;
+    background-color: black;
+}
+#pto1
+{
+    float: left;
+}
+#pto2
+{
+    float: right;
+}
+.ptsouter
+{
+    width: 50px;
+    height: 600px;
+    background-color: green;
+}
+.pts
+{
+    width: 50px;
+    height: 600px;
+    background-color: black;
 }
