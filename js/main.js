@@ -337,7 +337,8 @@ function verticalMovement(player) {
       p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
 
       if (Math.abs(p(player)[0].player.yVel) > OUCH_VELOCITY) {
-          updatePoints(player, -1*Math.abs(p(player)[0].player.yVel)/(OUCH_DIVIDER));
+          updatePoints(player, -1 * Math.abs(p(player)[0].player.yVel) /
+             (OUCH_DIVIDER));
       }
 
       p(player)[0].player.yVel = 0;
@@ -431,8 +432,8 @@ function updatePoints(playerNum, pointsInc) {
   else if (points < 0)
       points = 0;
 
-  $('#pts'+playerNum).animate({'height':
-      (100 - (points/NUM_RESOURCES)*100)+'%'}, 300);
+  $('#pts' + playerNum).animate({'height':
+      (100 - (points / NUM_RESOURCES) * 100) + '%'}, 300);
 
   p(playerNum)[0].player.points = points;
 }
