@@ -1,5 +1,6 @@
 var BLOCK_SIZE = 20;
-var PLAYER_SIZE = 15;
+var PLAYER_HEIGHT = 15;
+var PLAYER_WIDTH = 11;
 var RESOURCE_SIZE = 11;
 var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
@@ -15,9 +16,9 @@ var PLAYGROUND_HEIGHT = BLOCK_SIZE * GRID_HEIGHT;
 var START_XCOORD_P1 = 14;
 var START_XPOS_P1 = START_XCOORD_P1 * BLOCK_SIZE;
 var START_XCOORD_P2 = 25;
-var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_SIZE);
+var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
 var START_YCOORD = 24;
-var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_SIZE);
+var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
 var GRAVITY_ACCEL = 1.0; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -11;   // pixels/s
@@ -77,10 +78,10 @@ function addBackground() {
 function addActors() {
   $('#actors').addGroup('player1', {
       posx: START_XPOS_P1, posy: START_YPOS,
-      width: PLAYER_SIZE, height: PLAYER_SIZE});
+      width: PLAYER_WIDTH, height: PLAYER_HEIGHT});
   $('#actors').addGroup('player2', {
       posx: START_XPOS_P2, posy: START_YPOS,
-      width: PLAYER_SIZE, height: PLAYER_SIZE});
+      width: PLAYER_WIDTH, height: PLAYER_HEIGHT});
   $('#actors').addGroup('blocks');
   $('#actors').addGroup('resources');
   var player1 = new player($('#player1'), 1,
@@ -89,11 +90,11 @@ function addActors() {
                            START_XPOS_P2, START_YPOS);
   $('#player1').addSprite('player1spr', {
       animation: player1.player,
-      height: PLAYER_SIZE, width: PLAYER_SIZE,
+      height: PLAYER_HEIGHT, width: PLAYER_WIDTH,
       posx: 0, posy: 0});
   $('#player2').addSprite('player2spr', {
       animation: player2.player,
-      height: PLAYER_SIZE, width: PLAYER_SIZE,
+      height: PLAYER_HEIGHT, width: PLAYER_WIDTH,
       posx: 0, posy: 0});
   $('#player1')[0].player = player1;
   $('#player2')[0].player = player2;
@@ -270,10 +271,10 @@ function checkCollision(player, x, y) {
 //did a player get the resource we are updating?
 function resourceGet(rx, ry, px, py) {
   // screw the engine, I doubt this is any slower than theirs.
-  if ((px + PLAYER_SIZE > rx && px < rx + RESOURCE_SIZE) ||
-      (px < rx + RESOURCE_SIZE && px + PLAYER_SIZE >= rx)) {
-    if ((py + PLAYER_SIZE >= ry && py <= ry + RESOURCE_SIZE) ||
-        (py <= ry + RESOURCE_SIZE && py + PLAYER_SIZE >= ry)) {
+  if ((px + PLAYER_WIDTH > rx && px < rx + RESOURCE_SIZE) ||
+      (px < rx + RESOURCE_SIZE && px + PLAYER_WIDTH >= rx)) {
+    if ((py + PLAYER_HEIGHT >= ry && py <= ry + RESOURCE_SIZE) ||
+        (py <= ry + RESOURCE_SIZE && py + PLAYER_HEIGHT >= ry)) {
       return true;
     }
   }
@@ -333,13 +334,13 @@ function playerMove(player) {
 
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
       if (!elem || !elem.node ||
-          nextpos < elem.node.x() - PLAYER_SIZE) {
+          nextpos < elem.node.x() - PLAYER_WIDTH) {
         p(player).x(nextpos);
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
         }
-        p(player).x(elem.node.x() - PLAYER_SIZE);
+        p(player).x(elem.node.x() - PLAYER_WIDTH);
       }
     }
     if (!p(player)[0].player.runningRight) {
@@ -354,7 +355,7 @@ function playerMove(player) {
     // Ensure the player is standing on solid ground.
     var elem = lg(x, y + 1);
     if (elem && elem.node &&
-        p(player).y() == elem.node.y() - PLAYER_SIZE) {
+        p(player).y() == elem.node.y() - PLAYER_HEIGHT) {
       p(player)[0].player.yVel = JUMP_VELOCITY;
     }
     isRunning = true;
@@ -388,7 +389,7 @@ function verticalMovement(player) {
   if (p(player)[0].player.yVel >= 0) {
     var elem = lg(x, y + 1);
     if (!elem || !elem.node ||
-        nextpos < elem.node.y() - PLAYER_SIZE) {
+        nextpos < elem.node.y() - PLAYER_HEIGHT) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
       pspr(player).setAnimation(p(player)[0].player.playerJump);
@@ -396,7 +397,7 @@ function verticalMovement(player) {
       p(player)[0].player.runningLeft = false;
       p(player)[0].player.runningRight = false;
     } else {
-      p(player).y(elem.node.y() - PLAYER_SIZE);
+      p(player).y(elem.node.y() - PLAYER_HEIGHT);
 
       if (Math.abs(p(player)[0].player.yVel) > OUCH_VELOCITY) {
           updatePoints(player, -1 * Math.abs(p(player)[0].player.yVel) /
