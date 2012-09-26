@@ -190,7 +190,7 @@ function player(node, playerNum, xpos, ypos) {
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
 
   this.getX = function() {
-    return posToGrid(this.node.x());
+    return posToGrid(this.node.x() - 2.5);
   };
 
   this.getY = function() {
