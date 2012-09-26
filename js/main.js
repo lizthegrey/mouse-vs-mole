@@ -409,6 +409,9 @@ function verticalMovement(player) {
     var elem = lg(x, y - 1);
     if (!elem || !elem.node ||
         nextpos > elem.node.y() + BLOCK_SIZE) {
+      if (nextpos < 0) {
+        nextpos = 0;
+      }
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
       pspr(player).setAnimation(p(player)[0].player.playerJump);
