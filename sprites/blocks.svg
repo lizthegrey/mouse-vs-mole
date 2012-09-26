@@ -19,6 +19,17 @@
   <defs
      id="defs4">
     <linearGradient
+       id="linearGradient4045">
+      <stop
+         style="stop-color:#c04040;stop-opacity:1;"
+         offset="0"
+         id="stop4047" />
+      <stop
+         style="stop-color:#da6c6c;stop-opacity:0;"
+         offset="1"
+         id="stop4049" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient4113">
       <stop
          style="stop-color:#000000;stop-opacity:1;"
@@ -932,6 +943,100 @@
        fy="942.36218"
        r="20"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4045"
+       id="linearGradient4051"
+       x1="172"
+       y1="1032.3622"
+       x2="177"
+       y2="1027.3622"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4045"
+       id="linearGradient4065"
+       x1="172"
+       y1="1044.3622"
+       x2="179"
+       y2="1043.3622"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4045"
+       id="linearGradient4241"
+       gradientUnits="userSpaceOnUse"
+       x1="172"
+       y1="1032.3622"
+       x2="177"
+       y2="1027.3622" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4045"
+       id="linearGradient4243"
+       gradientUnits="userSpaceOnUse"
+       x1="172"
+       y1="1044.3622"
+       x2="179"
+       y2="1043.3622" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4045-0"
+       id="linearGradient4241-7"
+       gradientUnits="userSpaceOnUse"
+       x1="200"
+       y1="1029.3622"
+       x2="207"
+       y2="1028.3622" />
+    <linearGradient
+       id="linearGradient4045-0">
+      <stop
+         style="stop-color:#c04040;stop-opacity:1;"
+         offset="0"
+         id="stop4047-0" />
+      <stop
+         style="stop-color:#da6c6c;stop-opacity:0;"
+         offset="1"
+         id="stop4049-6" />
+    </linearGradient>
+    <linearGradient
+       y2="1027.3622"
+       x2="177"
+       y1="1032.3622"
+       x1="172"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient4281"
+       xlink:href="#linearGradient4045-0"
+       inkscape:collect="always" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4045-6"
+       id="linearGradient4243-5"
+       gradientUnits="userSpaceOnUse"
+       x1="200"
+       y1="1044.3622"
+       x2="207"
+       y2="1043.3622" />
+    <linearGradient
+       id="linearGradient4045-6">
+      <stop
+         style="stop-color:#c04040;stop-opacity:1;"
+         offset="0"
+         id="stop4047-02" />
+      <stop
+         style="stop-color:#da6c6c;stop-opacity:0;"
+         offset="1"
+         id="stop4049-8" />
+    </linearGradient>
+    <linearGradient
+       y2="1043.3622"
+       x2="179"
+       y1="1044.3622"
+       x1="172"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient4331"
+       xlink:href="#linearGradient4045-6"
+       inkscape:collect="always" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -940,9 +1045,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="6.95073"
-     inkscape:cx="150.9708"
-     inkscape:cy="88.710095"
+     inkscape:zoom="13.90146"
+     inkscape:cx="203.28559"
+     inkscape:cy="14.739934"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -963,7 +1068,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -971,6 +1076,26 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="color:#000000;fill:#e08282;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4245"
+       width="12"
+       height="12"
+       x="197"
+       y="1023.3622"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <rect
+       style="color:#000000;fill:url(#linearGradient4241-7);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4264"
+       width="10"
+       height="10"
+       x="198"
+       y="1024.3622"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
     <rect
        style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect4057"
@@ -1865,5 +1990,124 @@
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc" />
     </g>
+    <rect
+       style="color:#000000;fill:none;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3264"
+       width="22"
+       height="30"
+       x="164"
+       y="1022.3622"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       style="fill:#e08282;fill-opacity:1;stroke:#ff0000;stroke-width:1px;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 176,1035.3622 c -3,5 -3,12 -3,17 l 10,0 c 0,-5 0,-12 -3,-17"
+       id="path4039"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#e08282;fill-opacity:1;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path4034"
+       sodipodi:cx="178"
+       sodipodi:cy="1029.3622"
+       sodipodi:rx="6"
+       sodipodi:ry="6"
+       d="m 184,1029.3622 a 6,6 0 1 1 -12,0 6,6 0 1 1 12,0 z"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:url(#linearGradient4051);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path4043"
+       sodipodi:cx="175"
+       sodipodi:cy="1029.3622"
+       sodipodi:rx="5"
+       sodipodi:ry="5"
+       d="m 180,1029.3622 a 5,5 0 1 1 -10,0 5,5 0 1 1 10,0 z"
+       transform="translate(3,0)"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       sodipodi:type="inkscape:offset"
+       inkscape:radius="-1.0681787"
+       inkscape:original="M 173 1035.375 C 170 1040.375 170 1047.375 170 1052.375 L 180 1052.375 C 180 1047.375 180 1040.375 177 1035.375 L 173 1035.375 z "
+       style="fill:url(#linearGradient4065);fill-opacity:1;stroke:none"
+       id="path4057"
+       d="m 173.6875,1036.4375 c -2.34761,4.3044 -2.54445,10.1625 -2.5625,14.875 l 7.75,0 c -0.018,-4.7125 -0.21489,-10.5706 -2.5625,-14.875 l -2.625,0 z"
+       transform="translate(3,0)"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4195-7"
+       d="m 179,1040.3622 -12,6"
+       style="color:#000000;fill:none;stroke:#9c1f1f;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path4197-8"
+       d="m 172,1050.3622 c -6,-2 -6,-8 -5,-11"
+       style="color:#000000;fill:none;stroke:#b6b7c8;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <rect
+       inkscape:export-ydpi="45"
+       inkscape:export-xdpi="45"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       y="1022.3622"
+       x="189"
+       height="30"
+       width="22"
+       id="rect4227"
+       style="color:#000000;fill:none;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <path
+       sodipodi:type="inkscape:offset"
+       inkscape:radius="0"
+       inkscape:original="M 199 1035.375 L 196 1052.375 L 210 1052.375 L 207 1035.375 L 199 1035.375 z "
+       style="fill:#e08282;fill-opacity:1;stroke:#ff0000;stroke-width:1px;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:1"
+       id="path4333"
+       d="m 199,1035.375 -3,17 14,0 -3,-17 -8,0 z"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       d="m 199.78125,1036.3125 -2.6875,15.125 11.8125,0 -2.6875,-15.125 -6.4375,0 z"
+       id="path4335"
+       style="fill:url(#linearGradient4243-5);fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:1;color:#000000;fill-rule:nonzero;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:original="M 199 1035.375 L 196 1052.375 L 210 1052.375 L 207 1035.375 L 199 1035.375 z "
+       inkscape:radius="-0.9351536"
+       sodipodi:type="inkscape:offset"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       inkscape:export-ydpi="45"
+       inkscape:export-xdpi="45"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       style="color:#000000;fill:none;stroke:#9c1f1f;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       d="m 204,1040.3622 -12,6"
+       id="path4237"
+       inkscape:connector-curvature="0" />
+    <path
+       inkscape:export-ydpi="45"
+       inkscape:export-xdpi="45"
+       inkscape:export-filename="/home/cesium/mit/12fall/6.073/spelunker-deathmatch/sprites/Player1.png"
+       style="color:#000000;fill:none;stroke:#b6b7c8;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       d="m 197,1050.3622 c -6,-2 -6,-8 -5,-11"
+       id="path4239"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
   </g>
 </svg>
