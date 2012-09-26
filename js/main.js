@@ -28,9 +28,9 @@ var WINNING_POINTS = 35;
 var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
-var DAMAGE_TO_EXPLODE = 16;
-var DAMAGE_JUMP = 4;
-var DAMAGE_DIG = 6;
+var DAMAGE_TO_EXPLODE = 15;
+var DAMAGE_JUMP = 5;
+var DAMAGE_DIG = 5;
 var DAMAGE_COLLIDE = 2;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
