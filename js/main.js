@@ -1,6 +1,7 @@
 var BLOCK_SIZE = 20;
 var PLAYER_SIZE = 15;
 var RESOURCE_SIZE = 11;
+var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 3;
 
 var GRID_WIDTH = 40;
@@ -27,10 +28,16 @@ var WINNING_POINTS = 35;
 var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
-var DAMAGE_TO_EXPLODE = 4;
+var DAMAGE_TO_EXPLODE = 15;
+var DAMAGE_JUMP = 5;
+var DAMAGE_DIG = 5;
+var DAMAGE_COLLIDE = 2;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var NUM_RESOURCES = 0;
+var SPRITE_GRAPHIC_INDEXES = Array(2, 8, 6, 3);
+
+var CREEPING_DEATH_MS = 10000;
 
 var BG_MUSIC = 'sounds/casual_bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -42,9 +49,10 @@ var PLAYER2_RUNNING = false;
 
 var levelGrid; // 2D array containing block objects
 
-var resourceGrid; //2D array containing resource objects
+var resources; // resource objects
 
-var nonEmptyResources; //1D Array containing resourceGrid locations
+var should_creep = false;
+var death_y = GRID_HEIGHT; // tracks the creeping death.
 
 function buildPlayground() {
   $('#game').playground({
@@ -92,7 +100,7 @@ function addActors() {
   var block_sprites = [];
   for (var i = 0; i < NUM_COLORS; i++) {
     block_sprites[i] = new $.gameQuery.Animation({
-        imageURL: 'sprites/Block' + (i + 1) + '.png'});
+        imageURL: 'sprites/Block' + SPRITE_GRAPHIC_INDEXES[i] + '.png'});
   }
 
   var rand = 0;
@@ -122,32 +130,33 @@ function addActors() {
   var resource_sprite = new $.gameQuery.Animation({
       imageURL: 'sprites/Resource.png'});
 
-  resourceGrid = new Array(GRID_WIDTH);
-  nonEmptyResources = [];
+  resources = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
-    resourceGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
-        resourceGrid[x][y] = new resource(null);
         continue;
       }
       rand = Math.random();
       if (rand > RESOURCE_PROBABILITY) {
-        resourceGrid[x][y] = new resource(null);
         continue;
       }
+
+      // Ensure resources don't exactly overlap after falling
+      var twidx = RESOURCE_RANDOM_OFFSET *
+                  Math.round(3 * Math.random() - 1.5);
+      var twidy = RESOURCE_RANDOM_OFFSET *
+                  Math.round(3 * Math.random() - 1.5);
 
       $('#resources').addSprite('resource' + x + '-' + y, {
           animation: resource_sprite,
           height: RESOURCE_SIZE, width: RESOURCE_SIZE,
-          posx: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE),
-          posy: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE)});
+          posx: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
+          posy: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy
+      });
 
-      resourceGrid[x][y] = new resource($('#resource' + x + '-' + y));
+      resources.push(new resource($('#resource' + x + '-' + y)));
       NUM_RESOURCES += 1;
-
-      nonEmptyResources.push([x, y]);
     }
   }
 }
@@ -188,25 +197,25 @@ function player(node, playerNum, xpos, ypos) {
   this.points = 0;
   this.player = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
-  
+
   this.playerWalkLeft = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Walk.png',
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
-  
+
   this.playerWalkRight = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Walk.png',
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
-  
+
   this.playerMine = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Mine.png',
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
-  
+
   this.playerJump = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Jump.png'});
-      
+
   this.runningLeft = false;
   this.runningRight = false;
   this.miningSprite = false;
@@ -231,18 +240,23 @@ function addFunctionality() {
     playerMove(1);
     playerMove(2);
     playerStop();
+    deathFromBelow();
     removeDestroyed();
     verticalMovement(1);
     verticalMovement(2);
     resourceRefresh();
   }, 30);
+  $.playground().registerCallback(function() {
+    should_creep = true;
+  }, CREEPING_DEATH_MS);
 }
 
 function checkCollision(player, x, y) {
   var collided = false;
-  if (levelGrid[x][y].node != null) {
+  var elem = lg(x, y);
+  if (!elem || elem.node != null) {
     var collisions = p(player).collision(
-        '#' + levelGrid[x][y].node.attr('id') +
+        '#' + elem.node.attr('id') +
         ',#blocks,#actors');
     if (collisions.size() > 0) {
       collided = true;
@@ -291,15 +305,17 @@ function playerMove(player) {
 
   if ($.gameQuery.keyTracker[left]) {
     var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
+    var elem = lg(x - 1, y);
+
     if (nextpos > 0) {
-      if (!levelGrid[x - 1][y].node ||
-          nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE) {
+      if (!elem || !elem.node ||
+          nextpos > elem.node.x() + BLOCK_SIZE) {
         p(player).x(nextpos);
       } else {
-        if (levelGrid[x - 1][y] && levelGrid[x - 1][y].node) {
-          levelGrid[x - 1][y].damage++;
+        if (elem && elem.node) {
+          elem.damage += DAMAGE_COLLIDE;
         }
-        p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
+        p(player).x(elem.node.x() + BLOCK_SIZE);
       }
     }
     if (!p(player)[0].player.runningLeft) {
@@ -312,15 +328,17 @@ function playerMove(player) {
   }
   if ($.gameQuery.keyTracker[right]) {
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
+    var elem = lg(x + 1, y);
+
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
-      if (!levelGrid[x + 1][y].node ||
-          nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE) {
+      if (!elem || !elem.node ||
+          nextpos < elem.node.x() - PLAYER_SIZE) {
         p(player).x(nextpos);
       } else {
-        if (levelGrid[x + 1][y] && levelGrid[x + 1][y].node) {
-          levelGrid[x + 1][y].damage++;
+        if (elem && elem.node) {
+          elem.damage += DAMAGE_COLLIDE;
         }
-        p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
+        p(player).x(elem.node.x() - PLAYER_SIZE);
       }
     }
     if (!p(player)[0].player.runningRight) {
@@ -332,16 +350,19 @@ function playerMove(player) {
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[up]) {
-    if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node &&
-        p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+    // Ensure the player is standing on solid ground.
+    var elem = lg(x, y + 1);
+    if (elem && elem.node &&
+        p(player).y() == elem.node.y() - PLAYER_SIZE) {
       p(player)[0].player.yVel = JUMP_VELOCITY;
     }
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[dig]) {
     // Dig down.
-    if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node) {
-      levelGrid[x][y + 1].damage++;
+    var elem = lg(x, y + 1);
+    if (elem && elem.node) {
+      elem.damage += DAMAGE_DIG;
     }
     p(player)[0].player.runningLeft = false;
     p(player)[0].player.runningRight = false;
@@ -364,8 +385,9 @@ function verticalMovement(player) {
 
   var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
   if (p(player)[0].player.yVel >= 0) {
-    if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-        nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+    var elem = lg(x, y + 1);
+    if (!elem || !elem.node ||
+        nextpos < elem.node.y() - PLAYER_SIZE) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
       pspr(player).setAnimation(p(player)[0].player.playerJump);
@@ -373,7 +395,7 @@ function verticalMovement(player) {
       p(player)[0].player.runningLeft = false;
       p(player)[0].player.runningRight = false;
     } else {
-      p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
+      p(player).y(elem.node.y() - PLAYER_SIZE);
 
       if (Math.abs(p(player)[0].player.yVel) > OUCH_VELOCITY) {
           updatePoints(player, -1 * Math.abs(p(player)[0].player.yVel) /
@@ -383,8 +405,9 @@ function verticalMovement(player) {
       p(player)[0].player.yVel = 0;
     }
   } else {
-    if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
-        nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
+    var elem = lg(x, y - 1);
+    if (!elem || !elem.node ||
+        nextpos > elem.node.y() + BLOCK_SIZE) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
       pspr(player).setAnimation(p(player)[0].player.playerJump);
@@ -392,10 +415,10 @@ function verticalMovement(player) {
       p(player)[0].player.runningLeft = false;
       p(player)[0].player.runningRight = false;
     } else {
-      if (levelGrid[x][y - 1] && levelGrid[x][y - 1].node) {
-        levelGrid[x][y - 1].damage++;
+      if (elem && elem.node) {
+        elem.damage += DAMAGE_JUMP;
       }
-      p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
+      p(player).y(elem.node.y() + BLOCK_SIZE);
       p(player)[0].player.yVel = 0;
     }
   }
@@ -431,25 +454,25 @@ function playerStop() {
 }
 
 function resourceRefresh() {
-  for (var n = 0; n < nonEmptyResources.length; n++) {
-    var resourceLoc = nonEmptyResources[n];
-    var resource = resourceGrid[resourceLoc[0]][resourceLoc[1]];
+  for (var n = 0; n < resources.length; n++) {
+    var resource = resources[n];
     var x = resource.getX();
     var y = resource.getY();
 
-    if (levelGrid[x][y] && levelGrid[x][y].node) {
+    if (lg(x, y) && lg(x, y).node) {
       // Elements inside an unbroken block can neither fall nor be picked up.
       continue;
     }
 
     var nextpos = parseInt(resource.node.y() + resource.yVel);
     if (resource.yVel >= 0) {
-      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-          nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
+      var elem = lg(x, y + 1);
+      if (!elem || !elem.node ||
+          nextpos < elem.node.y() - RESOURCE_SIZE) {
         resource.node.y(nextpos);
         resource.yVel += GRAVITY_ACCEL;
       } else {
-        resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
+        resource.node.y(elem.node.y() - RESOURCE_SIZE);
         resource.yVel = 0;
       }
     }
@@ -463,7 +486,7 @@ function resourceRefresh() {
       var py = p(playerNum).y();
       if (resourceGet(rx, ry, px, py)) {
         if (!popped) {
-          nonEmptyResources.splice(n, 1);
+          resources.splice(n, 1);
         }
         updatePoints(playerNum, 1);
         popped = true;
@@ -480,10 +503,11 @@ function resourceRefresh() {
 
 function updatePoints(playerNum, pointsInc) {
   points = p(playerNum)[0].player.points + pointsInc;
-  if (points > WINNING_POINTS)
-      points = WINNING_POINTS;
-  else if (points < 0)
+  if (points > WINNING_POINTS) {
+    points = WINNING_POINTS;
+  } else if (points < 0) {
       points = 0;
+  }
 
   $('#pts' + playerNum).animate({'height':
       (100 - (points / NUM_RESOURCES) * 100) + '%'}, 300);
@@ -501,10 +525,17 @@ function pspr(n) {
   return $('#player' + n + 'spr');
 }
 
+function lg(x, y) {
+  if (levelGrid[x] && levelGrid[x][y]) {
+    return levelGrid[x][y];
+  }
+  return undefined;
+}
+
 function maybeChain(x, y, type) {
-  if (levelGrid[x] && levelGrid[x][y] &&
-      levelGrid[x][y].blockType == type) {
-    levelGrid[x][y].damage = DAMAGE_TO_EXPLODE;
+  var elem = lg(x, y);
+  if (elem && elem.blockType == type) {
+    elem.damage = DAMAGE_TO_EXPLODE;
   }
 }
 
@@ -530,6 +561,20 @@ function removeDestroyed() {
       }
     }
   }
+}
+
+function deathFromBelow() {
+  if (death_y == 0 || !should_creep) {
+    return;
+  }
+  death_y--;
+  for (var x = 0; x < GRID_WIDTH; x++) {
+    if (levelGrid[x][death_y].node) {
+      levelGrid[x][death_y].node.remove();
+      levelGrid[x][death_y] = new block(null, null, null);
+    }
+  }
+  should_creep = false;
 }
 
 $(document).ready(function() {
