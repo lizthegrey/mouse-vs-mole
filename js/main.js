@@ -27,10 +27,14 @@ var WINNING_POINTS = 35;
 var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
-var DAMAGE_TO_EXPLODE = 4;
+var DAMAGE_TO_EXPLODE = 16;
+var DAMAGE_JUMP = 4;
+var DAMAGE_DIG = 6;
+var DAMAGE_COLLIDE = 2;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var NUM_RESOURCES = 0;
+var SPRITE_GRAPHIC_INDEXES = Array(2, 4, 3, 5);
 
 var BG_MUSIC = 'sounds/casual_bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -92,7 +96,7 @@ function addActors() {
   var block_sprites = [];
   for (var i = 0; i < NUM_COLORS; i++) {
     block_sprites[i] = new $.gameQuery.Animation({
-        imageURL: 'sprites/Block' + (i + 1) + '.png'});
+        imageURL: 'sprites/Block' + SPRITE_GRAPHIC_INDEXES[i] + '.png'});
   }
 
   var rand = 0;
@@ -188,25 +192,25 @@ function player(node, playerNum, xpos, ypos) {
   this.points = 0;
   this.player = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
-  
+
   this.playerWalkLeft = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Walk.png',
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
-  
+
   this.playerWalkRight = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Walk.png',
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
-  
+
   this.playerMine = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Mine.png',
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
-  
+
   this.playerJump = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Jump.png'});
-      
+
   this.runningLeft = false;
   this.runningRight = false;
   this.miningSprite = false;
@@ -297,7 +301,7 @@ function playerMove(player) {
         p(player).x(nextpos);
       } else {
         if (levelGrid[x - 1][y] && levelGrid[x - 1][y].node) {
-          levelGrid[x - 1][y].damage++;
+          levelGrid[x - 1][y].damage += DAMAGE_COLLIDE;
         }
         p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
       }
@@ -318,7 +322,7 @@ function playerMove(player) {
         p(player).x(nextpos);
       } else {
         if (levelGrid[x + 1][y] && levelGrid[x + 1][y].node) {
-          levelGrid[x + 1][y].damage++;
+          levelGrid[x + 1][y].damage += DAMAGE_COLLIDE;
         }
         p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
       }
@@ -341,7 +345,7 @@ function playerMove(player) {
   if ($.gameQuery.keyTracker[dig]) {
     // Dig down.
     if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node) {
-      levelGrid[x][y + 1].damage++;
+      levelGrid[x][y + 1].damage += DAMAGE_DIG;
     }
     p(player)[0].player.runningLeft = false;
     p(player)[0].player.runningRight = false;
@@ -393,7 +397,7 @@ function verticalMovement(player) {
       p(player)[0].player.runningRight = false;
     } else {
       if (levelGrid[x][y - 1] && levelGrid[x][y - 1].node) {
-        levelGrid[x][y - 1].damage++;
+        levelGrid[x][y - 1].damage += DAMAGE_JUMP;
       }
       p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
       p(player)[0].player.yVel = 0;
@@ -480,10 +484,11 @@ function resourceRefresh() {
 
 function updatePoints(playerNum, pointsInc) {
   points = p(playerNum)[0].player.points + pointsInc;
-  if (points > WINNING_POINTS)
-      points = WINNING_POINTS;
-  else if (points < 0)
+  if (points > WINNING_POINTS) {
+    points = WINNING_POINTS;
+  } else if (points < 0) {
       points = 0;
+  }
 
   $('#pts' + playerNum).animate({'height':
       (100 - (points / NUM_RESOURCES) * 100) + '%'}, 300);
