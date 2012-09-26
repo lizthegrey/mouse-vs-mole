@@ -37,6 +37,8 @@ var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var NUM_RESOURCES = 0;
 var SPRITE_GRAPHIC_INDEXES = Array(2, 8, 6, 3);
 
+var CREEPING_DEATH_MS = 10000;
+
 var BG_MUSIC = 'sounds/casual_bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
 var PLAYER2_RUN = 'sounds/running_diff.ogg';
@@ -48,6 +50,9 @@ var PLAYER2_RUNNING = false;
 var levelGrid; // 2D array containing block objects
 
 var resources; // resource objects
+
+var should_creep = false;
+var death_y = GRID_HEIGHT; // tracks the creeping death.
 
 function buildPlayground() {
   $('#game').playground({
@@ -235,14 +240,15 @@ function addFunctionality() {
     playerMove(1);
     playerMove(2);
     playerStop();
+    deathFromBelow();
     removeDestroyed();
     verticalMovement(1);
     verticalMovement(2);
     resourceRefresh();
   }, 30);
   $.playground().registerCallback(function() {
-    deathFromBelow();
-  }, 10000);
+    should_creep = true;
+  }, CREEPING_DEATH_MS);
 }
 
 function checkCollision(player, x, y) {
@@ -555,6 +561,20 @@ function removeDestroyed() {
       }
     }
   }
+}
+
+function deathFromBelow() {
+  if (death_y == 0 || !should_creep) {
+    return;
+  }
+  death_y--;
+  for (var x = 0; x < GRID_WIDTH; x++) {
+    if (levelGrid[x][death_y].node) {
+      levelGrid[x][death_y].node.remove();
+      levelGrid[x][death_y] = new block(null, null, null);
+    }
+  }
+  should_creep = false;
 }
 
 $(document).ready(function() {
