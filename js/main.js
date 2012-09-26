@@ -1,6 +1,7 @@
 var BLOCK_SIZE = 20;
 var PLAYER_SIZE = 15;
 var RESOURCE_SIZE = 11;
+var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 3;
 
 var GRID_WIDTH = 40;
@@ -46,9 +47,7 @@ var PLAYER2_RUNNING = false;
 
 var levelGrid; // 2D array containing block objects
 
-var resourceGrid; //2D array containing resource objects
-
-var nonEmptyResources; //1D Array containing resourceGrid locations
+var resources; // resource objects
 
 function buildPlayground() {
   $('#game').playground({
@@ -126,32 +125,33 @@ function addActors() {
   var resource_sprite = new $.gameQuery.Animation({
       imageURL: 'sprites/Resource.png'});
 
-  resourceGrid = new Array(GRID_WIDTH);
-  nonEmptyResources = [];
+  resources = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
-    resourceGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
       if (y == START_YCOORD &&
           (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
-        resourceGrid[x][y] = new resource(null);
         continue;
       }
       rand = Math.random();
       if (rand > RESOURCE_PROBABILITY) {
-        resourceGrid[x][y] = new resource(null);
         continue;
       }
+
+      // Ensure resources don't exactly overlap after falling
+      var twidx = RESOURCE_RANDOM_OFFSET *
+                  Math.round(3 * Math.random() - 1.5);
+      var twidy = RESOURCE_RANDOM_OFFSET *
+                  Math.round(3 * Math.random() - 1.5);
 
       $('#resources').addSprite('resource' + x + '-' + y, {
           animation: resource_sprite,
           height: RESOURCE_SIZE, width: RESOURCE_SIZE,
-          posx: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE),
-          posy: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE)});
+          posx: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
+          posy: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy
+      });
 
-      resourceGrid[x][y] = new resource($('#resource' + x + '-' + y));
+      resources.push(new resource($('#resource' + x + '-' + y)));
       NUM_RESOURCES += 1;
-
-      nonEmptyResources.push([x, y]);
     }
   }
 }
@@ -240,6 +240,9 @@ function addFunctionality() {
     verticalMovement(2);
     resourceRefresh();
   }, 30);
+  $.playground().registerCallback(function() {
+    deathFromBelow();
+  }, 10000);
 }
 
 function checkCollision(player, x, y) {
@@ -445,9 +448,8 @@ function playerStop() {
 }
 
 function resourceRefresh() {
-  for (var n = 0; n < nonEmptyResources.length; n++) {
-    var resourceLoc = nonEmptyResources[n];
-    var resource = resourceGrid[resourceLoc[0]][resourceLoc[1]];
+  for (var n = 0; n < resources.length; n++) {
+    var resource = resources[n];
     var x = resource.getX();
     var y = resource.getY();
 
@@ -478,7 +480,7 @@ function resourceRefresh() {
       var py = p(playerNum).y();
       if (resourceGet(rx, ry, px, py)) {
         if (!popped) {
-          nonEmptyResources.splice(n, 1);
+          resources.splice(n, 1);
         }
         updatePoints(playerNum, 1);
         popped = true;
