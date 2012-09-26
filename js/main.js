@@ -1,6 +1,6 @@
 var BLOCK_SIZE = 20;
 var PLAYER_SIZE = 15;
-var RESOURCE_SIZE = 20;
+var RESOURCE_SIZE = 11;
 var NUM_COLORS = 3;
 
 var GRID_WIDTH = 40;
@@ -183,6 +183,28 @@ function player(node, playerNum, xpos, ypos) {
   this.points = 0;
   this.player = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '.png'});
+  
+  this.playerWalkLeft = new $.gameQuery.Animation({
+      imageURL: 'sprites/Player' + this.playerNum + '-Walk.png',
+      numberOfFrame: 4, delta: 11, rate: 60,
+      type: $.gQ.ANIMATION_HORIZONTAL});
+  
+  this.playerWalkRight = new $.gameQuery.Animation({
+      imageURL: 'sprites/Player' + this.playerNum + '-Walk.png',
+      numberOfFrame: 4, delta: 11, rate: 60,
+      type: $.gQ.ANIMATION_HORIZONTAL});
+  
+  this.playerMine = new $.gameQuery.Animation({
+      imageURL: 'sprites/Player' + this.playerNum + '-Mine.png',
+      numberOfFrame: 4, delta: 11, rate: 60,
+      type: $.gQ.ANIMATION_HORIZONTAL});
+  
+  this.playerJump = new $.gameQuery.Animation({
+      imageURL: 'sprites/Player' + this.playerNum + '-Jump.png'});
+      
+  this.runningLeft = false;
+  this.runningRight = false;
+  this.miningSprite = false;
 
   this.getX = function() {
     return posToGrid(this.node.x());
@@ -203,8 +225,7 @@ function addFunctionality() {
   $.playground().registerCallback(function() {
     playerMove(1);
     playerMove(2);
-    playerStop(1);
-    playerStop(2);
+    playerStop();
     removeDestroyed();
     verticalMovement(1);
     verticalMovement(2);
@@ -276,6 +297,11 @@ function playerMove(player) {
         p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
       }
     }
+    if (!p(player)[0].player.runningLeft) {
+      pspr(player).setAnimation(p(player)[0].player.playerWalkLeft);
+      p(player)[0].player.runningLeft = true;
+      p(player)[0].player.runningRight = false;
+    }
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[right]) {
@@ -291,6 +317,11 @@ function playerMove(player) {
         p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
       }
     }
+    if (!p(player)[0].player.runningRight) {
+      pspr(player).setAnimation(p(player)[0].player.playerWalkRight);
+      p(player)[0].player.runningRight = true;
+      p(player)[0].player.runningLeft = false;
+    }
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[up]) {
@@ -305,6 +336,8 @@ function playerMove(player) {
     if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node) {
       levelGrid[x][y + 1].damage++;
     }
+    p(player)[0].player.runningLeft = false;
+    p(player)[0].player.runningRight = false;
   }
   if (player == 1 && isRunning && !PLAYER1_RUNNING) {
     // console.log("Player 1 begun walking");
@@ -328,6 +361,10 @@ function verticalMovement(player) {
         nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
+      pspr(player).setAnimation(p(player)[0].player.playerJump);
+      p(player)[0].player.miningSprite = false;
+      p(player)[0].player.runningLeft = false;
+      p(player)[0].player.runningRight = false;
     } else {
       p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
       p(player)[0].player.yVel = 0;
@@ -337,6 +374,10 @@ function verticalMovement(player) {
         nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
+      pspr(player).setAnimation(p(player)[0].player.playerJump);
+      p(player)[0].player.miningSprite = false;
+      p(player)[0].player.runningLeft = false;
+      p(player)[0].player.runningRight = false;
     } else {
       if (levelGrid[x][y - 1] && levelGrid[x][y - 1].node) {
         levelGrid[x][y - 1].damage++;
@@ -348,21 +389,31 @@ function verticalMovement(player) {
 }
 
 /* Function to stop sound upon player no longer moving */
-function playerStop(player) {
-  if (player == 1 && PLAYER1_RUNNING) {
-    if (!$.gameQuery.keyTracker[65] &&
-        !$.gameQuery.keyTracker[68] &&
-        !$.gameQuery.keyTracker[87]) {
+/* Also changes player animation back to standing still */
+function playerStop() {
+  if (!$.gameQuery.keyTracker[65] &&
+      !$.gameQuery.keyTracker[68] &&
+      !$.gameQuery.keyTracker[87]) {
+    if (PLAYER1_RUNNING) {
       PLAYER1_RUNNING = false;
       $('#player1').pauseSound();
     }
-  } else if (player == 2 && PLAYER2_RUNNING) {
-    if (!$.gameQuery.keyTracker[37] &&
-        !$.gameQuery.keyTracker[38] &&
-        !$.gameQuery.keyTracker[39]) {
+    pspr(1).setAnimation(p(1)[0].player.player);
+    p(1)[0].player.miningSprite = false;
+    p(1)[0].player.runningLeft = false;
+    p(1)[0].player.runningRight = false;
+  }
+  if (!$.gameQuery.keyTracker[37] &&
+      !$.gameQuery.keyTracker[38] &&
+      !$.gameQuery.keyTracker[39]) {
+    if (PLAYER2_RUNNING) {
       PLAYER2_RUNNING = false;
       $('#player2').pauseSound();
     }
+    pspr(2).setAnimation(p(2)[0].player.player);
+    p(2)[0].player.miningSprite = false;
+    p(2)[0].player.runningLeft = false;
+    p(2)[0].player.runningRight = false;
   }
 }
 
@@ -417,6 +468,11 @@ function resourceRefresh() {
 // Returns the player object associated with a player number.
 function p(n) {
   return $('#player' + n);
+}
+
+// Returns the sprite object associated with a player number.
+function pspr(n) {
+  return $('#player' + n + 'spr');
 }
 
 function maybeChain(x, y, type) {
