@@ -2,7 +2,7 @@ var BLOCK_SIZE = 20;
 var PLAYER_SIZE = 15;
 var RESOURCE_SIZE = 11;
 var RESOURCE_RANDOM_OFFSET = 2;
-var NUM_COLORS = 3;
+var NUM_COLORS = 4;
 
 var GRID_WIDTH = 40;
 var GRID_HEIGHT = 30;
@@ -12,15 +12,15 @@ var PLAYGROUND_HEIGHT = BLOCK_SIZE * GRID_HEIGHT;
 
 // XPOS_P2 and YPOS get a modifier based on sizes to make the board symmetric
 // and to begin with a block for a floor
-var START_XCOORD_P1 = 2;
+var START_XCOORD_P1 = 14;
 var START_XPOS_P1 = START_XCOORD_P1 * BLOCK_SIZE;
-var START_XCOORD_P2 = 37;
+var START_XCOORD_P2 = 25;
 var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_SIZE);
-var START_YCOORD = 14;
+var START_YCOORD = 24;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_SIZE);
 
 var GRAVITY_ACCEL = 1.0; // pixels/s^2 (down is positive)
-var JUMP_VELOCITY = -9;   // pixels/s
+var JUMP_VELOCITY = -11;   // pixels/s
 var MOVE_VELOCITY = 2;
 
 var WINNING_POINTS = 35;
