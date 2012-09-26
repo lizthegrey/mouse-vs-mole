@@ -299,6 +299,7 @@ function playerMove(player) {
     }
     if (!p(player)[0].player.runningLeft) {
       pspr(player).setAnimation(p(player)[0].player.playerWalkLeft);
+      pspr(player).fliph(false);
       p(player)[0].player.runningLeft = true;
       p(player)[0].player.runningRight = false;
     }
@@ -319,6 +320,7 @@ function playerMove(player) {
     }
     if (!p(player)[0].player.runningRight) {
       pspr(player).setAnimation(p(player)[0].player.playerWalkRight);
+      pspr(player).fliph(true);
       p(player)[0].player.runningRight = true;
       p(player)[0].player.runningLeft = false;
     }
