@@ -1,5 +1,35 @@
 #game
 {
-    width: 500px;
-    height: 500px;
+    width: 800px;
+    height: 600px;
+    margin-left: 60px;
+    margin-right: 60px;
+}
+#gamewrapper
+{
+    width: 920px;
+    height: 600px;
+    background-color: black;
+}
+#pto1
+{
+    float: left;
+}
+#pto2
+{
+    float: right;
+}
+.ptsouter
+{
+    width: 60px;
+    height: 600px;
+    background-color: green;
+    background-image: url('../sprites/Score.png');
+}
+.pts
+{
+    width: 60px;
+    height: 600px;
+    background-color: black;
+    background-image: url('../sprites/ScoreBg.png');
 }
