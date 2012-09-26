@@ -34,7 +34,7 @@ var DAMAGE_COLLIDE = 2;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var NUM_RESOURCES = 0;
-var SPRITE_GRAPHIC_INDEXES = Array(2, 4, 3, 5);
+var SPRITE_GRAPHIC_INDEXES = Array(2, 8, 6, 3);
 
 var BG_MUSIC = 'sounds/casual_bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -244,9 +244,10 @@ function addFunctionality() {
 
 function checkCollision(player, x, y) {
   var collided = false;
-  if (levelGrid[x][y].node != null) {
+  var elem = lg(x, y);
+  if (!elem || elem.node != null) {
     var collisions = p(player).collision(
-        '#' + levelGrid[x][y].node.attr('id') +
+        '#' + elem.node.attr('id') +
         ',#blocks,#actors');
     if (collisions.size() > 0) {
       collided = true;
@@ -295,15 +296,17 @@ function playerMove(player) {
 
   if ($.gameQuery.keyTracker[left]) {
     var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
+    var elem = lg(x - 1, y);
+
     if (nextpos > 0) {
-      if (!levelGrid[x - 1][y].node ||
-          nextpos > levelGrid[x - 1][y].node.x() + BLOCK_SIZE) {
+      if (!elem || !elem.node ||
+          nextpos > elem.node.x() + BLOCK_SIZE) {
         p(player).x(nextpos);
       } else {
-        if (levelGrid[x - 1][y] && levelGrid[x - 1][y].node) {
-          levelGrid[x - 1][y].damage += DAMAGE_COLLIDE;
+        if (elem && elem.node) {
+          elem.damage += DAMAGE_COLLIDE;
         }
-        p(player).x(levelGrid[x - 1][y].node.x() + BLOCK_SIZE);
+        p(player).x(elem.node.x() + BLOCK_SIZE);
       }
     }
     if (!p(player)[0].player.runningLeft) {
@@ -316,15 +319,17 @@ function playerMove(player) {
   }
   if ($.gameQuery.keyTracker[right]) {
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
+    var elem = lg(x + 1, y);
+
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
-      if (!levelGrid[x + 1][y].node ||
-          nextpos < levelGrid[x + 1][y].node.x() - PLAYER_SIZE) {
+      if (!elem || !elem.node ||
+          nextpos < elem.node.x() - PLAYER_SIZE) {
         p(player).x(nextpos);
       } else {
-        if (levelGrid[x + 1][y] && levelGrid[x + 1][y].node) {
-          levelGrid[x + 1][y].damage += DAMAGE_COLLIDE;
+        if (elem && elem.node) {
+          elem.damage += DAMAGE_COLLIDE;
         }
-        p(player).x(levelGrid[x + 1][y].node.x() - PLAYER_SIZE);
+        p(player).x(elem.node.x() - PLAYER_SIZE);
       }
     }
     if (!p(player)[0].player.runningRight) {
@@ -336,16 +341,19 @@ function playerMove(player) {
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[up]) {
-    if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node &&
-        p(player).y() == levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+    // Ensure the player is standing on solid ground.
+    var elem = lg(x, y + 1);
+    if (elem && elem.node &&
+        p(player).y() == elem.node.y() - PLAYER_SIZE) {
       p(player)[0].player.yVel = JUMP_VELOCITY;
     }
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[dig]) {
     // Dig down.
-    if (levelGrid[x][y + 1] && levelGrid[x][y + 1].node) {
-      levelGrid[x][y + 1].damage += DAMAGE_DIG;
+    var elem = lg(x, y + 1);
+    if (elem && elem.node) {
+      elem.damage += DAMAGE_DIG;
     }
     p(player)[0].player.runningLeft = false;
     p(player)[0].player.runningRight = false;
@@ -368,8 +376,9 @@ function verticalMovement(player) {
 
   var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
   if (p(player)[0].player.yVel >= 0) {
-    if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-        nextpos < levelGrid[x][y + 1].node.y() - PLAYER_SIZE) {
+    var elem = lg(x, y + 1);
+    if (!elem || !elem.node ||
+        nextpos < elem.node.y() - PLAYER_SIZE) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
       pspr(player).setAnimation(p(player)[0].player.playerJump);
@@ -377,7 +386,7 @@ function verticalMovement(player) {
       p(player)[0].player.runningLeft = false;
       p(player)[0].player.runningRight = false;
     } else {
-      p(player).y(levelGrid[x][y + 1].node.y() - PLAYER_SIZE);
+      p(player).y(elem.node.y() - PLAYER_SIZE);
 
       if (Math.abs(p(player)[0].player.yVel) > OUCH_VELOCITY) {
           updatePoints(player, -1 * Math.abs(p(player)[0].player.yVel) /
@@ -387,8 +396,9 @@ function verticalMovement(player) {
       p(player)[0].player.yVel = 0;
     }
   } else {
-    if (!levelGrid[x][y - 1] || !levelGrid[x][y - 1].node ||
-        nextpos > levelGrid[x][y - 1].node.y() + BLOCK_SIZE) {
+    var elem = lg(x, y - 1);
+    if (!elem || !elem.node ||
+        nextpos > elem.node.y() + BLOCK_SIZE) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
       pspr(player).setAnimation(p(player)[0].player.playerJump);
@@ -396,10 +406,10 @@ function verticalMovement(player) {
       p(player)[0].player.runningLeft = false;
       p(player)[0].player.runningRight = false;
     } else {
-      if (levelGrid[x][y - 1] && levelGrid[x][y - 1].node) {
-        levelGrid[x][y - 1].damage += DAMAGE_JUMP;
+      if (elem && elem.node) {
+        elem.damage += DAMAGE_JUMP;
       }
-      p(player).y(levelGrid[x][y - 1].node.y() + BLOCK_SIZE);
+      p(player).y(elem.node.y() + BLOCK_SIZE);
       p(player)[0].player.yVel = 0;
     }
   }
@@ -441,19 +451,20 @@ function resourceRefresh() {
     var x = resource.getX();
     var y = resource.getY();
 
-    if (levelGrid[x][y] && levelGrid[x][y].node) {
+    if (lg(x, y) && lg(x, y).node) {
       // Elements inside an unbroken block can neither fall nor be picked up.
       continue;
     }
 
     var nextpos = parseInt(resource.node.y() + resource.yVel);
     if (resource.yVel >= 0) {
-      if (!levelGrid[x][y + 1] || !levelGrid[x][y + 1].node ||
-          nextpos < levelGrid[x][y + 1].node.y() - RESOURCE_SIZE) {
+      var elem = lg(x, y + 1);
+      if (!elem || !elem.node ||
+          nextpos < elem.node.y() - RESOURCE_SIZE) {
         resource.node.y(nextpos);
         resource.yVel += GRAVITY_ACCEL;
       } else {
-        resource.node.y(levelGrid[x][y + 1].node.y() - RESOURCE_SIZE);
+        resource.node.y(elem.node.y() - RESOURCE_SIZE);
         resource.yVel = 0;
       }
     }
@@ -506,10 +517,17 @@ function pspr(n) {
   return $('#player' + n + 'spr');
 }
 
+function lg(x, y) {
+  if (levelGrid[x] && levelGrid[x][y]) {
+    return levelGrid[x][y];
+  }
+  return undefined;
+}
+
 function maybeChain(x, y, type) {
-  if (levelGrid[x] && levelGrid[x][y] &&
-      levelGrid[x][y].blockType == type) {
-    levelGrid[x][y].damage = DAMAGE_TO_EXPLODE;
+  var elem = lg(x, y);
+  if (elem && elem.blockType == type) {
+    elem.damage = DAMAGE_TO_EXPLODE;
   }
 }
 
