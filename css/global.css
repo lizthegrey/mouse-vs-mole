@@ -2,12 +2,12 @@
 {
     width: 800px;
     height: 600px;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: 60px;
+    margin-right: 60px;
 }
 #gamewrapper
 {
-    width: 900px;
+    width: 920px;
     height: 600px;
     background-color: black;
 }
@@ -21,13 +21,15 @@
 }
 .ptsouter
 {
-    width: 50px;
+    width: 60px;
     height: 600px;
     background-color: green;
+    background-image: url('../sprites/Score.png');
 }
 .pts
 {
-    width: 50px;
+    width: 60px;
     height: 600px;
     background-color: black;
+    background-image: url('../sprites/ScoreBg.png');
 }
