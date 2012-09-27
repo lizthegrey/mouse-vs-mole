@@ -223,7 +223,7 @@ function player(node, playerNum, xpos, ypos) {
   this.miningSprite = false;
 
   this.getX = function() {
-    return posToGrid(this.node.x() - 2.5);
+    return posToGrid(this.node.x() - 4);
   };
 
   this.getY = function() {
