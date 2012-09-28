@@ -626,6 +626,7 @@ function restart(bool) {
     addSounds();
     addFunctionality();
     $.playground().startGame();
+    startMusic();
   }
 }
 
@@ -649,6 +650,7 @@ function gameOver() {
     updatePoints(1, -1 * p(1)[0].player.points);
     updatePoints(2, -1 * p(2)[0].player.points);
 
+    stopMusic();
     death_y = GRID_HEIGHT;
     ENABLE_CREEPING = false;
 
