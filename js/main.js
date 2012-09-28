@@ -514,8 +514,9 @@ function updatePoints(playerNum, pointsInc) {
       points = 0;
   }
 
+  var h = Math.atan(points/8)/(Math.PI/2);
   $('#pts' + playerNum).animate({'height':
-      (100 - (points / NUM_RESOURCES) * 100) + '%'}, 300);
+      100 - h*100 + '%'}, 300);
 
   p(playerNum)[0].player.points = points;
 }
