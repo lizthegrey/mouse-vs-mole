@@ -643,6 +643,7 @@ function stopMusic() {
 
 function restart(bool) {
   if (bool || $.gameQuery.keyTracker[82]) {
+    death_y = GRID_HEIGHT; // tracks the creeping death.
     $('#text').remove();
     $.playground().clearAll(true);
     buildPlayground();
