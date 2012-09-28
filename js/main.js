@@ -46,12 +46,16 @@ var SPRITE_GRAPHIC_INDEXES = Array(2, 8, 6, 3);
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
 var PLAYER2_RUN = 'sounds/running_diff.ogg';
-var BLOCK_BREAK = 'sounds/crunches.ogg';
+var BLOCK_BREAK = 'sounds/crunch.ogg';
+var PLAYER_DEATH = 'sounds/splat.ogg';
+var RESOURCE_GET = 'sounds/chime.ogg';
 
 var PLAYER1_RUNNING = false;
 var PLAYER2_RUNNING = false;
 
 var MUSIC_PLAYING = false;
+var PLAYER1_DEAD = false;
+var PLAYER2_DEAD = false;
 
 var levelGrid; // 2D array containing block objects
 
@@ -173,11 +177,16 @@ function addSounds() {
   var bgMusic = new $.gameQuery.SoundWrapper(BG_MUSIC, true);
   var player1Run = new $.gameQuery.SoundWrapper(PLAYER1_RUN, true);
   var player2Run = new $.gameQuery.SoundWrapper(PLAYER2_RUN, true);
-  var blockBreak = new $.gameQuery.SoundWrapper(BLOCK_BREAK, true);
+  var blockBreak = new $.gameQuery.SoundWrapper(BLOCK_BREAK, false);
+  var resourceGet = new $.gameQuery.SoundWrapper(RESOURCE_GET, false);
+  var playerDeath = new $.gameQuery.SoundWrapper(PLAYER_DEATH, false);
   $('#background').addSound(bgMusic, false);
   $('#player1').addSound(player1Run, false);
   $('#player2').addSound(player2Run, false);
   // We will want another object to play block breaking sounds
+  $('#blocks').addSound(blockBreak, false);
+  $('#resources').addSound(resourceGet, false);
+  $('#actors').addSound(playerDeath, false);
 }
 
 function block(node, blockType, damage) {
@@ -377,12 +386,12 @@ function playerMove(player) {
     p(player)[0].player.runningLeft = false;
     p(player)[0].player.runningRight = false;
   }
-  if (player == 1 && isRunning && !PLAYER1_RUNNING) {
+  if (player == 1 && isRunning && !PLAYER1_RUNNING && !PLAYER1_DEAD) {
     // console.log("Player 1 begun walking");
     $('#player1').playSound();
     PLAYER1_RUNNING = true;
   }
-  if (player == 2 && isRunning && !PLAYER2_RUNNING) {
+  if (player == 2 && isRunning && !PLAYER2_RUNNING && !PLAYER2_DEAD) {
     // console.log("Player 2 begun walking");
     $('#player2').playSound();
     PLAYER2_RUNNING = true;
@@ -503,6 +512,7 @@ function resourceRefresh() {
         }
         updatePoints(playerNum, 1);
         popped = true;
+        $('#resources').playSound();
         // I thought about having a break statement in here, but if the players
         // are occupying the same space, they both deserve the points for a
         // resource as it falls on them.
@@ -566,7 +576,8 @@ function removeDestroyed() {
           var type = levelGrid[x][y].blockType;
           levelGrid[x][y].node.remove();
           levelGrid[x][y] = new block(null, null, null);
-
+          
+          $('#blocks').playSound();
           maybeChain(x + 1, y, type);
           maybeChain(x - 1, y, type);
           maybeChain(x, y + 1, type);
@@ -620,8 +631,18 @@ function restart(bool) {
 }
 
 function gameOver() {
-  if (p(1).y() > PLAYGROUND_HEIGHT &&
-      p(2).y() > PLAYGROUND_HEIGHT) {
+  if (!PLAYER1_DEAD && p(1).y() > PLAYGROUND_HEIGHT){
+    PLAYER1_DEAD = true;
+    $('#actors').playSound();
+  }
+  if(!PLAYER2_DEAD && p(2).y() > PLAYGROUND_HEIGHT){
+    PLAYER2_DEAD = true;
+    $('#actors').playSound();
+  }
+
+  if (PLAYER1_DEAD && PLAYER2_DEAD) {
+    PLAYER1_DEAD = false;
+    PLAYER2_DEAD = false;
     var pl = 0;
     if (p(1)[0].player.points > p(2)[0].player.points) pl = 1;
     else if (p(1)[0].player.points < p(2)[0].player.points) pl = 2;
