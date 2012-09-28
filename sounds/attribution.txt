@@ -1,4 +1,6 @@
 casual_bg.ogg: by bebeto, http://www.freesound.org/people/bebeto/sounds/18973/
 dancy_bg.ogg: by bebeto, http://www.freesound.org/people/bebeto/sounds/24046/
-crunches.ogg: by Robinhood76, http://www.freesound.org/people/Robinhood76/sounds/55690/
+crunch.ogg: by Robinhood76, http://www.freesound.org/people/Robinhood76/sounds/55690/
 running.ogg: by bevangoldswain, http://www.freesound.org/people/bevangoldswain/sounds/54779/
+splat.ogg: by slykmrbyches, http://www.freesound.org/people/SlykMrByches/sounds/55234/
+chime.ogg: by BristolStories, http://www.freesound.org/people/BristolStories/sounds/51715/
