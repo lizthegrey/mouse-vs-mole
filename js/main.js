@@ -603,6 +603,10 @@ function gameOver() {
     var pl = 0;
     if (p(1)[0].player.points > p(2)[0].player.points) pl = 1;
     else if (p(1)[0].player.points < p(2)[0].player.points) pl = 2;
+
+    updatePoints(1, -1*p(1)[0].player.points);
+    updatePoints(2, -1*p(2)[0].player.points);
+
     $.playground().clearAll(true);
     $.playground().addGroup('text', {
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
