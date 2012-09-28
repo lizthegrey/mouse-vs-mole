@@ -51,6 +51,8 @@ var BLOCK_BREAK = 'sounds/crunches.ogg';
 var PLAYER1_RUNNING = false;
 var PLAYER2_RUNNING = false;
 
+var MUSIC_PLAYING = false;
+
 var levelGrid; // 2D array containing block objects
 
 var resources; // resource objects
@@ -589,6 +591,20 @@ function deathFromBelow() {
   should_creep = false;
 }
 
+function startMusic() {
+  if (!MUSIC_PLAYING) {
+    $('#background').playSound();
+    MUSIC_PLAYING = true;
+  }
+}
+
+function stopMusic() {
+  if (MUSIC_PLAYING) {
+    $('#background').pauseSound();
+    MUSIC_PLAYING = false;
+  }
+}
+
 function restart(bool) {
   if (bool || $.gameQuery.keyTracker[82]) {
     $('#text').remove();
@@ -643,6 +659,16 @@ $(document).keydown(function(e) {
       return true;
 });
 
+$(window).focus(function() {
+    startMusic();
+    $.playground().resumeGame();
+});
+
+$(window).blur(function() {
+    stopMusic();
+    $.playground().pauseGame();
+});
+
 $(document).ready(function() {
   buildPlayground();
   addBackground();
@@ -650,5 +676,5 @@ $(document).ready(function() {
   addSounds();
   addFunctionality();
   $.playground().startGame();
-  $('#background').playSound();
+  startMusic();
 });
