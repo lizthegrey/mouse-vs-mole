@@ -618,6 +618,7 @@ function gameOver() {
     updatePoints(2, -1 * p(2)[0].player.points);
 
     death_y = GRID_HEIGHT;
+    ENABLE_CREEPING = false;
 
     $.playground().clearAll(true);
     $.playground().addGroup('text', {
