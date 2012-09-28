@@ -232,7 +232,11 @@ function player(node, playerNum, xpos, ypos) {
   this.miningSprite = false;
 
   this.getX = function() {
-    return posToGrid(this.node.x() - 4);
+    return posToGrid(this.node.x());
+  };
+  
+  this.getRightX = function() {
+    return posToGrid(this.node.x() - PLAYER_WIDTH + 1);
   };
 
   this.getY = function() {
@@ -313,6 +317,7 @@ function playerMove(player) {
   }
 
   var x = p(player)[0].player.getX();
+  var rx = p(player)[0].player.getRightX();
   var y = p(player)[0].player.getY();
 
   var isRunning = false;
@@ -370,8 +375,11 @@ function playerMove(player) {
     ENABLE_CREEPING = true;
     // Ensure the player is standing on solid ground.
     var elem = lg(x, y + 1);
+    var elem2 = lg(rx, y + 1);
     if (elem && elem.node &&
-        p(player).y() == elem.node.y() - PLAYER_HEIGHT) {
+        p(player).y() == elem.node.y() - PLAYER_HEIGHT ||
+        elem2 && elem2.node &&
+        p(player).y() == elem2.node.y() - PLAYER_HEIGHT) {
       p(player)[0].player.yVel = JUMP_VELOCITY;
     }
     isRunning = true;
@@ -380,8 +388,12 @@ function playerMove(player) {
     ENABLE_CREEPING = true;
     // Dig down.
     var elem = lg(x, y + 1);
+    var elem2 = lg(rx, y + 1);
     if (elem && elem.node) {
       elem.damage += DAMAGE_DIG;
+    }
+    else if (elem2 && elem2.node) {
+      elem2.damage += DAMAGE_DIG;
     }
     p(player)[0].player.runningLeft = false;
     p(player)[0].player.runningRight = false;
@@ -400,13 +412,17 @@ function playerMove(player) {
 
 function verticalMovement(player) {
   var x = p(player)[0].player.getX();
+  var rx = p(player)[0].player.getRightX();
   var y = p(player)[0].player.getY();
 
   var nextpos = parseInt(p(player).y() + p(player)[0].player.yVel);
   if (p(player)[0].player.yVel >= 0) {
     var elem = lg(x, y + 1);
-    if (!elem || !elem.node ||
-        nextpos < elem.node.y() - PLAYER_HEIGHT) {
+    var elem2 = lg(rx, y + 1);
+    if ((!elem || !elem.node ||
+        nextpos < elem.node.y() - PLAYER_HEIGHT) &&
+        (!elem2 || !elem2.node ||
+        nextpos < elem2.node.y() - PLAYER_HEIGHT)) {
       p(player).y(nextpos);
       p(player)[0].player.yVel += GRAVITY_ACCEL;
       pspr(player).setAnimation(p(player)[0].player.playerJump);
@@ -414,7 +430,9 @@ function verticalMovement(player) {
       p(player)[0].player.runningLeft = false;
       p(player)[0].player.runningRight = false;
     } else {
-      p(player).y(elem.node.y() - PLAYER_HEIGHT);
+      if (elem && elem.node)
+      	p(player).y(elem.node.y() - PLAYER_HEIGHT);
+      else p(player).y(elem2.node.y() - PLAYER_HEIGHT);
 
       if (Math.abs(p(player)[0].player.yVel) > OUCH_VELOCITY) {
           updatePoints(player, -1 * Math.abs(p(player)[0].player.yVel) /
@@ -425,8 +443,11 @@ function verticalMovement(player) {
     }
   } else {
     var elem = lg(x, y - 1);
-    if (!elem || !elem.node ||
-        nextpos > elem.node.y() + BLOCK_SIZE) {
+    var elem2 = lg(rx, y - 1);
+    if ((!elem || !elem.node ||
+        nextpos > elem.node.y() + BLOCK_SIZE) &&
+        (!elem2 || !elem2.node ||
+        nextpos > elem2.node.y() + BLOCK_SIZE)) {
       if (nextpos < 0) {
         nextpos = 0;
       }
@@ -439,8 +460,12 @@ function verticalMovement(player) {
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
+        p(player).y(elem.node.y() + BLOCK_SIZE);
       }
-      p(player).y(elem.node.y() + BLOCK_SIZE);
+      else if (elem2 && elem2.node) {
+        elem2.damage += DAMAGE_JUMP;
+        p(player).y(elem2.node.y() + BLOCK_SIZE);
+      }
       p(player)[0].player.yVel = 0;
     }
   }
