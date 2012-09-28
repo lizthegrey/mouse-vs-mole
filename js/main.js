@@ -322,9 +322,7 @@ function playerMove(player) {
           nextpos > elem.node.x() + BLOCK_SIZE) {
         p(player).x(nextpos);
       } else {
-        if (elem && elem.node) {
-          elem.damage += DAMAGE_COLLIDE;
-        }
+        damageBlock(elem, DAMAGE_COLLIDE);
         p(player).x(elem.node.x() + BLOCK_SIZE);
       }
     }
@@ -346,9 +344,7 @@ function playerMove(player) {
           nextpos < elem.node.x() - PLAYER_WIDTH) {
         p(player).x(nextpos);
       } else {
-        if (elem && elem.node) {
-          elem.damage += DAMAGE_COLLIDE;
-        }
+        damageBlock(elem, DAMAGE_COLLIDE);
         p(player).x(elem.node.x() - PLAYER_WIDTH);
       }
     }
@@ -374,9 +370,7 @@ function playerMove(player) {
     ENABLE_CREEPING = true;
     // Dig down.
     var elem = lg(x, y + 1);
-    if (elem && elem.node) {
-      elem.damage += DAMAGE_DIG;
-    }
+    damageBlock(elem, DAMAGE_DIG);
     p(player)[0].player.runningLeft = false;
     p(player)[0].player.runningRight = false;
   }
@@ -431,12 +425,19 @@ function verticalMovement(player) {
       p(player)[0].player.runningLeft = false;
       p(player)[0].player.runningRight = false;
     } else {
-      if (elem && elem.node) {
-        elem.damage += DAMAGE_JUMP;
-      }
+      damageBlock(elem, DAMAGE_JUMP);
       p(player).y(elem.node.y() + BLOCK_SIZE);
       p(player)[0].player.yVel = 0;
     }
+  }
+}
+
+function damageBlock(elem, damage) {
+  if (elem && elem.node) {
+    elem.damage += damage;
+    elem.node.fadeOut(35);
+    elem.node.fadeIn(35);
+
   }
 }
 
