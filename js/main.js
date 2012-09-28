@@ -247,6 +247,8 @@ function addFunctionality() {
     verticalMovement(1);
     verticalMovement(2);
     resourceRefresh();
+    restart(false);
+    gameOver();
   }, 30);
   $.playground().registerCallback(function() {
     should_creep = true;
@@ -580,6 +582,44 @@ function deathFromBelow() {
     }
   }
   should_creep = false;
+}
+
+function restart(bool) {
+  if (bool || $.gameQuery.keyTracker[82]) {
+    $('#text').remove();
+    $.playground().clearAll(true);
+    buildPlayground();
+    addBackground();
+    addActors();
+    addSounds();
+    addFunctionality();
+    $.playground().startGame();
+  }
+}
+
+function gameOver() {
+  if (p(1).y() > PLAYGROUND_HEIGHT &&
+      p(2).y() > PLAYGROUND_HEIGHT) {
+    var pl = 0;
+    if (p(1)[0].player.points > p(2)[0].player.points) pl = 1;
+    else if (p(1)[0].player.points < p(2)[0].player.points) pl = 2;
+
+    updatePoints(1, -1*p(1)[0].player.points);
+    updatePoints(2, -1*p(2)[0].player.points);
+
+    $.playground().clearAll(true);
+    $.playground().addGroup('text', {
+      height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
+    if (pl != 0) {
+      $('#text').append('<div style="position: absolute; top: 290px;'
+      + 'width: 800px; color: white;"><center><a style="cursor: pointer;"'
+      + 'id="restartbutton">Player ' + pl + ' Wins!</a></center></div>'); }
+	 else { $('#text').append('<div style="position: absolute; top: 290px;'
+	 + 'width: 800px; color: white;"><center><a style="cursor: pointer;"'
+	 + 'id="restartbutton">Draw!</a></center></div>'); }
+    setTimeout( function() {
+    	restart(true); }, 3000);
+  }
 }
 
 $(document).ready(function() {
