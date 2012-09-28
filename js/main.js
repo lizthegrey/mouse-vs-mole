@@ -642,11 +642,15 @@ function stopMusic() {
 }
 
 function restart(bool) {
+
   if (bool || $.gameQuery.keyTracker[82]) {
-    updatePoints(1, -1 * p(1)[0].player.points);
-    updatePoints(2, -1 * p(2)[0].player.points);
-    stopMusic();
-    death_y = GRID_HEIGHT; // tracks the creeping death.
+
+    if ($.gameQuery.keyTracker[82]) {
+      updatePoints(1, -1 * p(1)[0].player.points);
+      updatePoints(2, -1 * p(2)[0].player.points);
+      stopMusic();
+      death_y = GRID_HEIGHT;
+    }
 
     $('#text').remove();
     $.playground().clearAll(true);
