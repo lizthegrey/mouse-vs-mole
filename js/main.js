@@ -43,7 +43,7 @@ var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var NUM_RESOURCES = 0;
 var SPRITE_GRAPHIC_INDEXES = Array(2, 8, 6, 3);
 
-var BG_MUSIC = 'sounds/casual_bg.ogg';
+var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
 var PLAYER2_RUN = 'sounds/running_diff.ogg';
 var BLOCK_BREAK = 'sounds/crunches.ogg';
@@ -210,11 +210,6 @@ function player(node, playerNum, xpos, ypos) {
 
   this.playerWalkRight = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Walk.png',
-      numberOfFrame: 4, delta: 11, rate: 60,
-      type: $.gQ.ANIMATION_HORIZONTAL});
-
-  this.playerMine = new $.gameQuery.Animation({
-      imageURL: 'sprites/Player' + this.playerNum + '-Mine.png',
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
 
@@ -655,6 +650,5 @@ $(document).ready(function() {
   addSounds();
   addFunctionality();
   $.playground().startGame();
-  //$('#background').playSound();
-  //console.log("testing sound");
+  $('#background').playSound();
 });
