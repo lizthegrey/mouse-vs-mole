@@ -34,6 +34,8 @@ var DAMAGE_JUMP = 5;
 var DAMAGE_DIG = 5;
 var DAMAGE_COLLIDE = 2;
 
+var POINT_RAMPING = 13;
+
 var CREEPING_DEATH_MS = 10000;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
@@ -516,8 +518,9 @@ function updatePoints(playerNum, pointsInc) {
       points = 0;
   }
 
+  var h = Math.atan(points/POINT_RAMPING)/(Math.PI/2);
   $('#pts' + playerNum).animate({'height':
-      (100 - (points / NUM_RESOURCES) * 100) + '%'}, 300);
+      100 - h*100 + '%'}, 300);
 
   p(playerNum)[0].player.points = points;
 }
@@ -621,6 +624,19 @@ function gameOver() {
     	restart(true); }, 3000);
   }
 }
+
+var ar=new Array(33,34,35,36,37,38,39,40);
+
+$(document).keydown(function(e) {
+     var key = e.which;
+      //console.log(key);
+      //if(key==35 || key == 36 || key == 37 || key == 39)
+      if($.inArray(key,ar) > -1) {
+          e.preventDefault();
+          return false;
+      }
+      return true;
+});
 
 $(document).ready(function() {
   buildPlayground();
