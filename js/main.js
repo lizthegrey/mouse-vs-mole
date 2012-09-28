@@ -213,11 +213,6 @@ function player(node, playerNum, xpos, ypos) {
       numberOfFrame: 4, delta: 11, rate: 60,
       type: $.gQ.ANIMATION_HORIZONTAL});
 
-  this.playerMine = new $.gameQuery.Animation({
-      imageURL: 'sprites/Player' + this.playerNum + '-Mine.png',
-      numberOfFrame: 4, delta: 11, rate: 60,
-      type: $.gQ.ANIMATION_HORIZONTAL});
-
   this.playerJump = new $.gameQuery.Animation({
       imageURL: 'sprites/Player' + this.playerNum + '-Jump.png'});
 
