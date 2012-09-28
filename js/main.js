@@ -36,6 +36,7 @@ var DAMAGE_COLLIDE = 2;
 
 var POINT_RAMPING = 13;
 
+var ENABLE_CREEPING = false;
 var CREEPING_DEATH_MS = 10000;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
@@ -253,7 +254,8 @@ function addFunctionality() {
     gameOver();
   }, 30);
   $.playground().registerCallback(function() {
-    should_creep = true;
+    if (ENABLE_CREEPING)
+        should_creep = true;
   }, CREEPING_DEATH_MS);
 }
 
@@ -310,6 +312,8 @@ function playerMove(player) {
   var isRunning = false;
 
   if ($.gameQuery.keyTracker[left]) {
+    ENABLE_CREEPING = true;
+
     var nextpos = parseInt(p(player).x()) - MOVE_VELOCITY;
     var elem = lg(x - 1, y);
 
@@ -333,6 +337,7 @@ function playerMove(player) {
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[right]) {
+    ENABLE_CREEPING = true;
     var nextpos = parseInt(p(player).x()) + MOVE_VELOCITY;
     var elem = lg(x + 1, y);
 
@@ -356,6 +361,7 @@ function playerMove(player) {
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[up]) {
+    ENABLE_CREEPING = true;
     // Ensure the player is standing on solid ground.
     var elem = lg(x, y + 1);
     if (elem && elem.node &&
@@ -365,6 +371,7 @@ function playerMove(player) {
     isRunning = true;
   }
   if ($.gameQuery.keyTracker[dig]) {
+    ENABLE_CREEPING = true;
     // Dig down.
     var elem = lg(x, y + 1);
     if (elem && elem.node) {
@@ -518,9 +525,9 @@ function updatePoints(playerNum, pointsInc) {
       points = 0;
   }
 
-  var h = Math.atan(points/POINT_RAMPING)/(Math.PI/2);
+  var h = Math.atan(points / POINT_RAMPING) / (Math.PI / 2);
   $('#pts' + playerNum).animate({'height':
-      100 - h*100 + '%'}, 300);
+      100 - h * 100 + '%'}, 300);
 
   p(playerNum)[0].player.points = points;
 }
@@ -574,7 +581,7 @@ function removeDestroyed() {
 }
 
 function deathFromBelow() {
-  if (death_y == 1 || !should_creep) {
+  if (death_y == 1 || !should_creep || !ENABLE_CREEPING) {
     return;
   }
   death_y--;
@@ -607,31 +614,31 @@ function gameOver() {
     if (p(1)[0].player.points > p(2)[0].player.points) pl = 1;
     else if (p(1)[0].player.points < p(2)[0].player.points) pl = 2;
 
-    updatePoints(1, -1*p(1)[0].player.points);
-    updatePoints(2, -1*p(2)[0].player.points);
+    updatePoints(1, -1 * p(1)[0].player.points);
+    updatePoints(2, -1 * p(2)[0].player.points);
 
     $.playground().clearAll(true);
     $.playground().addGroup('text', {
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
     if (pl != 0) {
-      $('#text').append('<div style="position: absolute; top: 290px;'
-      + 'width: 800px; color: white;"><center><a style="cursor: pointer;"'
-      + 'id="restartbutton">Player ' + pl + ' Wins!</a></center></div>'); }
-	 else { $('#text').append('<div style="position: absolute; top: 290px;'
-	 + 'width: 800px; color: white;"><center><a style="cursor: pointer;"'
-	 + 'id="restartbutton">Draw!</a></center></div>'); }
-    setTimeout( function() {
-    	restart(true); }, 3000);
+      $('#text').append('<div style="position: absolute; top: 290px;' +
+        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
+        'id="restartbutton">Player ' + pl + ' Wins!</a></center></div>'); }
+    else { $('#text').append('<div style="position: absolute; top: 290px;' +
+       'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
+       'id="restartbutton">Draw!</a></center></div>'); }
+    setTimeout(function() {
+        restart(true); }, 3000);
   }
 }
 
-var ar=new Array(33,34,35,36,37,38,39,40);
+var ar = new Array(33, 34, 35, 36, 37, 38, 39, 40);
 
 $(document).keydown(function(e) {
      var key = e.which;
       //console.log(key);
       //if(key==35 || key == 36 || key == 37 || key == 39)
-      if($.inArray(key,ar) > -1) {
+      if ($.inArray(key, ar) > -1) {
           e.preventDefault();
           return false;
       }
