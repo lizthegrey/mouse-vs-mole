@@ -33,3 +33,62 @@
     background-color: black;
     background-image: url('../sprites/ScoreBg.png');
 }
+
+
+h2
+{
+    margin-top: 0px;
+}
+h3
+{
+    margin-top: 0px;
+}
+h4
+{
+    font-weight: normal;
+    text-decoration: underline;
+}
+.instbox
+{
+    border-style: dotted;
+    border-width: 1px;
+
+    padding: 10px;
+    margin: 5px;
+    margin-bottom: 15px;
+}
+.smcontrols
+{
+    display: inline-block;
+    margin-left: 40px;
+    margin-right: 40px;
+}
+.key
+{
+    font-weight: bolder;
+}
+#start
+{
+    margin-left: 15px;
+    font-style: italic;
+}
+#undergame
+{
+    width: 890px;
+    font-family: sans-serif;
+    margin-left: 15px;
+}
+#left
+{
+    float: left;
+    width: 520px;
+}
+#controls{
+    float: right;
+}
+#p1controls{
+    float: left;
+}
+#p2controls{
+    float: right;
+}
