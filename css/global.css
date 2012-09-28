@@ -1,3 +1,11 @@
+body {
+    background: tan;
+}
+
+#gamewrapper, #undergame {
+    margin: auto;
+}
+
 #game
 {
     width: 800px;
@@ -76,7 +84,6 @@ h4
 {
     width: 890px;
     font-family: sans-serif;
-    margin-left: 15px;
 }
 #left
 {
