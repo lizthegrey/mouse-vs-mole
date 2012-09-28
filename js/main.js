@@ -34,6 +34,8 @@ var DAMAGE_JUMP = 5;
 var DAMAGE_DIG = 5;
 var DAMAGE_COLLIDE = 2;
 
+var POINT_RAMPING = 13;
+
 var CREEPING_DEATH_MS = 10000;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
@@ -514,7 +516,7 @@ function updatePoints(playerNum, pointsInc) {
       points = 0;
   }
 
-  var h = Math.atan(points/8)/(Math.PI/2);
+  var h = Math.atan(points/POINT_RAMPING)/(Math.PI/2);
   $('#pts' + playerNum).animate({'height':
       100 - h*100 + '%'}, 300);
 
