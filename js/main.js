@@ -65,32 +65,30 @@ var death_y = GRID_HEIGHT; // tracks the creeping death.
 var players = Array(null, null);
 
 function buildPlayground() {
-  Crafty.scene('mainLevel', function () {
-    var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
-    asset_list += ['sprites/blocks.png'];
-    asset_list += ['sprites/players.png'];
-    Crafty.load(asset_list);
-    //Crafty.background('sprites/800x600.png');
+  var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
+  asset_list += ['sprites/blocks.png'];
+  asset_list += ['sprites/players.png'];
+  Crafty.load(asset_list);
+  //Crafty.background('sprites/800x600.png');
 
-    Crafty.sprite(RESOURCE_SIZE, 'sprites/Resource.png', {
-      resource: [0, 0]
-    });
+  Crafty.sprite(RESOURCE_SIZE, 'sprites/Resource.png', {
+    resource: [0, 0]
+  });
 
-    Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT, 'sprites/players.png', {
-      player1: [0, 0],
-      player2: [0, 1],
-    });
+  Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT, 'sprites/players.png', {
+    player1: [0, 0],
+    player2: [0, 1],
+  });
 
-    Crafty.sprite(BLOCK_SIZE, 'sprites/blocks.png', {
-      block1: [0, 0],
-      block2: [1, 0],
-      block3: [2, 0],
-      block4: [3, 0],
-      block5: [4, 0],
-      block6: [5, 0],
-      block7: [6, 0],
-      block8: [7, 0],
-    });
+  Crafty.sprite(BLOCK_SIZE, 'sprites/blocks.png', {
+    block1: [0, 0],
+    block2: [1, 0],
+    block3: [2, 0],
+    block4: [3, 0],
+    block5: [4, 0],
+    block6: [5, 0],
+    block7: [6, 0],
+    block8: [7, 0],
   });
 
   timer = Crafty.e('Delay')
@@ -100,6 +98,7 @@ function buildPlayground() {
       restart();
     }
   });
+
 }
 
 function addActors() {
@@ -116,8 +115,8 @@ function addActors() {
       rand = Math.floor(Math.random() * NUM_COLORS);
       blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
 
-      var b = Crafty.e('2D, Canvas, block, Collision' + blockColor).
-          attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 0});
+      var b = Crafty.e('2D, Canvas, block, Collision, ' + blockColor).
+          attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
 
       levelGrid[x][y] = new block(b, rand, 0);
     }
@@ -143,7 +142,7 @@ function addActors() {
       var r = Crafty.e('2D, Canvas, resource, Collision, Gravity').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
-          z: 0
+          z: 200
       }).gravityConst(GRAVITY_ACCEL).gravity('block')
       .onHit('player', function(rsrc, hit) {
         for (object in hit) {
@@ -154,7 +153,7 @@ function addActors() {
             }
           }
         }
-        rsrc.destroy();
+        //rsrc.destroy();
       });
     }
   }
@@ -227,11 +226,11 @@ function addActors() {
 
   var p1 = Crafty.e('2D, Canvas, player, Gravity, Collision, ' +
                     'p1anim, player1, leftControl')
-      .attr({x: START_XPOS_P1, y: START_YPOS, z: 0})
+      .attr({x: START_XPOS_P1, y: START_YPOS, z: 200})
       .gravityConst(GRAVITY_ACCEL).gravity('block');
   var p2 = Crafty.e('2D, Canvas, player, Gravity, Collision, ' +
                     'p2anim, player2, rightControl')
-      .attr({x: START_XPOS_P2, y: START_YPOS, z: 0})
+      .attr({x: START_XPOS_P2, y: START_YPOS, z: 200})
       .gravityConst(GRAVITY_ACCEL).gravity('block');
 
   players[0] = new player(p1, 1,
@@ -614,7 +613,9 @@ function deathFromBelow() {
 
 function startMusic() {
   if (!MUSIC_PLAYING) {
-    Crafty.audio.play('bgMusic', -1, 0.5);
+    console.log("Playing music");
+    Crafty.audio.play('bgMusic', -1, 1.0);
+    console.log("Playing music");
     MUSIC_PLAYING = true;
   }
 }
@@ -633,11 +634,17 @@ function restart() {
   stopMusic();
   death_y = GRID_HEIGHT;
   $('#text').remove();
-  $.playground().clearAll(true);
+
+  Crafty.stop(true);
+
+  Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
+  //Crafty.canvas.init();
+
   buildPlayground();
   addActors();
   addSounds();
   addFunctionality();
+  Crafty.scene('mainLevel');
   startMusic();
 }
 
@@ -693,15 +700,17 @@ $(document).keydown(function(e) {
       return true;
 });
 
-$(document).ready(function() {
-  Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  Crafty.canvas.init();
-
+Crafty.scene('mainLevel', function() {
   buildPlayground();
   addActors();
   addSounds();
   addFunctionality();
-
-  Crafty.scene('mainLevel');
   startMusic();
+});
+
+
+$(document).ready(function() {
+  Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
+  Crafty.canvas.init();
+  Crafty.scene('mainLevel');
 });
