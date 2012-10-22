@@ -40,7 +40,7 @@ var ENABLE_CREEPING = false;
 var CREEPING_DEATH_MS = 10000;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
-var SPRITE_GRAPHIC_INDEXES = Array(2, 8, 6, 3);
+var SPRITE_GRAPHIC_INDEXES = new Array(2, 8, 6, 3);
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -62,7 +62,7 @@ var timer;
 var should_creep = false;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
 
-var players = Array(null, null);
+var players = new Array(null, null);
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
@@ -91,7 +91,7 @@ function buildPlayground() {
     block8: [7, 0],
   });
 
-  timer = Crafty.e('Delay')
+  timer = Crafty.e('Delay');
   timer.delay(doCreep, CREEPING_DEATH_MS);
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
@@ -164,7 +164,7 @@ function addActors() {
     },
     
     leftControl: function() {
-      this.multiway(MOVE_VELOCITY, {D: 0, A: 180})
+      this.multiway(MOVE_VELOCITY, {D: 0, A: 180});
       this.bind('EnterFrame', function () {
         if (this.disableControls) return;
         if (this._up) {
@@ -189,7 +189,7 @@ function addActors() {
     },
     
     leftControl: function() {
-      this.multiway(MOVE_VELOCITY, {RIGHT_ARROW: 0, LEFT_ARROW: 180})
+      this.multiway(MOVE_VELOCITY, {RIGHT_ARROW: 0, LEFT_ARROW: 180});
       this.bind('EnterFrame', function () {
         if (this.disableControls) return;
         if (this._up) {
@@ -220,7 +220,7 @@ function addActors() {
     p2anim: function() {
       this.requires('SpriteAnimation, Collision, Grid')
           .animate('walk', 1, 1, 4)
-          .animate('jump', 5, 1, 1)
+          .animate('jump', 5, 1, 1);
     }
   });
 
@@ -269,7 +269,7 @@ function resource(node) {
   this.node._gy = 0;
   this.getX = function() {
     return posToGrid(this.node._x);
-  }
+  };
   this.getY = function() {
     return posToGrid(this.node._y);
   };
@@ -449,7 +449,7 @@ function verticalMovement(player) {
   var rx = p(player).getRightX();
   var y = p(player).getY();
 
-  var nextpos = parseInt(pspr(player)._y + pspr(player)._gy);
+  var nextpos = parseInt(pspr(player)._y) + pspr(player)._gy;
   if (pspr(player)._gy >= 0) {
     var elem = lg(x, y + 1);
     var elem2 = lg(rx, y + 1);
@@ -465,7 +465,7 @@ function verticalMovement(player) {
       p(player).runningRight = false;
     } else {
       if (elem && elem.node) {
-      	pspr(player).y = elem.node._y - PLAYER_HEIGHT;
+        pspr(player).y = elem.node._y - PLAYER_HEIGHT;
       } else {
         pspr(player).y = elem2.node._y - PLAYER_HEIGHT;
       }
