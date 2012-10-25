@@ -158,56 +158,6 @@ function addActors() {
     }
   }
 
-  Crafty.c('leftControl', {
-    init: function() {
-      this.requires('Multiway');
-    },
-    
-    leftControl: function() {
-      this.multiway(MOVE_VELOCITY, {D: 0, A: 180});
-      this.bind('EnterFrame', function () {
-        if (this.disableControls) return;
-        if (this._up) {
-          this.y += JUMP_VELOCITY;
-          this._falling = true;
-        }
-      }).bind('KeyDown', function () {
-        if (this.isDown('W')) {
-          this._up = true;
-        }
-      });
-
-      // TODO: bind "D" for digging.
-
-      return this;
-    }
-  });
-
-  Crafty.c('rightControl', {
-    init: function() {
-      this.requires('Multiway');
-    },
-    
-    leftControl: function() {
-      this.multiway(MOVE_VELOCITY, {RIGHT_ARROW: 0, LEFT_ARROW: 180});
-      this.bind('EnterFrame', function () {
-        if (this.disableControls) return;
-        if (this._up) {
-          this.y += JUMP_VELOCITY;
-          this._falling = true;
-        }
-      }).bind('KeyDown', function () {
-        if (this.isDown('UP_ARROW')) {
-          this._up = true;
-        }
-      });
-
-      // TODO: bind "DOWN_ARROW" for digging.
-
-      return this;
-    }
-  });
-
   Crafty.c('p1anim', {
     p1anim: function() {
       this.requires('SpriteAnimation, Collision, Grid')
@@ -336,16 +286,16 @@ function playerMove(player) {
   var up = 0;
   switch (player) {
    case 1:
-    left = 65;
-    right = 68;
-    up = 87;
-    dig = 83;
+    left = Crafty.keys['A'];
+    right = Crafty.keys['D'];
+    up = Crafty.keys['W'];
+    dig = Crafty.keys['S'];
     break;
    case 2:
-    left = 37;
-    right = 39;
-    up = 38;
-    dig = 40;
+    left = Crafty.keys['LEFT_ARROW'];
+    right = Crafty.keys['RIGHT_ARROW'];
+    up = Crafty.keys['UP_ARROW'];
+    dig = Crafty.keys['DOWN_ARROW'];
     break;
   }
 
@@ -354,70 +304,70 @@ function playerMove(player) {
   var y = p(player).getY();
 
   var isRunning = false;
-/*
-  if ($.gameQuery.keyTracker[left]) {
+
+  if (Crafty.keydown[left]) {
     ENABLE_CREEPING = true;
 
-    var nextpos = parseInt(p(player)._x) - MOVE_VELOCITY;
+    var nextpos = parseInt(pspr(player)._x) - MOVE_VELOCITY;
     var elem = lg(x - 1, y);
 
     if (nextpos > 0) {
       if (!elem || !elem.node ||
           nextpos > elem.node._x + BLOCK_SIZE) {
-        p(player).x(nextpos);
+        pspr(player).x = nextpos;
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
         }
-        p(player).x(elem.node._x + BLOCK_SIZE);
+        pspr(player).x = elem.node._x + BLOCK_SIZE;
       }
     }
     if (!p(player).runningLeft) {
-      pspr(player).setAnimation(p(player).playerWalkLeft);
-      pspr(player).fliph(false);
+      //pspr(player).setAnimation(p(player).playerWalkLeft);
+      //pspr(player).fliph(false);
       p(player).runningLeft = true;
       p(player).runningRight = false;
     }
     isRunning = true;
   }
-  if ($.gameQuery.keyTracker[right]) {
+  if (Crafty.keydown[right]) {
     ENABLE_CREEPING = true;
-    var nextpos = parseInt(p(player)._x) + MOVE_VELOCITY;
+    var nextpos = parseInt(pspr(player)._x) + MOVE_VELOCITY;
     var elem = lg(x + 1, y);
 
     if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
       if (!elem || !elem.node ||
           nextpos < elem.node._x - PLAYER_WIDTH) {
-        p(player).x(nextpos);
+        pspr(player).x = nextpos;
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
         }
-        p(player).x(elem.node._x - PLAYER_WIDTH);
+        pspr(player).x = elem.node._x - PLAYER_WIDTH;
       }
     }
-    if (!p(player).runningRight) {
-      pspr(player).setAnimation(p(player).playerWalkRight);
-      pspr(player).fliph(true);
-      p(player).runningRight = true;
-      p(player).runningLeft = false;
+    if (!pspr(player).runningRight) {
+      //pspr(player).setAnimation(p(player).playerWalkRight);
+      //pspr(player).fliph(true);
+      pspr(player).runningRight = true;
+      pspr(player).runningLeft = false;
     }
     isRunning = true;
   }
-  if ($.gameQuery.keyTracker[up]) {
+  if (Crafty.keydown[up]) {
     ENABLE_CREEPING = true;
     // Ensure the player is standing on solid ground.
     var elem = lg(x, y + 1);
     var elem2 = lg(rx, y + 1);
     if (elem && elem.node &&
-        p(player)._y == elem.node._y - PLAYER_HEIGHT ||
+        pspr(player)._y == elem.node._y - PLAYER_HEIGHT ||
         elem2 && elem2.node &&
-        p(player)._y == elem2.node._y - PLAYER_HEIGHT) {
+        pspr(player)._y == elem2.node._y - PLAYER_HEIGHT) {
       pspr(player)._gy = JUMP_VELOCITY;
     }
     isRunning = true;
   }
-  if ($.gameQuery.keyTracker[dig]) {
+  if (Crafty.keydown[dig]) {
     ENABLE_CREEPING = true;
     // Dig down.
     var elem = lg(x, y + 1);
@@ -428,10 +378,10 @@ function playerMove(player) {
     else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
     }
-    p(player).runningLeft = false;
-    p(player).runningRight = false;
+    pspr(player).runningLeft = false;
+    pspr(player).runningRight = false;
   }
-*/
+
   if (player == 1 && isRunning && !PLAYER1_RUNNING && !PLAYER1_DEAD) {
     // console.log("Player 1 begun walking");
     Crafty.audio.play('player1Run', -1);
@@ -457,17 +407,17 @@ function verticalMovement(player) {
         nextpos < elem.node._y - PLAYER_HEIGHT) &&
         (!elem2 || !elem2.node ||
         nextpos < elem2.node._y - PLAYER_HEIGHT)) {
-      p(player).y(nextpos);
+      p(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).animate('jump');
+      ////pspr(player).animate('jump');
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
     } else {
       if (elem && elem.node) {
-        pspr(player).y = elem.node._y - PLAYER_HEIGHT;
+        p(player).y = elem.node._y - PLAYER_HEIGHT;
       } else {
-        pspr(player).y = elem2.node._y - PLAYER_HEIGHT;
+        p(player).y = elem2.node._y - PLAYER_HEIGHT;
       }
 
       pspr(player)._gy = 0;
@@ -482,20 +432,20 @@ function verticalMovement(player) {
       if (nextpos < 0) {
         nextpos = 0;
       }
-      p(player).y(nextpos);
+      pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).setAnimation(p(player).playerJump);
+      //pspr(player).setAnimation(p(player).playerJump);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
-        p(player).y(elem.node._y + BLOCK_SIZE);
+        p(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
-        p(player).y(elem2.node._y + BLOCK_SIZE);
+        p(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
     }
@@ -505,32 +455,32 @@ function verticalMovement(player) {
 /* Function to stop sound upon player no longer moving */
 /* Also changes player animation back to standing still */
 function playerStop() {
-/*
-  if (!$.gameQuery.keyTracker[65] &&
-      !$.gameQuery.keyTracker[68] &&
-      !$.gameQuery.keyTracker[87]) {
+
+  if (!Crafty.keydown[65] &&
+      !Crafty.keydown[68] &&
+      !Crafty.keydown[87]) {
     if (PLAYER1_RUNNING) {
       PLAYER1_RUNNING = false;
       Crafty.audio.stop('player1Run');
     }
-    pspr(1).stop();
+    //pspr(1).stop();
     p(1).miningSprite = false;
     p(1).runningLeft = false;
     p(1).runningRight = false;
   }
-  if (!$.gameQuery.keyTracker[37] &&
-      !$.gameQuery.keyTracker[38] &&
-      !$.gameQuery.keyTracker[39]) {
+  if (!Crafty.keydown[37] &&
+      !Crafty.keydown[38] &&
+      !Crafty.keydown[39]) {
     if (PLAYER2_RUNNING) {
       PLAYER2_RUNNING = false;
       Crafty.audio.stop('player2Run');
     }
-    pspr(2).stop();
+    //pspr(2).stop();
     p(2).miningSprite = false;
     p(2).runningLeft = false;
     p(2).runningRight = false;
   }
-*/
+
 }
 
 function updatePoints(playerNum, pointsInc) {
@@ -583,7 +533,7 @@ function removeDestroyed() {
             levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
           evaluateChainReaction = true;
           var type = levelGrid[x][y].blockType;
-          levelGrid[x][y].node.remove();
+          //levelGrid[x][y].node.remove();
           levelGrid[x][y] = new block(null, null, null);
           
           Crafty.audio.play('blockBreak');
@@ -604,7 +554,7 @@ function deathFromBelow() {
   death_y--;
   for (var x = 0; x < GRID_WIDTH; x++) {
     if (levelGrid[x][death_y].node) {
-      levelGrid[x][death_y].node.remove();
+      //levelGrid[x][death_y].node.remove();
       levelGrid[x][death_y] = new block(null, null, null);
     }
   }
