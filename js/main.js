@@ -149,15 +149,15 @@ function addActors() {
     }
   }
   Crafty.c('p1anim', {
-    p1anim: function() {
-      this.requires('SpriteAnimation, Grid')
+    init: function() {
+      this.requires('Sprite,SpriteAnimation, Grid')
           .animate('walk', 1, 0, 4)
           .animate('jump', 5, 0, 1);
     }
   });
   
   Crafty.c('p2anim', {
-    p2anim: function() {
+    init: function() {
       this.requires('SpriteAnimation, Grid')
           .animate('walk', 1, 1, 4)
           .animate('jump', 5, 1, 1);
@@ -165,10 +165,10 @@ function addActors() {
   });
 
   var p1 = Crafty.e('2D, Canvas, player, ' +
-                    'p1anim, player1, leftControl')
+                    'player1, p1anim, leftControl')
       .attr({x: START_XPOS_P1, y: START_YPOS, z: 200});
   var p2 = Crafty.e('2D, Canvas, player, ' +
-                    'p2anim, player2, rightControl')
+                    'player2, p2anim, rightControl')
       .attr({x: START_XPOS_P2, y: START_YPOS, z: 200});
 
   players[0] = new player(p1, 1,
@@ -400,8 +400,8 @@ function playerMove(player) {
       }
     }
     if (!p(player).runningLeft) {
-      //pspr(player).setAnimation(p(player).playerWalkLeft);
-      //pspr(player).fliph(false);
+      pspr(player).animate('walk', -1);
+      pspr(player).unflip('X');
       p(player).runningLeft = true;
       p(player).runningRight = false;
     }
@@ -423,11 +423,11 @@ function playerMove(player) {
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
       }
     }
-    if (!pspr(player).runningRight) {
-      //pspr(player).setAnimation(p(player).playerWalkRight);
-      //pspr(player).fliph(true);
-      pspr(player).runningRight = true;
-      pspr(player).runningLeft = false;
+    if (!p(player).runningRight) {
+      pspr(player).animate('walk', -1);
+      pspr(player).flip('X');
+      p(player).runningRight = true;
+      p(player).runningLeft = false;
     }
     isRunning = true;
   }
@@ -486,7 +486,7 @@ function verticalMovement(player) {
         nextpos < elem2.node._y - PLAYER_HEIGHT)) {
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      ////pspr(player).animate('jump');
+      pspr(player).animate('jump', -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
@@ -511,7 +511,7 @@ function verticalMovement(player) {
       }
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      //pspr(player).setAnimation(p(player).playerJump);
+      pspr(player).animate('jump', -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
