@@ -63,7 +63,7 @@ var should_creep = false;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
 
 var players = new Array(null, null);
-var resources = new Array(0);
+var resources = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
@@ -105,7 +105,7 @@ function buildPlayground() {
 function addActors() {
   var rand = 0;
   levelGrid = new Array(GRID_WIDTH);
-  resources = new Array(0);
+  resources = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
@@ -117,7 +117,7 @@ function addActors() {
       rand = Math.floor(Math.random() * NUM_COLORS);
       blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
 
-      var b = Crafty.e('2D, Canvas, block, Collision, ' + blockColor).
+      var b = Crafty.e('2D, Canvas, block, ' + blockColor).
           attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
 
       levelGrid[x][y] = new block(b, rand, 0);
@@ -141,7 +141,7 @@ function addActors() {
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
 
-      resources.push(new resource(Crafty.e('2D, Canvas, resource, Collision').attr({
+      resources.push(new resource(Crafty.e('2D, Canvas, resource').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
@@ -150,7 +150,7 @@ function addActors() {
   }
   Crafty.c('p1anim', {
     p1anim: function() {
-      this.requires('SpriteAnimation, Collision, Grid')
+      this.requires('SpriteAnimation, Grid')
           .animate('walk', 1, 0, 4)
           .animate('jump', 5, 0, 1);
     }
@@ -158,16 +158,16 @@ function addActors() {
   
   Crafty.c('p2anim', {
     p2anim: function() {
-      this.requires('SpriteAnimation, Collision, Grid')
+      this.requires('SpriteAnimation, Grid')
           .animate('walk', 1, 1, 4)
           .animate('jump', 5, 1, 1);
     }
   });
 
-  var p1 = Crafty.e('2D, Canvas, player, Collision, ' +
+  var p1 = Crafty.e('2D, Canvas, player, ' +
                     'p1anim, player1, leftControl')
       .attr({x: START_XPOS_P1, y: START_YPOS, z: 200});
-  var p2 = Crafty.e('2D, Canvas, player, Collision, ' +
+  var p2 = Crafty.e('2D, Canvas, player, ' +
                     'p2anim, player2, rightControl')
       .attr({x: START_XPOS_P2, y: START_YPOS, z: 200});
 
@@ -204,7 +204,7 @@ function block(node, blockType, damage) {
 
 function resource(node) {
   this.node = node;
-  this.node._gy = 0;
+  this.yVel = 0;
   this.getX = function() {
     return posToGrid(this.node._x);
   };
@@ -253,7 +253,12 @@ function resourceRefresh() {
       // Elements inside an unbroken block can neither fall nor be picked up.
       continue;
     }
-
+    if (resource.node.y > PLAYGROUND_HEIGHT) {
+      resources.splice(n, 1);
+      resource.node.destroy();
+      continue;
+    }
+    console.log("block got here.");
     var nextpos = parseInt(resource.node.y) + parseInt(resource.yVel);
     var elem = lg(x, y + 1);
     if (!elem || !elem.node ||
@@ -727,7 +732,7 @@ Crafty.scene('mainLevel', function() {
 
 $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  //Crafty.canvas.init();
+  Crafty.canvas.init();
   Crafty.scene('mainLevel');
   Crafty.viewport.init();
 });
