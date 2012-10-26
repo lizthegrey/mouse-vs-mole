@@ -311,28 +311,30 @@ function addFunctionality() {
   Crafty.bind('EnterFrame', frameFunctionality);
 }
 
-var viewportCount = 0;
 function viewport() {
-  viewportCount += 1;
-
-  if(viewportCount % 4 != 0) {
+  if (Crafty.frame() % 8 != 0) {
     return;
   }
 
-  if(!PLAYER1_DEAD && !PLAYER2_DEAD) {
+  if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
     var x = -1*(pspr(1)._x + pspr(2)._x)/2;
     var y = -1*(pspr(1)._y + pspr(2)._y)/2;
-    var zoom = 1.7 - 0.000005*(Math.pow(pspr(1)._x - pspr(2)._x, 2) + Math.pow(pspr(1)._y - pspr(2)._y, 2));
 
-    if(zoom < 1.1)
+    var x_scale = pspr(1)._x - pspr(2)._x;     
+    var y_scale = pspr(1)._y - pspr(2)._y;     
+    var zoom = 1.7 - 0.000005 *
+        (x_scale * x_scale + y_scale * y_scale);
+
+    if (zoom < 1.1) {
       zoom = 1.1;
+    }
   }
-  else if(!PLAYER1_DEAD) {
+  else if (!PLAYER1_DEAD) {
       var x = -1*pspr(1)._x;
       var y = -1*pspr(1)._y;
       var zoom = 1.2;
   }
-  else if(!PLAYER2_DEAD) {
+  else if (!PLAYER2_DEAD) {
       var x = -1*pspr(2)._x;
       var y = -1*pspr(2)._y;
       var zoom = 1.2;
@@ -666,11 +668,11 @@ function restart() {
 }
 
 function gameOver() {
-  if (!PLAYER1_DEAD && pspr(1)._y > PLAYGROUND_HEIGHT){
+  if (!PLAYER1_DEAD && pspr(1)._y > PLAYGROUND_HEIGHT) {
     PLAYER1_DEAD = true;
     Crafty.audio.play('playerDeath');
   }
-  if(!PLAYER2_DEAD && pspr(2)._y > PLAYGROUND_HEIGHT){
+  if (!PLAYER2_DEAD && pspr(2)._y > PLAYGROUND_HEIGHT) {
     PLAYER2_DEAD = true;
     Crafty.audio.play('playerDeath');
   }
@@ -711,7 +713,7 @@ var ar = new Array(33, 34, 35, 36, 37, 38, 39, 40);
 $(document).keydown(function(e) {
      var key = e.which;
       //console.log(key);
-      //if(key==35 || key == 36 || key == 37 || key == 39)
+      //if (key==35 || key == 36 || key == 37 || key == 39)
       if ($.inArray(key, ar) > -1) {
           e.preventDefault();
           return false;
