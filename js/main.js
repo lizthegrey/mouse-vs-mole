@@ -63,6 +63,7 @@ var should_creep = false;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
 
 var players = new Array(null, null);
+var resources = new Array(0);
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
@@ -104,6 +105,7 @@ function buildPlayground() {
 function addActors() {
   var rand = 0;
   levelGrid = new Array(GRID_WIDTH);
+  resources = new Array(0);
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
@@ -139,19 +141,11 @@ function addActors() {
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
 
-      var r = Crafty.e('2D, Canvas, resource, Collision').attr({
+      resources.push(new resource(Crafty.e('2D, Canvas, resource, Collision').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
-      })
-      .onHit('player', function(hit) {
-        for (var hitobj = 0; hitobj < hit.length; hitobj++) {
-          h = hit[hitobj];
-          updatePoints(h.obj.player.playerNum, 1);
-          Crafty.audio.play('resourceGet');
-        }
-        this.destroy();
-      });
+      })));
     }
   }
   Crafty.c('p1anim', {
@@ -249,6 +243,53 @@ function posToGrid(pos) {
   return Math.round(pos / BLOCK_SIZE);
 }
 
+function resourceRefresh() {
+  for (var n = 0; n < resources.length; n++) {
+    var resource = resources[n];
+    var x = resource.getX();
+    var y = resource.getY();
+
+    if (lg(x, y) && lg(x, y).node) {
+      // Elements inside an unbroken block can neither fall nor be picked up.
+      continue;
+    }
+
+    var nextpos = parseInt(resource.node.y) + parseInt(resource.yVel);
+    var elem = lg(x, y + 1);
+    if (!elem || !elem.node ||
+        nextpos < elem.node.y - RESOURCE_SIZE) {
+      resource.node.y = nextpos;
+      resource.yVel += GRAVITY_ACCEL;
+    } else {
+      resource.node.y = elem.node.y - RESOURCE_SIZE;
+      resource.yVel = 0;
+    }
+
+    var rx = resource.node.x;
+    var ry = resource.node.y;
+
+    var popped = false;
+    for (var playerNum = 1; playerNum <= 2; playerNum++) {
+      var px = pspr(playerNum).x;
+      var py = pspr(playerNum).y;
+      if (resourceGet(rx, ry, px, py)) {
+        if (!popped) {
+          resources.splice(n, 1);
+        }
+        updatePoints(playerNum, 1);
+        popped = true;
+        Crafty.audio.play('resourceGet');
+        // I thought about having a break statement in here, but if the players
+        // are occupying the same space, they both deserve the points for a
+        // resource as it falls on them.
+      }
+    }
+    if (popped) {
+      resource.node.destroy();
+    }
+  }
+}
+
 function frameFunctionality() {
   playerMove(1);
   playerMove(2);
@@ -257,6 +298,7 @@ function frameFunctionality() {
   removeDestroyed();
   verticalMovement(1);
   verticalMovement(2);
+  resourceRefresh();
   gameOver();
   viewport();
 }
@@ -685,7 +727,7 @@ Crafty.scene('mainLevel', function() {
 
 $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  Crafty.canvas.init();
+  //Crafty.canvas.init();
   Crafty.scene('mainLevel');
   Crafty.viewport.init();
 });
