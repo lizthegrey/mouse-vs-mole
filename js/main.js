@@ -199,12 +199,12 @@ function doCreep() {
 /* Block initializes sounds in gameworld */
 function addSounds() {
   Crafty.audio.add({
-    bgMusic: BG_MUSIC,
-    player1Run: PLAYER1_RUN,
-    player2Run: PLAYER2_RUN,
-    blockBreak: BLOCK_BREAK,
-    resourceGet: RESOURCE_GET,
-    playerDeath: PLAYER_DEATH
+    bgMusic: [BG_MUSIC],
+    player1Run: [PLAYER1_RUN],
+    player2Run: [PLAYER2_RUN],
+    blockBreak: [BLOCK_BREAK],
+    resourceGet: [RESOURCE_GET],
+    playerDeath: [PLAYER_DEATH]
   });
 }
 
