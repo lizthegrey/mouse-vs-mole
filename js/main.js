@@ -17,7 +17,7 @@ var START_XCOORD_P1 = 14;
 var START_XPOS_P1 = START_XCOORD_P1 * BLOCK_SIZE;
 var START_XCOORD_P2 = 25;
 var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
-var START_YCOORD = 24;
+var START_YCOORD = 15;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
 var GRAVITY_ACCEL = 1; // pixels/s^2 (down is positive)
@@ -261,10 +261,44 @@ function frameFunctionality() {
   verticalMovement(1);
   verticalMovement(2);
   gameOver();
+  viewport();
 }
 
 function addFunctionality() {
   Crafty.bind('EnterFrame', frameFunctionality);
+}
+
+var viewportCount = 0;
+var previousZoom = 1;
+function viewport() {
+	viewportCount += 1;
+
+	if(!PLAYER1_DEAD && !PLAYER2_DEAD) {
+	  var x = -1*(pspr(1)._x + pspr(2)._x)/2;
+	  var y = -1*(pspr(1)._y + pspr(2)._y)/2;
+	  var zoom = 2 - 0.000005*(Math.pow(pspr(1)._x - pspr(2)._x, 2) + Math.pow(pspr(1)._y - pspr(2)._y, 2));
+	}
+	else if(!PLAYER1_DEAD) {
+      var x = -1*pspr(1)._x;
+      var y = -1*pspr(1)._y;
+      var zoom = 2;
+	}
+	else if(!PLAYER2_DEAD) {
+      var x = -1*pspr(2)._x;
+      var y = -1*pspr(2)._y;
+      var zoom = 2;
+	}
+
+	if(zoom < 1)
+		zoom = 1;
+	console.log(zoom);
+	if(viewportCount % 3 === 0) {
+		Crafty.viewport.scale(0);
+		Crafty.viewport.scale(zoom);
+		Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
+		Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
+	}
+	var previousZoom = zoom;
 }
 
 // did a player get the resource we are updating?
@@ -656,4 +690,5 @@ $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.canvas.init();
   Crafty.scene('mainLevel');
+  Crafty.viewport.init();
 });
