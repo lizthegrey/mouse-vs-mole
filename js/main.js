@@ -266,7 +266,7 @@ function frameFunctionality() {
 }
 
 function addFunctionality() {
-  boundEvent = Crafty.bind('EnterFrame', frameFunctionality);
+  Crafty.bind('EnterFrame', frameFunctionality);
 }
 
 // did a player get the resource we are updating?
