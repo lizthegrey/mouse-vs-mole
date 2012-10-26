@@ -20,7 +20,7 @@ var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
 var START_YCOORD = 24;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
-var GRAVITY_ACCEL = 0.1; // pixels/s^2 (down is positive)
+var GRAVITY_ACCEL = 1; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -11;   // pixels/s
 var MOVE_VELOCITY = 2;
 
@@ -139,11 +139,11 @@ function addActors() {
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
 
-      var r = Crafty.e('2D, Canvas, resource, Collision, Gravity').attr({
+      var r = Crafty.e('2D, Canvas, resource, Collision').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
-      }).gravityConst(GRAVITY_ACCEL).gravity('block')
+      })
       .onHit('player', function(rsrc, hit) {
         for (object in hit) {
           for (player in players) {
@@ -174,14 +174,12 @@ function addActors() {
     }
   });
 
-  var p1 = Crafty.e('2D, Canvas, player, Gravity, Collision, ' +
+  var p1 = Crafty.e('2D, Canvas, player, Collision, ' +
                     'p1anim, player1, leftControl')
-      .attr({x: START_XPOS_P1, y: START_YPOS, z: 200})
-      .gravityConst(GRAVITY_ACCEL).gravity('block');
-  var p2 = Crafty.e('2D, Canvas, player, Gravity, Collision, ' +
+      .attr({x: START_XPOS_P1, y: START_YPOS, z: 200});
+  var p2 = Crafty.e('2D, Canvas, player, Collision, ' +
                     'p2anim, player2, rightControl')
-      .attr({x: START_XPOS_P2, y: START_YPOS, z: 200})
-      .gravityConst(GRAVITY_ACCEL).gravity('block');
+      .attr({x: START_XPOS_P2, y: START_YPOS, z: 200});
 
   players[0] = new player(p1, 1,
                           START_XPOS_P1, START_YPOS);
