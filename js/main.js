@@ -363,7 +363,7 @@ function playerMove(player) {
         pspr(player)._y == elem.node._y - PLAYER_HEIGHT ||
         elem2 && elem2.node &&
         pspr(player)._y == elem2.node._y - PLAYER_HEIGHT) {
-      pspr(player)._gy = JUMP_VELOCITY;
+      pspr(player)._gy = -3;//JUMP_VELOCITY;
     }
     isRunning = true;
   }
@@ -407,7 +407,7 @@ function verticalMovement(player) {
         nextpos < elem.node._y - PLAYER_HEIGHT) &&
         (!elem2 || !elem2.node ||
         nextpos < elem2.node._y - PLAYER_HEIGHT)) {
-      p(player).y = nextpos;
+      pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
       ////pspr(player).animate('jump');
       p(player).miningSprite = false;
@@ -415,9 +415,9 @@ function verticalMovement(player) {
       p(player).runningRight = false;
     } else {
       if (elem && elem.node) {
-        p(player).y = elem.node._y - PLAYER_HEIGHT;
+        pspr(player).y = elem.node._y - PLAYER_HEIGHT;
       } else {
-        p(player).y = elem2.node._y - PLAYER_HEIGHT;
+        pspr(player).y = elem2.node._y - PLAYER_HEIGHT;
       }
 
       pspr(player)._gy = 0;
@@ -441,11 +441,11 @@ function verticalMovement(player) {
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
-        p(player).y = elem.node._y + BLOCK_SIZE;
+        pspr(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
-        p(player).y = elem2.node._y + BLOCK_SIZE;
+        pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
     }
@@ -533,7 +533,7 @@ function removeDestroyed() {
             levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
           evaluateChainReaction = true;
           var type = levelGrid[x][y].blockType;
-          //levelGrid[x][y].node.remove();
+          levelGrid[x][y].node.destroy();
           levelGrid[x][y] = new block(null, null, null);
           
           Crafty.audio.play('blockBreak');
@@ -554,7 +554,7 @@ function deathFromBelow() {
   death_y--;
   for (var x = 0; x < GRID_WIDTH; x++) {
     if (levelGrid[x][death_y].node) {
-      //levelGrid[x][death_y].node.remove();
+      levelGrid[x][death_y].node.destroy();
       levelGrid[x][death_y] = new block(null, null, null);
     }
   }
