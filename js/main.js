@@ -316,7 +316,7 @@ function addFunctionality() {
 }
 
 function viewport() {
-  if (Crafty.frame() % 8 != 0) {
+  if (Crafty.frame() % 2 != 0) {
     return;
   }
 
