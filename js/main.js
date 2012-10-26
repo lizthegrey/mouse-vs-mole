@@ -275,7 +275,10 @@ function viewport() {
 	if(!PLAYER1_DEAD && !PLAYER2_DEAD) {
 	  var x = -1*(pspr(1)._x + pspr(2)._x)/2;
 	  var y = -1*(pspr(1)._y + pspr(2)._y)/2;
-	  var zoom = 1.6 - 0.000005*(Math.pow(pspr(1)._x - pspr(2)._x, 2) + Math.pow(pspr(1)._y - pspr(2)._y, 2));
+	  var zoom = 1.7 - 0.000005*(Math.pow(pspr(1)._x - pspr(2)._x, 2) + Math.pow(pspr(1)._y - pspr(2)._y, 2));
+
+	  if(zoom < 1.1)
+		  zoom = 1.1;
 	}
 	else if(!PLAYER1_DEAD) {
       var x = -1*pspr(1)._x;
@@ -288,8 +291,6 @@ function viewport() {
       var zoom = 1.2;
 	}
 
-	if(zoom < 1)
-		zoom = 1;
 	console.log(zoom);
 	if(viewportCount % 2 === 0) {
 		Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
