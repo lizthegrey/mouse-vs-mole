@@ -52,6 +52,8 @@ var RESOURCE_GET = 'sounds/chime.ogg';
 var PLAYER1_RUNNING = false;
 var PLAYER2_RUNNING = false;
 
+var PLAYER_INAIR = [false, false]
+
 var MUSIC_PLAYING = false;
 var PLAYER1_DEAD = false;
 var PLAYER2_DEAD = false;
@@ -151,16 +153,18 @@ function addActors() {
   Crafty.c('p1anim', {
     init: function() {
       this.requires('Sprite,SpriteAnimation, Grid')
+          .animate('stand', 0, 0, 0)
           .animate('walk', 1, 0, 4)
-          .animate('jump', 5, 0, 1);
+          .animate('jump', 5, 0, 5);
     }
   });
   
   Crafty.c('p2anim', {
     init: function() {
       this.requires('SpriteAnimation, Grid')
+          .animate('stand', 0, 1, 0)
           .animate('walk', 1, 1, 4)
-          .animate('jump', 5, 1, 1);
+          .animate('jump', 5, 1, 5);
     }
   });
 
@@ -304,7 +308,7 @@ function frameFunctionality() {
   verticalMovement(2);
   resourceRefresh();
   gameOver();
-  viewport();
+  //viewport();
 }
 
 function addFunctionality() {
@@ -312,7 +316,7 @@ function addFunctionality() {
 }
 
 function viewport() {
-  if (Crafty.frame() % 2 != 0) {
+  if (Crafty.frame() % 8 != 0) {
     return;
   }
 
@@ -400,8 +404,8 @@ function playerMove(player) {
       }
     }
     if (!p(player).runningLeft) {
-      pspr(player).animate('walk', -1);
       pspr(player).unflip('X');
+      pspr(player).stop().animate('walk', 4, -1);
       p(player).runningLeft = true;
       p(player).runningRight = false;
     }
@@ -424,8 +428,8 @@ function playerMove(player) {
       }
     }
     if (!p(player).runningRight) {
-      pspr(player).animate('walk', -1);
       pspr(player).flip('X');
+      pspr(player).stop().animate('walk', 4, -1);
       p(player).runningRight = true;
       p(player).runningLeft = false;
     }
@@ -486,18 +490,19 @@ function verticalMovement(player) {
         nextpos < elem2.node._y - PLAYER_HEIGHT)) {
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).animate('jump', -1);
+      pspr(player).stop().animate('jump', 1, -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
+      PLAYER_INAIR[player - 1] = true;
     } else {
       if (elem && elem.node) {
         pspr(player).y = elem.node._y - PLAYER_HEIGHT;
       } else {
         pspr(player).y = elem2.node._y - PLAYER_HEIGHT;
       }
-
       pspr(player)._gy = 0;
+      PLAYER_INAIR[player - 1] = false;
     }
   } else {
     var elem = lg(x, y - 1);
@@ -511,10 +516,11 @@ function verticalMovement(player) {
       }
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).animate('jump', -1);
+      pspr(player).stop().animate('jump', 1, -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
+      PLAYER_INAIR[player - 1] = true;
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
@@ -525,6 +531,7 @@ function verticalMovement(player) {
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
+      PLAYER_INAIR[player - 1] = false;
     }
   }
 }
@@ -532,13 +539,13 @@ function verticalMovement(player) {
 /* Function to stop sound upon player no longer moving */
 /* Also changes player animation back to standing still */
 function playerStop() {
-
   if (!Crafty.keydown[65] &&
       !Crafty.keydown[68] &&
       !Crafty.keydown[87]) {
     if (PLAYER1_RUNNING) {
       PLAYER1_RUNNING = false;
       Crafty.audio.stop('player1Run');
+      pspr(1).stop().animate('stand', 1, -1);
     }
     //pspr(1).stop();
     p(1).miningSprite = false;
@@ -551,13 +558,19 @@ function playerStop() {
     if (PLAYER2_RUNNING) {
       PLAYER2_RUNNING = false;
       Crafty.audio.stop('player2Run');
+      pspr(2).stop().animate('stand', 1, -1);
     }
     //pspr(2).stop();
     p(2).miningSprite = false;
     p(2).runningLeft = false;
     p(2).runningRight = false;
   }
-
+  if (!PLAYER_INAIR[0] && !PLAYER1_RUNNING) {
+    pspr(1).stop().animate('stand', 1, -1);
+  }
+  if (!PLAYER_INAIR[1] && !PLAYER2_RUNNING) {
+    pspr(2).stop().animate('stand', 1, -1);
+  }
 }
 
 function updatePoints(playerNum, pointsInc) {
