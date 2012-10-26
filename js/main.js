@@ -62,6 +62,8 @@ var levelGrid; // 2D array containing block objects
 
 var timer;
 var frameDelay;
+var viewportDelay;
+var restartNow = false;
 var should_creep = false;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
 
@@ -69,6 +71,7 @@ var players = new Array(null, null);
 var resources = [];
 
 function buildPlayground() {
+  restartNow = false;
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
   asset_list += ['sprites/blocks.png'];
   asset_list += ['sprites/players.png'];
@@ -103,8 +106,11 @@ function buildPlayground() {
     }
   });
 
+  viewportDelay = Crafty.e('Delay');
+  viewportDelay.delay(viewport, 30);
+  
   frameDelay = Crafty.e('Delay');
-  frameDelay.delay(viewport, 20);
+  frameDelay.delay(frameFunctionality, 20);
 }
 
 function addActors() {
@@ -188,7 +194,7 @@ function doCreep() {
   if (ENABLE_CREEPING) {
     should_creep = true;
   }
-  timer.delay(doCreep, CREEPING_DEATH_MS);
+  if (!restartNow) timer.delay(doCreep, CREEPING_DEATH_MS);
 }
 
 /* Block initializes sounds in gameworld */
@@ -311,11 +317,15 @@ function frameFunctionality() {
   verticalMovement(2);
   resourceRefresh();
   gameOver();
+  if (!restartNow) {
+    frameDelay.delay(frameFunctionality, 3);
+  }
   //viewport();
 }
 
 function addFunctionality() {
-  Crafty.bind('EnterFrame', frameFunctionality);
+  frameDelay.delay(frameFunctionality, 30);
+  //Crafty.bind('EnterFrame', frameFunctionality);
 }
 
 function viewport() {
@@ -346,7 +356,7 @@ function viewport() {
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
   Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
   Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
-  frameDelay.delay(viewport, 20);
+  if (!restartNow) frameDelay.delay(viewport, 5);
 }
 
 // did a player get the resource we are updating?
@@ -676,7 +686,8 @@ function restart() {
   ENABLE_CREEPING = false;
   $('cr-stage').empty();
   $('#text').remove();
-  Crafty.unbind('EnterFrame', frameFunctionality);
+  //Crafty.unbind('EnterFrame', frameFunctionality);
+  restartNow = true;
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.scene('mainLevel');
 }
