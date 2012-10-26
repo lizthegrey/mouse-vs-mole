@@ -308,6 +308,9 @@ function resourceRefresh() {
 }
 
 function frameFunctionality() {
+  if (!restartNow) {
+    frameDelay.delay(frameFunctionality, 20);
+  }
   playerMove(1);
   playerMove(2);
   playerStop();
@@ -317,9 +320,6 @@ function frameFunctionality() {
   verticalMovement(2);
   resourceRefresh();
   gameOver();
-  if (!restartNow) {
-    frameDelay.delay(frameFunctionality, 3);
-  }
   //viewport();
 }
 
