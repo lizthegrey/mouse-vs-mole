@@ -61,6 +61,7 @@ var PLAYER2_DEAD = false;
 var levelGrid; // 2D array containing block objects
 
 var timer;
+var frameDelay;
 var should_creep = false;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
 
@@ -102,6 +103,8 @@ function buildPlayground() {
     }
   });
 
+  frameDelay = Crafty.e('Delay');
+  frameDelay.delay(viewport, 30);
 }
 
 function addActors() {
@@ -308,7 +311,7 @@ function frameFunctionality() {
   verticalMovement(2);
   resourceRefresh();
   gameOver();
-  viewport();
+  //viewport();
 }
 
 function addFunctionality() {
@@ -316,9 +319,9 @@ function addFunctionality() {
 }
 
 function viewport() {
-  if (Crafty.frame() % 8 != 0) {
+  /*if (Crafty.frame() % 8 != 0) {
     return;
-  }
+  }*/
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
     var x = -1*(pspr(1)._x + pspr(2)._x)/2;
@@ -346,6 +349,7 @@ function viewport() {
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
   Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
   Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
+  frameDelay.delay(viewport, 30);
 }
 
 // did a player get the resource we are updating?
