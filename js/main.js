@@ -258,7 +258,6 @@ function resourceRefresh() {
       resource.node.destroy();
       continue;
     }
-    console.log("block got here.");
     var nextpos = parseInt(resource.node.y) + parseInt(resource.yVel);
     var elem = lg(x, y + 1);
     if (!elem || !elem.node ||
