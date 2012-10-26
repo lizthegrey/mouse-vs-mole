@@ -269,36 +269,33 @@ function addFunctionality() {
 }
 
 var viewportCount = 0;
-var previousZoom = 1;
 function viewport() {
 	viewportCount += 1;
 
 	if(!PLAYER1_DEAD && !PLAYER2_DEAD) {
 	  var x = -1*(pspr(1)._x + pspr(2)._x)/2;
 	  var y = -1*(pspr(1)._y + pspr(2)._y)/2;
-	  var zoom = 2 - 0.000005*(Math.pow(pspr(1)._x - pspr(2)._x, 2) + Math.pow(pspr(1)._y - pspr(2)._y, 2));
+	  var zoom = 1.6 - 0.000005*(Math.pow(pspr(1)._x - pspr(2)._x, 2) + Math.pow(pspr(1)._y - pspr(2)._y, 2));
 	}
 	else if(!PLAYER1_DEAD) {
       var x = -1*pspr(1)._x;
       var y = -1*pspr(1)._y;
-      var zoom = 2;
+      var zoom = 1.2;
 	}
 	else if(!PLAYER2_DEAD) {
       var x = -1*pspr(2)._x;
       var y = -1*pspr(2)._y;
-      var zoom = 2;
+      var zoom = 1.2;
 	}
 
 	if(zoom < 1)
 		zoom = 1;
 	console.log(zoom);
-	if(viewportCount % 3 === 0) {
-		Crafty.viewport.scale(0);
-		Crafty.viewport.scale(zoom);
+	if(viewportCount % 2 === 0) {
+		Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
 		Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
 		Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
 	}
-	var previousZoom = zoom;
 }
 
 // did a player get the resource we are updating?
