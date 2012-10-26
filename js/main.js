@@ -147,12 +147,11 @@ function addActors() {
       .onHit('player', function(rsrc, hit) {
         for (player in players) {
           if (hit == player.node) {
-            updatePoints(player.playerNum, 1);
+            //updatePoints(player.playerNum, 1);
             Crafty.audio.play('resourceGet');
+            this.destroy();
           }
-          console.log("player!");
         }
-        this.destroy();
       });
     }
   }
