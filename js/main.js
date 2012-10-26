@@ -594,11 +594,11 @@ function restart() {
 }
 
 function gameOver() {
-  if (!PLAYER1_DEAD && p(1)._y > PLAYGROUND_HEIGHT){
+  if (!PLAYER1_DEAD && pspr(1)._y > PLAYGROUND_HEIGHT){
     PLAYER1_DEAD = true;
     Crafty.audio.play('playerDeath');
   }
-  if(!PLAYER2_DEAD && p(2)._y > PLAYGROUND_HEIGHT){
+  if(!PLAYER2_DEAD && pspr(2)._y > PLAYGROUND_HEIGHT){
     PLAYER2_DEAD = true;
     Crafty.audio.play('playerDeath');
   }
@@ -617,8 +617,9 @@ function gameOver() {
     death_y = GRID_HEIGHT;
     ENABLE_CREEPING = false;
 
-    $.playground().clearAll(true);
-    $.playground().addGroup('text', {
+    
+    $('cr-stage').empty();
+    /*$.playground().addGroup('text', {
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
     if (pl != 0) {
       $('#text').append('<div style="position: absolute; top: 290px;' +
@@ -626,7 +627,8 @@ function gameOver() {
         'id="restartbutton">Player ' + pl + ' Wins!</a></center></div>'); }
     else { $('#text').append('<div style="position: absolute; top: 290px;' +
        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
-       'id="restartbutton">Draw!</a></center></div>'); }
+       'id="restartbutton">Draw!</a></center></div>'); } */
+    Crafty.unbind('EnterFrame', frameFunctionality);
     setTimeout(function() {
         restart(); }, 3000);
   }
