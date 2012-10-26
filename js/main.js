@@ -145,15 +145,14 @@ function addActors() {
           z: 200
       })
       .onHit('player', function(rsrc, hit) {
-        for (object in hit) {
-          for (player in players) {
-            if (object.obj == player.node) {
-              updatePoints(player.playerNum, 1);
-              Crafty.audio.play('resourceGet');
-            }
+        for (player in players) {
+          if (hit == player.node) {
+            updatePoints(player.playerNum, 1);
+            Crafty.audio.play('resourceGet');
           }
+          console.log("player!");
         }
-        //rsrc.destroy();
+        this.destroy();
       });
     }
   }
@@ -484,6 +483,7 @@ function playerStop() {
 }
 
 function updatePoints(playerNum, pointsInc) {
+  playerNum = parseInt(playerNum);
   points = p(playerNum).points + pointsInc;
   if (points > WINNING_POINTS) {
     points = WINNING_POINTS;
