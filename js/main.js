@@ -254,17 +254,19 @@ function posToGrid(pos) {
   return Math.round(pos / BLOCK_SIZE);
 }
 
+function frameFunctionality() {
+  playerMove(1);
+  playerMove(2);
+  playerStop();
+  deathFromBelow();
+  removeDestroyed();
+  verticalMovement(1);
+  verticalMovement(2);
+  gameOver();
+}
+
 function addFunctionality() {
-  Crafty.bind('EnterFrame', function() {
-    playerMove(1);
-    playerMove(2);
-    playerStop();
-    deathFromBelow();
-    removeDestroyed();
-    verticalMovement(1);
-    verticalMovement(2);
-    gameOver();
-  });
+  boundEvent = Crafty.bind('EnterFrame', frameFunctionality);
 }
 
 // did a player get the resource we are updating?
@@ -580,22 +582,12 @@ function stopMusic() {
 function restart() {
   updatePoints(1, -1 * p(1).points);
   updatePoints(2, -1 * p(2).points);
-
   stopMusic();
-  death_y = GRID_HEIGHT;
+  $('cr-stage').empty();
   $('#text').remove();
-
-  Crafty.stop(true);
-
+  Crafty.unbind('EnterFrame', frameFunctionality);
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  //Crafty.canvas.init();
-
-  buildPlayground();
-  addActors();
-  addSounds();
-  addFunctionality();
   Crafty.scene('mainLevel');
-  startMusic();
 }
 
 function gameOver() {
