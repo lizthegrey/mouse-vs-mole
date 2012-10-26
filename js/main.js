@@ -20,7 +20,7 @@ var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
 var START_YCOORD = 24;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
-var GRAVITY_ACCEL = 1.0; // pixels/s^2 (down is positive)
+var GRAVITY_ACCEL = 0.1; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -11;   // pixels/s
 var MOVE_VELOCITY = 2;
 
@@ -365,7 +365,7 @@ function playerMove(player) {
         pspr(player)._y == elem.node._y - PLAYER_HEIGHT ||
         elem2 && elem2.node &&
         pspr(player)._y == elem2.node._y - PLAYER_HEIGHT) {
-      pspr(player)._gy = -3;//JUMP_VELOCITY;
+      pspr(player)._gy = JUMP_VELOCITY;
     }
     isRunning = true;
   }
