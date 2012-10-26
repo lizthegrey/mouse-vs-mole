@@ -291,7 +291,6 @@ function viewport() {
       var zoom = 1.2;
 	}
 
-	console.log(zoom);
 	if(viewportCount % 2 === 0) {
 		Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
 		Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
