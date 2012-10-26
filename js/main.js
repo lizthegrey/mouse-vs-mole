@@ -144,18 +144,16 @@ function addActors() {
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
       })
-      .onHit('player', function(rsrc, hit) {
-        for (player in players) {
-          if (hit == player.node) {
-            //updatePoints(player.playerNum, 1);
-            Crafty.audio.play('resourceGet');
-            this.destroy();
-          }
+      .onHit('player', function(hit) {
+        for (var hitobj = 0; hitobj < hit.length; hitobj++) {
+          h = hit[hitobj];
+          updatePoints(h.obj.player.playerNum, 1);
+          Crafty.audio.play('resourceGet');
         }
+        this.destroy();
       });
     }
   }
-
   Crafty.c('p1anim', {
     p1anim: function() {
       this.requires('SpriteAnimation, Collision, Grid')
@@ -163,7 +161,7 @@ function addActors() {
           .animate('jump', 5, 0, 1);
     }
   });
-
+  
   Crafty.c('p2anim', {
     p2anim: function() {
       this.requires('SpriteAnimation, Collision, Grid')
@@ -223,6 +221,7 @@ function resource(node) {
 
 function player(node, playerNum, xpos, ypos) {
   this.node = node;
+  this.node.player = this;
   this.playerNum = playerNum;
   this.node._gy = 0;
   this.points = 0;
