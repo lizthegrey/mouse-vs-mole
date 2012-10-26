@@ -308,7 +308,7 @@ function frameFunctionality() {
   verticalMovement(2);
   resourceRefresh();
   gameOver();
-  //viewport();
+  viewport();
 }
 
 function addFunctionality() {
