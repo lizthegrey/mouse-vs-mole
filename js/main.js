@@ -455,8 +455,8 @@ function playerMove(player) {
     else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
     }
-    pspr(player).runningLeft = false;
-    pspr(player).runningRight = false;
+    p(player).runningLeft = false;
+    p(player).runningRight = false;
   }
 
   if (player == 1 && isRunning && !PLAYER1_RUNNING && !PLAYER1_DEAD) {
