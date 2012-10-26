@@ -580,7 +580,10 @@ function stopMusic() {
 function restart() {
   updatePoints(1, -1 * p(1).points);
   updatePoints(2, -1 * p(2).points);
+  
   stopMusic();
+  death_y = GRID_HEIGHT;
+  ENABLE_CREEPING = false;
   $('cr-stage').empty();
   $('#text').remove();
   Crafty.unbind('EnterFrame', frameFunctionality);
