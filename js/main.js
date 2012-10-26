@@ -727,7 +727,8 @@ function gameOver() {
     else { $('#text').append('<div style="position: absolute; top: 290px;' +
        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
        'id="restartbutton">Draw!</a></center></div>'); } */
-    Crafty.unbind('EnterFrame', frameFunctionality);
+    //Crafty.unbind('EnterFrame', frameFunctionality);
+    restartNow = true;
     setTimeout(function() {
         restart(); }, 3000);
   }
