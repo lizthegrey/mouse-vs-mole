@@ -128,7 +128,7 @@ function addActors() {
       rand = Math.floor(Math.random() * NUM_COLORS);
       blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
 
-      var b = Crafty.e('2D, Canvas, block, ' + blockColor).
+      var b = Crafty.e('2D, DOM, block, ' + blockColor).
           attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
 
       levelGrid[x][y] = new block(b, rand, 0);
@@ -152,7 +152,7 @@ function addActors() {
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
 
-      resources.push(new resource(Crafty.e('2D, Canvas, resource').attr({
+      resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
@@ -177,10 +177,10 @@ function addActors() {
     }
   });
 
-  var p1 = Crafty.e('2D, Canvas, player, ' +
+  var p1 = Crafty.e('2D, DOM, player, ' +
                     'player1, p1anim, leftControl')
       .attr({x: START_XPOS_P1, y: START_YPOS, z: 200});
-  var p2 = Crafty.e('2D, Canvas, player, ' +
+  var p2 = Crafty.e('2D, DOM, player, ' +
                     'player2, p2anim, rightControl')
       .attr({x: START_XPOS_P2, y: START_YPOS, z: 200});
 
@@ -309,7 +309,7 @@ function resourceRefresh() {
 
 function frameFunctionality() {
   if (!restartNow) {
-    frameDelay.delay(frameFunctionality, 20);
+    frameDelay.delay(frameFunctionality, 15);
   }
   playerMove(1);
   playerMove(2);
@@ -427,7 +427,7 @@ function playerMove(player) {
     var nextpos = parseInt(pspr(player)._x) + MOVE_VELOCITY;
     var elem = lg(x + 1, y);
 
-    if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
+    if (nextpos < PLAYGROUND_WIDTH - PLAYER_WIDTH) {
       if (!elem || !elem.node ||
           nextpos < elem.node._x - PLAYER_WIDTH) {
         pspr(player).x = nextpos;
@@ -758,7 +758,7 @@ Crafty.scene('mainLevel', function() {
 
 $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  Crafty.canvas.init();
-  Crafty.scene('mainLevel');
+  //Crafty.canvas.init();
   Crafty.viewport.init();
+  Crafty.scene('mainLevel');
 });
