@@ -38,6 +38,9 @@ var POINT_RAMPING = 5;
 
 var ENABLE_CREEPING = false;
 var CREEPING_DEATH_MS = 10000;
+var FRAME_DELAY = 30;
+var CAMERA_DELAY = 5;
+var REBOOT_DELAY = 50;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(2, 8, 6, 3);
@@ -71,7 +74,6 @@ var players = new Array(null, null);
 var resources = [];
 
 function buildPlayground() {
-  restartNow = false;
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
   asset_list += ['sprites/blocks.png'];
   asset_list += ['sprites/players.png'];
@@ -97,20 +99,12 @@ function buildPlayground() {
     block7: [6, 0],
     block8: [7, 0],
   });
-
-  timer = Crafty.e('Delay');
-  timer.delay(doCreep, CREEPING_DEATH_MS);
+  
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
       restart();
     }
   });
-
-  viewportDelay = Crafty.e('Delay');
-  viewportDelay.delay(viewport, 30);
-  
-  frameDelay = Crafty.e('Delay');
-  frameDelay.delay(frameFunctionality, 20);
 }
 
 function addActors() {
@@ -309,7 +303,7 @@ function resourceRefresh() {
 
 function frameFunctionality() {
   if (!restartNow) {
-    frameDelay.delay(frameFunctionality, 15);
+    frameDelay.delay(frameFunctionality, FRAME_DELAY);
   }
   playerMove(1);
   playerMove(2);
@@ -324,8 +318,16 @@ function frameFunctionality() {
 }
 
 function addFunctionality() {
-  frameDelay.delay(frameFunctionality, 30);
+  restartNow = false;
+  
+  frameDelay = Crafty.e('Delay');
+  frameDelay.delay(frameFunctionality, FRAME_DELAY);
   //Crafty.bind('EnterFrame', frameFunctionality);
+  timer = Crafty.e('Delay');
+  timer.delay(doCreep, CREEPING_DEATH_MS);
+
+  viewportDelay = Crafty.e('Delay');
+  viewportDelay.delay(viewport, CAMERA_DELAY);
 }
 
 function viewport() {
@@ -356,7 +358,7 @@ function viewport() {
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
   Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
   Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
-  if (!restartNow) frameDelay.delay(viewport, 5);
+  if (!restartNow) frameDelay.delay(viewport, CAMERA_DELAY);
 }
 
 // did a player get the resource we are updating?
@@ -678,18 +680,45 @@ function stopMusic() {
 }
 
 function restart() {
+  restartNow = true;
+  var rebootDelay = Crafty.e('Delay');
+  rebootDelay.delay(reboot, REBOOT_DELAY);
+}
+
+function reboot() {
   updatePoints(1, -1 * p(1).points);
   updatePoints(2, -1 * p(2).points);
+  
+  PLAYER1_DEAD = false;
+  PLAYER2_DEAD = false;
   
   stopMusic();
   death_y = GRID_HEIGHT;
   ENABLE_CREEPING = false;
-  $('cr-stage').empty();
-  $('#text').remove();
+  
+  for (var a = 0; a < levelGrid.length; a++) {
+    for(var b = 0; b < levelGrid[a].length; b++) {
+      var newBlock = levelGrid[a][b];
+      if (newBlock.node != null)
+        newBlock.node.destroy();
+    }
+  }
+  for (a = 0; a < resources.length; a++) {
+    var resource = resources[a];
+    if (resource.node != null)
+      resource.node.destroy();
+  }
+  pspr(1).destroy();
+  pspr(2).destroy();
+  //$('cr-stage').empty();
+  //$('#text').remove();
   //Crafty.unbind('EnterFrame', frameFunctionality);
-  restartNow = true;
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  Crafty.scene('mainLevel');
+  Crafty.viewport.init();
+  
+  addActors();
+  addFunctionality();
+  startMusic();
 }
 
 function gameOver() {
@@ -712,12 +741,11 @@ function gameOver() {
     updatePoints(1, -1 * p(1).points);
     updatePoints(2, -1 * p(2).points);
 
-    stopMusic();
+    //stopMusic();
     death_y = GRID_HEIGHT;
     ENABLE_CREEPING = false;
 
     
-    $('cr-stage').empty();
     /*$.playground().addGroup('text', {
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
     if (pl != 0) {
@@ -729,8 +757,7 @@ function gameOver() {
        'id="restartbutton">Draw!</a></center></div>'); } */
     //Crafty.unbind('EnterFrame', frameFunctionality);
     restartNow = true;
-    setTimeout(function() {
-        restart(); }, 3000);
+    setTimeout(restart, 3000);
   }
 }
 
@@ -754,7 +781,6 @@ Crafty.scene('mainLevel', function() {
   addFunctionality();
   startMusic();
 });
-
 
 $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
