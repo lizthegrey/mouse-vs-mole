@@ -38,6 +38,9 @@ var POINT_RAMPING = 5;
 
 var ENABLE_CREEPING = false;
 var CREEPING_DEATH_MS = 10000;
+var FRAME_DELAY = 30;
+var CAMERA_DELAY = 5;
+var REBOOT_DELAY = 50;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(2, 8, 6, 3);
@@ -52,6 +55,8 @@ var RESOURCE_GET = 'sounds/chime.ogg';
 var PLAYER1_RUNNING = false;
 var PLAYER2_RUNNING = false;
 
+var PLAYER_INAIR = [false, false]
+
 var MUSIC_PLAYING = false;
 var PLAYER1_DEAD = false;
 var PLAYER2_DEAD = false;
@@ -59,6 +64,9 @@ var PLAYER2_DEAD = false;
 var levelGrid; // 2D array containing block objects
 
 var timer;
+var frameDelay;
+var viewportDelay;
+var restartNow = false;
 var should_creep = false;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
 
@@ -91,15 +99,12 @@ function buildPlayground() {
     block7: [6, 0],
     block8: [7, 0],
   });
-
-  timer = Crafty.e('Delay');
-  timer.delay(doCreep, CREEPING_DEATH_MS);
+  
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
       restart();
     }
   });
-
 }
 
 function addActors() {
@@ -117,7 +122,7 @@ function addActors() {
       rand = Math.floor(Math.random() * NUM_COLORS);
       blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
 
-      var b = Crafty.e('2D, Canvas, block, ' + blockColor).
+      var b = Crafty.e('2D, DOM, block, ' + blockColor).
           attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
 
       levelGrid[x][y] = new block(b, rand, 0);
@@ -141,7 +146,7 @@ function addActors() {
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
 
-      resources.push(new resource(Crafty.e('2D, Canvas, resource').attr({
+      resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
@@ -151,23 +156,25 @@ function addActors() {
   Crafty.c('p1anim', {
     init: function() {
       this.requires('Sprite,SpriteAnimation, Grid')
+          .animate('stand', 0, 0, 0)
           .animate('walk', 1, 0, 4)
-          .animate('jump', 5, 0, 1);
+          .animate('jump', 5, 0, 5);
     }
   });
   
   Crafty.c('p2anim', {
     init: function() {
       this.requires('SpriteAnimation, Grid')
+          .animate('stand', 0, 1, 0)
           .animate('walk', 1, 1, 4)
-          .animate('jump', 5, 1, 1);
+          .animate('jump', 5, 1, 5);
     }
   });
 
-  var p1 = Crafty.e('2D, Canvas, player, ' +
+  var p1 = Crafty.e('2D, DOM, player, ' +
                     'player1, p1anim, leftControl')
       .attr({x: START_XPOS_P1, y: START_YPOS, z: 200});
-  var p2 = Crafty.e('2D, Canvas, player, ' +
+  var p2 = Crafty.e('2D, DOM, player, ' +
                     'player2, p2anim, rightControl')
       .attr({x: START_XPOS_P2, y: START_YPOS, z: 200});
 
@@ -181,7 +188,7 @@ function doCreep() {
   if (ENABLE_CREEPING) {
     should_creep = true;
   }
-  timer.delay(doCreep, CREEPING_DEATH_MS);
+  if (!restartNow) timer.delay(doCreep, CREEPING_DEATH_MS);
 }
 
 /* Block initializes sounds in gameworld */
@@ -295,6 +302,9 @@ function resourceRefresh() {
 }
 
 function frameFunctionality() {
+  if (!restartNow) {
+    frameDelay.delay(frameFunctionality, FRAME_DELAY);
+  }
   playerMove(1);
   playerMove(2);
   playerStop();
@@ -304,17 +314,23 @@ function frameFunctionality() {
   verticalMovement(2);
   resourceRefresh();
   gameOver();
-  viewport();
+  //viewport();
 }
 
 function addFunctionality() {
-  Crafty.bind('EnterFrame', frameFunctionality);
+  restartNow = false;
+  
+  frameDelay = Crafty.e('Delay');
+  frameDelay.delay(frameFunctionality, FRAME_DELAY);
+  //Crafty.bind('EnterFrame', frameFunctionality);
+  timer = Crafty.e('Delay');
+  timer.delay(doCreep, CREEPING_DEATH_MS);
+
+  viewportDelay = Crafty.e('Delay');
+  viewportDelay.delay(viewport, CAMERA_DELAY);
 }
 
 function viewport() {
-  if (Crafty.frame() % 8 != 0) {
-    return;
-  }
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
     var x = -1*(pspr(1)._x + pspr(2)._x)/2;
@@ -342,6 +358,7 @@ function viewport() {
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
   Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
   Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
+  if (!restartNow) frameDelay.delay(viewport, CAMERA_DELAY);
 }
 
 // did a player get the resource we are updating?
@@ -400,8 +417,8 @@ function playerMove(player) {
       }
     }
     if (!p(player).runningLeft) {
-      pspr(player).animate('walk', -1);
       pspr(player).unflip('X');
+      pspr(player).stop().animate('walk', 4, -1);
       p(player).runningLeft = true;
       p(player).runningRight = false;
     }
@@ -412,7 +429,7 @@ function playerMove(player) {
     var nextpos = parseInt(pspr(player)._x) + MOVE_VELOCITY;
     var elem = lg(x + 1, y);
 
-    if (nextpos < PLAYGROUND_WIDTH - BLOCK_SIZE) {
+    if (nextpos < PLAYGROUND_WIDTH - PLAYER_WIDTH) {
       if (!elem || !elem.node ||
           nextpos < elem.node._x - PLAYER_WIDTH) {
         pspr(player).x = nextpos;
@@ -424,8 +441,8 @@ function playerMove(player) {
       }
     }
     if (!p(player).runningRight) {
-      pspr(player).animate('walk', -1);
       pspr(player).flip('X');
+      pspr(player).stop().animate('walk', 4, -1);
       p(player).runningRight = true;
       p(player).runningLeft = false;
     }
@@ -486,18 +503,19 @@ function verticalMovement(player) {
         nextpos < elem2.node._y - PLAYER_HEIGHT)) {
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).animate('jump', -1);
+      pspr(player).stop().animate('jump', 1, -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
+      PLAYER_INAIR[player - 1] = true;
     } else {
       if (elem && elem.node) {
         pspr(player).y = elem.node._y - PLAYER_HEIGHT;
       } else {
         pspr(player).y = elem2.node._y - PLAYER_HEIGHT;
       }
-
       pspr(player)._gy = 0;
+      PLAYER_INAIR[player - 1] = false;
     }
   } else {
     var elem = lg(x, y - 1);
@@ -511,10 +529,11 @@ function verticalMovement(player) {
       }
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).animate('jump', -1);
+      pspr(player).stop().animate('jump', 1, -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
+      PLAYER_INAIR[player - 1] = true;
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
@@ -525,6 +544,7 @@ function verticalMovement(player) {
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
+      PLAYER_INAIR[player - 1] = false;
     }
   }
 }
@@ -532,13 +552,13 @@ function verticalMovement(player) {
 /* Function to stop sound upon player no longer moving */
 /* Also changes player animation back to standing still */
 function playerStop() {
-
   if (!Crafty.keydown[65] &&
       !Crafty.keydown[68] &&
       !Crafty.keydown[87]) {
     if (PLAYER1_RUNNING) {
       PLAYER1_RUNNING = false;
       Crafty.audio.stop('player1Run');
+      pspr(1).stop().animate('stand', 1, -1);
     }
     //pspr(1).stop();
     p(1).miningSprite = false;
@@ -551,13 +571,19 @@ function playerStop() {
     if (PLAYER2_RUNNING) {
       PLAYER2_RUNNING = false;
       Crafty.audio.stop('player2Run');
+      pspr(2).stop().animate('stand', 1, -1);
     }
     //pspr(2).stop();
     p(2).miningSprite = false;
     p(2).runningLeft = false;
     p(2).runningRight = false;
   }
-
+  if (!PLAYER_INAIR[0] && !PLAYER1_RUNNING) {
+    pspr(1).stop().animate('stand', 1, -1);
+  }
+  if (!PLAYER_INAIR[1] && !PLAYER2_RUNNING) {
+    pspr(2).stop().animate('stand', 1, -1);
+  }
 }
 
 function updatePoints(playerNum, pointsInc) {
@@ -654,17 +680,45 @@ function stopMusic() {
 }
 
 function restart() {
+  restartNow = true;
+  var rebootDelay = Crafty.e('Delay');
+  rebootDelay.delay(reboot, REBOOT_DELAY);
+}
+
+function reboot() {
   updatePoints(1, -1 * p(1).points);
   updatePoints(2, -1 * p(2).points);
+  
+  PLAYER1_DEAD = false;
+  PLAYER2_DEAD = false;
   
   stopMusic();
   death_y = GRID_HEIGHT;
   ENABLE_CREEPING = false;
-  $('cr-stage').empty();
-  $('#text').remove();
-  Crafty.unbind('EnterFrame', frameFunctionality);
+  
+  for (var a = 0; a < levelGrid.length; a++) {
+    for(var b = 0; b < levelGrid[a].length; b++) {
+      var newBlock = levelGrid[a][b];
+      if (newBlock.node != null)
+        newBlock.node.destroy();
+    }
+  }
+  for (a = 0; a < resources.length; a++) {
+    var resource = resources[a];
+    if (resource.node != null)
+      resource.node.destroy();
+  }
+  pspr(1).destroy();
+  pspr(2).destroy();
+  //$('cr-stage').empty();
+  //$('#text').remove();
+  //Crafty.unbind('EnterFrame', frameFunctionality);
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  Crafty.scene('mainLevel');
+  Crafty.viewport.init();
+  
+  addActors();
+  addFunctionality();
+  startMusic();
 }
 
 function gameOver() {
@@ -687,12 +741,11 @@ function gameOver() {
     updatePoints(1, -1 * p(1).points);
     updatePoints(2, -1 * p(2).points);
 
-    stopMusic();
+    //stopMusic();
     death_y = GRID_HEIGHT;
     ENABLE_CREEPING = false;
 
     
-    $('cr-stage').empty();
     /*$.playground().addGroup('text', {
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
     if (pl != 0) {
@@ -702,9 +755,9 @@ function gameOver() {
     else { $('#text').append('<div style="position: absolute; top: 290px;' +
        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
        'id="restartbutton">Draw!</a></center></div>'); } */
-    Crafty.unbind('EnterFrame', frameFunctionality);
-    setTimeout(function() {
-        restart(); }, 3000);
+    //Crafty.unbind('EnterFrame', frameFunctionality);
+    restartNow = true;
+    setTimeout(restart, 3000);
   }
 }
 
@@ -729,10 +782,9 @@ Crafty.scene('mainLevel', function() {
   startMusic();
 });
 
-
 $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  Crafty.canvas.init();
-  Crafty.scene('mainLevel');
+  //Crafty.canvas.init();
   Crafty.viewport.init();
+  Crafty.scene('mainLevel');
 });
