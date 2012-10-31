@@ -736,8 +736,12 @@ function gameOver() {
     PLAYER1_DEAD = false;
     PLAYER2_DEAD = false;
     var pl = 0;
-    if (p(1).points > p(2).points) pl = 1;
-    else if (p(1).points < p(2).points) pl = 2;
+    if (p(1).points > p(2).points) {
+      pl = 1;
+    }
+    else if (p(1).points < p(2).points) {
+      pl = 2;
+    }
 
     updatePoints(1, -1 * p(1).points);
     updatePoints(2, -1 * p(2).points);
