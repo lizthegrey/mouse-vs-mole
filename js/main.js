@@ -188,7 +188,9 @@ function doCreep() {
   if (ENABLE_CREEPING) {
     should_creep = true;
   }
-  if (!restartNow) timer.delay(doCreep, CREEPING_DEATH_MS);
+  if (!restartNow) {
+    timer.delay(doCreep, CREEPING_DEATH_MS);
+  }
 }
 
 /* Block initializes sounds in gameworld */
@@ -322,7 +324,6 @@ function addFunctionality() {
   
   frameDelay = Crafty.e('Delay');
   frameDelay.delay(frameFunctionality, FRAME_DELAY);
-  //Crafty.bind('EnterFrame', frameFunctionality);
   timer = Crafty.e('Delay');
   timer.delay(doCreep, CREEPING_DEATH_MS);
 
@@ -358,7 +359,9 @@ function viewport() {
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
   Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
   Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
-  if (!restartNow) frameDelay.delay(viewport, CAMERA_DELAY);
+  if (!restartNow) {
+    frameDelay.delay(viewport, CAMERA_DELAY);
+  }
 }
 
 // did a player get the resource we are updating?
@@ -710,9 +713,7 @@ function reboot() {
   }
   pspr(1).destroy();
   pspr(2).destroy();
-  //$('cr-stage').empty();
   //$('#text').remove();
-  //Crafty.unbind('EnterFrame', frameFunctionality);
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.viewport.init();
   
@@ -755,7 +756,6 @@ function gameOver() {
     else { $('#text').append('<div style="position: absolute; top: 290px;' +
        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
        'id="restartbutton">Draw!</a></center></div>'); } */
-    //Crafty.unbind('EnterFrame', frameFunctionality);
     restartNow = true;
     setTimeout(restart, 3000);
   }
