@@ -102,7 +102,9 @@ function buildPlayground() {
   
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
-      restart();
+      if (!restartNow) {
+        restart();
+      }
     }
   });
 }
@@ -733,6 +735,7 @@ function gameOver() {
   }
 
   if (PLAYER1_DEAD && PLAYER2_DEAD && !restartNow) {
+    restartNow = true;
     var pl = 0;
     if (p(1).points > p(2).points) {
       pl = 1;
@@ -752,7 +755,6 @@ function gameOver() {
     else { $('#text').append('<div style="position: absolute; top: 290px;' +
        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
        'id="restartbutton">Draw!</a></center></div>'); } */
-    restartNow = true;
     setTimeout(restart, 3000);
   }
 }
