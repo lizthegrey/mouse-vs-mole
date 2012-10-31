@@ -732,9 +732,7 @@ function gameOver() {
     Crafty.audio.play('playerDeath');
   }
 
-  if (PLAYER1_DEAD && PLAYER2_DEAD) {
-    PLAYER1_DEAD = false;
-    PLAYER2_DEAD = false;
+  if (PLAYER1_DEAD && PLAYER2_DEAD && !restartNow) {
     var pl = 0;
     if (p(1).points > p(2).points) {
       pl = 1;
@@ -743,13 +741,7 @@ function gameOver() {
       pl = 2;
     }
 
-    updatePoints(1, -1 * p(1).points);
-    updatePoints(2, -1 * p(2).points);
-
     //stopMusic();
-    death_y = GRID_HEIGHT;
-    ENABLE_CREEPING = false;
-
     
     /*$.playground().addGroup('text', {
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
