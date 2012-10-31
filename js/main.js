@@ -1,6 +1,6 @@
-var BLOCK_SIZE = 20;
-var PLAYER_HEIGHT = 15;
-var PLAYER_WIDTH = 11;
+var BLOCK_SIZE = 70;
+var PLAYER_HEIGHT = 60;
+var PLAYER_WIDTH = 60;
 var RESOURCE_SIZE = 11;
 var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
@@ -46,7 +46,7 @@ var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
-var SPRITE_GRAPHIC_INDEXES = new Array(2, 8, 6, 3);
+var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4);
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -78,8 +78,8 @@ var resources = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
-  asset_list += ['sprites/blocks.png'];
-  asset_list += ['sprites/players.png'];
+  asset_list += ['sprites/vert_tiles_70.png'];
+  asset_list += ['sprites/player_tiles_60.png'];
   Crafty.load(asset_list);
   //Crafty.background('sprites/800x600.png');
 
@@ -87,20 +87,23 @@ function buildPlayground() {
     resource: [0, 0]
   });
 
-  Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT, 'sprites/players.png', {
+  Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
+      'sprites/player_tiles_60.png', {
     player1: [0, 0],
     player2: [0, 1],
   });
 
-  Crafty.sprite(BLOCK_SIZE, 'sprites/blocks.png', {
+  Crafty.sprite(BLOCK_SIZE,
+      'sprites/vert_tiles_70.png', {
     block1: [0, 0],
-    block2: [1, 0],
-    block3: [2, 0],
-    block4: [3, 0],
-    block5: [4, 0],
-    block6: [5, 0],
-    block7: [6, 0],
-    block8: [7, 0],
+    block2: [0, 1],
+    block3: [0, 2],
+    block4: [0, 3],
+    block5: [0, 4],
+    block6: [0, 5],
+    block7: [0, 6],
+    block8: [0, 7],
+    block8: [0, 9],
   });
   
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
@@ -384,6 +387,10 @@ function viewport() {
   zoom /= prevZoom.length;
   if(prevZoom.length >= ZOOM_AVERAGE) {
     prevZoom.shift();
+  }
+
+  if (Crafty.frame() % 1000 != 0) {
+    console.log("x: " + x + " y: " + y + " zoom: " + zoom);
   }
 
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
