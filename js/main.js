@@ -29,6 +29,9 @@ var WINNING_POINTS = 35;
 var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
+var CAM_Y_AVERAGE = 10;
+var ZOOM_AVERAGE = 10;
+
 var DAMAGE_TO_EXPLODE = 15;
 var DAMAGE_JUMP = 5;
 var DAMAGE_DIG = 5;
@@ -163,7 +166,7 @@ function addActors() {
           .animate('jump', 5, 0, 5);
     }
   });
-  
+
   Crafty.c('p2anim', {
     init: function() {
       this.requires('SpriteAnimation, Grid')
@@ -234,6 +237,8 @@ function player(node, playerNum, xpos, ypos) {
   this.runningLeft = false;
   this.runningRight = false;
   this.miningSprite = false;
+
+  this.groundY = this.node._y;
 
   this.getX = function() {
     return posToGrid(this.node._x);
@@ -333,31 +338,54 @@ function addFunctionality() {
   viewportDelay.delay(viewport, CAMERA_DELAY);
 }
 
+var prevY = [];
+var prevZoom = [];
 function viewport() {
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
     var x = -1*(pspr(1)._x + pspr(2)._x)/2;
-    var y = -1*(pspr(1)._y + pspr(2)._y)/2;
 
-    var x_scale = pspr(1)._x - pspr(2)._x;     
-    var y_scale = pspr(1)._y - pspr(2)._y;     
-    var zoom = 1.7 - 0.000005 *
+    var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
+    var x_scale = pspr(1)._x - pspr(2)._x;
+    var y_scale = pspr(1)._y - pspr(2)._y;
+    var curZoom = 1.7 - 0.000005 *
         (x_scale * x_scale + y_scale * y_scale);
 
-    if (zoom < 1.1) {
-      zoom = 1.1;
+    if (curZoom < 1.1) {
+      curZoom = 1.1;
     }
   }
   else if (!PLAYER1_DEAD) {
       var x = -1*pspr(1)._x;
-      var y = -1*pspr(1)._y;
-      var zoom = 1.2;
+      var curY = -1*pspr(1)._y;
+      var curZoom = 1.2;
   }
   else if (!PLAYER2_DEAD) {
       var x = -1*pspr(2)._x;
-      var y = -1*pspr(2)._y;
-      var zoom = 1.2;
+      var curY = -1*pspr(2)._y;
+      var curZoom = 1.2;
   }
+
+  prevY.push(curY);
+  var y = 0;
+  for(var i = 0; i < prevY.length; i++) {
+    y += prevY[i];
+  }
+  y /= prevY.length;
+  if(prevY.length >= CAM_Y_AVERAGE) {
+    prevY.shift();
+  }
+
+  prevZoom.push(curZoom);
+  var zoom = 0;
+  for(var i = 0; i < prevZoom.length; i++) {
+    zoom += prevZoom[i];
+  }
+  zoom /= prevZoom.length;
+  if(prevZoom.length >= ZOOM_AVERAGE) {
+    prevZoom.shift();
+  }
+
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
   Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
   Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
@@ -552,6 +580,9 @@ function verticalMovement(player) {
       PLAYER_INAIR[player - 1] = false;
     }
   }
+
+  if(!PLAYER_INAIR[player - 1])
+      p(player).groundY = pspr(player)._y;
 }
 
 /* Function to stop sound upon player no longer moving */
