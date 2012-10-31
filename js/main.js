@@ -29,7 +29,7 @@ var WINNING_POINTS = 35;
 var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
-var Y_AVERAGE = 10;
+var CAM_Y_AVERAGE = 10;
 var ZOOM_AVERAGE = 10;
 
 var DAMAGE_TO_EXPLODE = 15;
@@ -370,8 +370,9 @@ function viewport() {
     y += prevY[i];
   }
   y /= prevY.length;
-  if(prevY.length >= Y_AVERAGE)
+  if(prevY.length >= CAM_Y_AVERAGE) {
     prevY.shift();
+  }
 
   prevZoom.push(curZoom);
   var zoom = 0;
@@ -379,8 +380,9 @@ function viewport() {
     zoom += prevZoom[i];
   }
   zoom /= prevZoom.length;
-  if(prevZoom.length >= ZOOM_AVERAGE)
+  if(prevZoom.length >= ZOOM_AVERAGE) {
     prevZoom.shift();
+  }
 
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
   Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
