@@ -732,7 +732,7 @@ function gameOver() {
     Crafty.audio.play('playerDeath');
   }
 
-  if (PLAYER1_DEAD && PLAYER2_DEAD) {
+  if (PLAYER1_DEAD && PLAYER2_DEAD && !restartNow) {
     var pl = 0;
     if (p(1).points > p(2).points) {
       pl = 1;
