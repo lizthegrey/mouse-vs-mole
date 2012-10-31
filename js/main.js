@@ -11,6 +11,9 @@ var GRID_HEIGHT = 30;
 var PLAYGROUND_WIDTH = BLOCK_SIZE * GRID_WIDTH;
 var PLAYGROUND_HEIGHT = BLOCK_SIZE * GRID_HEIGHT;
 
+var DISPLAY_WIDTH = 800;
+var DISPLAY_HEIGHT = 600;
+
 // XPOS_P2 and YPOS get a modifier based on sizes to make the board symmetric
 // and to begin with a block for a floor
 var START_XCOORD_P1 = 14;
@@ -44,6 +47,9 @@ var CREEPING_DEATH_MS = 10000;
 var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
+
+var MAX_ZOOM = 1.0;
+var MIN_ZOOM = 0.4;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4);
@@ -351,11 +357,11 @@ function viewport() {
     var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
     var x_scale = pspr(1)._x - pspr(2)._x;
     var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = 1.7 - 0.000005 *
+    var curZoom = MAX_ZOOM - 0.000005 *
         (x_scale * x_scale + y_scale * y_scale);
 
-    if (curZoom < 1.1) {
-      curZoom = 1.1;
+    if (curZoom < MIN_ZOOM) {
+      curZoom = MIN_ZOOM;
     }
   }
   else if (!PLAYER1_DEAD) {
@@ -389,13 +395,9 @@ function viewport() {
     prevZoom.shift();
   }
 
-  if (Crafty.frame() % 1000 != 0) {
-    console.log("x: " + x + " y: " + y + " zoom: " + zoom);
-  }
-
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
-  Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
-  Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
+  Crafty.viewport.x = x + (DISPLAY_WIDTH/zoom)/2;
+  Crafty.viewport.y = y + (DISPLAY_HEIGHT/zoom)/2;
   if (!restartNow) {
     frameDelay.delay(viewport, CAMERA_DELAY);
   }
