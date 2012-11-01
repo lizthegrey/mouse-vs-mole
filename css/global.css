@@ -2,7 +2,7 @@ body {
     background: tan;
 }
 
-#gamewrapper, #undergame {
+#metawrapper, #gamewrapper, #undergame {
     margin: auto;
 }
 
@@ -12,11 +12,19 @@ body {
     width: 800px;
     height: 600px;
 }
-#gamewrapper
+#metawrapper
 {
     width: 920px;
     height: 600px;
     background-color: black;
+    overflow:hidden;
+}
+#gamewrapper
+{
+    width: 800px;
+    height: 600px;
+    background-color: black;
+    display: inline-block;
     overflow: hidden;
 }
 #pto1
