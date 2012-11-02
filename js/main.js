@@ -358,8 +358,8 @@ function viewport() {
     var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
     var x_scale = pspr(1)._x - pspr(2)._x;
     var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = MAX_ZOOM - 0.000005 *
-        (x_scale * x_scale + y_scale * y_scale);
+    var curZoom = MAX_ZOOM - 0.000001 *
+        Math.max(x_scale * x_scale, y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
       curZoom = MIN_ZOOM;
@@ -397,8 +397,8 @@ function viewport() {
   }
 
   Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
-  Crafty.viewport.x = x + (DISPLAY_WIDTH/zoom)/2;
-  Crafty.viewport.y = y + (DISPLAY_HEIGHT/zoom)/2;
+  Crafty.viewport.x = x + 5*(DISPLAY_WIDTH/zoom)/9;
+  Crafty.viewport.y = y + 5*(DISPLAY_HEIGHT/zoom)/9;
   if (!restartNow) {
     frameDelay.delay(viewport, CAMERA_DELAY);
   }
