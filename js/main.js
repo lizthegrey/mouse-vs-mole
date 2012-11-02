@@ -23,9 +23,9 @@ var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
 var START_YCOORD = 15;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
-var GRAVITY_ACCEL = 1; // pixels/s^2 (down is positive)
-var JUMP_VELOCITY = -11;   // pixels/s
-var MOVE_VELOCITY = 2;
+var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
+var JUMP_VELOCITY = -25;   // pixels/s
+var MOVE_VELOCITY = 4;
 
 var WINNING_POINTS = 35;
 
