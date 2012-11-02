@@ -34,7 +34,7 @@ var OUCH_DIVIDER = 3;
 
 var CAM_Y_AVERAGE = 10;
 var ZOOM_AVERAGE = 10;
-var FIXED_ZOOM = 0.7;
+var FIXED_ZOOM = 1.2;
 
 var DAMAGE_TO_EXPLODE = 15;
 var DAMAGE_JUMP = 5;
@@ -49,8 +49,8 @@ var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
-var MAX_ZOOM = 1.0;
-var MIN_ZOOM = 0.4;
+var MAX_ZOOM = 1.8;
+var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4);
@@ -161,11 +161,11 @@ function addActors() {
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
 
-      resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
+      /*resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
-      })));
+      })));*/
     }
   }
   Crafty.c('p1anim', {
@@ -338,7 +338,7 @@ function frameFunctionality() {
 
 function addFunctionality() {
   restartNow = false;
-  
+
   frameDelay = Crafty.e('Delay');
   frameDelay.delay(frameFunctionality, FRAME_DELAY);
   timer = Crafty.e('Delay');
@@ -349,16 +349,16 @@ function addFunctionality() {
 }
 
 var prevY = [];
+var prevX = [];
 var prevZoom = [];
 function viewport() {
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
-    var x = -1*(pspr(1)._x + pspr(2)._x)/2;
-
+    var curX = -1*(pspr(1)._x + pspr(2)._x)/2;
     var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
     var x_scale = pspr(1)._x - pspr(2)._x;
     var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = MAX_ZOOM - 0.000005 *
+    var curZoom = MAX_ZOOM - 0.0000005 *
         (x_scale * x_scale + y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
@@ -366,25 +366,16 @@ function viewport() {
     }
   }
   else if (!PLAYER1_DEAD) {
-      var x = -1*pspr(1)._x;
+      var curX = -1*pspr(1)._x;
       var curY = -1*pspr(1)._y;
       var curZoom = FIXED_ZOOM;
   }
   else if (!PLAYER2_DEAD) {
-      var x = -1*pspr(2)._x;
+      var curX = -1*pspr(2)._x;
       var curY = -1*pspr(2)._y;
       var curZoom = FIXED_ZOOM;
   }
 
-  prevY.push(curY);
-  var y = 0;
-  for(var i = 0; i < prevY.length; i++) {
-    y += prevY[i];
-  }
-  y /= prevY.length;
-  if(prevY.length >= CAM_Y_AVERAGE) {
-    prevY.shift();
-  }
 
   prevZoom.push(curZoom);
   var zoom = 0;
@@ -396,9 +387,43 @@ function viewport() {
     prevZoom.shift();
   }
 
-  Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
-  Crafty.viewport.x = x + (DISPLAY_WIDTH/zoom)/2;
-  Crafty.viewport.y = y + (DISPLAY_HEIGHT/zoom)/2;
+
+  curX += (PLAYGROUND_WIDTH/(zoom*0.78))/2;
+  curY += (PLAYGROUND_HEIGHT/(zoom*0.78))/2;
+
+  if(curX > 0)
+      curX = 0;
+  if(curX < DISPLAY_WIDTH*(1-zoom) )
+      curX = DISPLAY_WIDTH*(1-zoom);
+
+  if(curY > 0)
+      curY = 0;
+  if(curY < DISPLAY_HEIGHT*(1-zoom) )
+      curY = DISPLAY_HEIGHT*(1-zoom);
+
+  prevY.push(curY);
+  var y = 0;
+  for(var i = 0; i < prevY.length; i++) {
+    y += prevY[i];
+  }
+  y /= prevY.length;
+  if(prevY.length >= CAM_Y_AVERAGE) {
+    prevY.shift();
+  }
+
+  prevX.push(curX);
+  var x = 0;
+  for(var i = 0; i < prevX.length; i++) {
+    x += prevX[i];
+  }
+  x /= prevX.length;
+  if(prevX.length >= CAM_Y_AVERAGE) {
+    prevX.shift();
+  }
+
+  Crafty.viewport.scale((zoom*0.286)/Crafty.viewport._zoom);
+  Crafty.viewport.x = x;
+  Crafty.viewport.y = y;
   if (!restartNow) {
     frameDelay.delay(viewport, CAMERA_DELAY);
   }
