@@ -359,7 +359,7 @@ function viewport() {
     var x_scale = pspr(1)._x - pspr(2)._x;
     var y_scale = pspr(1)._y - pspr(2)._y;
     var curZoom = MAX_ZOOM - 0.0000005 *
-        (x_scale * x_scale + y_scale * y_scale);
+        Math.max(x_scale * x_scale, y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
       curZoom = MIN_ZOOM;
