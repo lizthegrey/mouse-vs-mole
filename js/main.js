@@ -108,6 +108,7 @@ function buildPlayground() {
 }
 
 function addActors() {
+	simpleStage()
   var rand = 0;
   levelGrid = new Array(GRID_WIDTH);
   resources = [];
@@ -119,7 +120,11 @@ function addActors() {
         levelGrid[x][y] = new block(null, null, null);
         continue;
       }
-      rand = Math.floor(Math.random() * NUM_COLORS);
+			if (levelMap[x][y]==10){
+        levelGrid[x][y] = new block(null, null, null);
+        continue;
+			}
+      rand = levelMap[x][y];
       blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
 
       var b = Crafty.e('2D, DOM, block, ' + blockColor).
