@@ -49,7 +49,7 @@ var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
-var MAX_ZOOM = 3.0;
+var MAX_ZOOM = 2.8;
 var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
@@ -388,8 +388,8 @@ function viewport() {
   }
 
 
-  curX += (PLAYGROUND_WIDTH/(zoom*0.72))/2;
-  curY += (PLAYGROUND_HEIGHT/(zoom*0.78))/2;
+  curX += (PLAYGROUND_WIDTH/(zoom*0.78))/2;
+  curY += (PLAYGROUND_HEIGHT/(zoom*0.75))/2;
 
   if(curX > 0)
       curX = 0;
