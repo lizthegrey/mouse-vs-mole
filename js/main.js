@@ -34,7 +34,7 @@ var OUCH_DIVIDER = 3;
 
 var CAM_Y_AVERAGE = 10;
 var ZOOM_AVERAGE = 10;
-var FIXED_ZOOM = 1.2;
+var FIXED_ZOOM = 2.0;
 
 var DAMAGE_TO_EXPLODE = 15;
 var DAMAGE_JUMP = 5;
@@ -49,7 +49,7 @@ var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
-var MAX_ZOOM = 1.8;
+var MAX_ZOOM = 3.0;
 var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
@@ -358,7 +358,7 @@ function viewport() {
     var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
     var x_scale = pspr(1)._x - pspr(2)._x;
     var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = MAX_ZOOM - 0.0000005 *
+    var curZoom = MAX_ZOOM - 0.0000019 *
         Math.max(x_scale * x_scale, y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
@@ -388,7 +388,7 @@ function viewport() {
   }
 
 
-  curX += (PLAYGROUND_WIDTH/(zoom*0.78))/2;
+  curX += (PLAYGROUND_WIDTH/(zoom*0.72))/2;
   curY += (PLAYGROUND_HEIGHT/(zoom*0.78))/2;
 
   if(curX > 0)
