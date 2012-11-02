@@ -460,7 +460,7 @@ function playerMove(player) {
     }
     if (!p(player).runningLeft) {
       pspr(player).unflip('X');
-      pspr(player).stop().animate('walk', 4, -1);
+      pspr(player).stop().animate('walk', 12, -1);
       p(player).runningLeft = true;
       p(player).runningRight = false;
     }
@@ -484,7 +484,7 @@ function playerMove(player) {
     }
     if (!p(player).runningRight) {
       pspr(player).flip('X');
-      pspr(player).stop().animate('walk', 4, -1);
+      pspr(player).stop().animate('walk', 12, -1);
       p(player).runningRight = true;
       p(player).runningLeft = false;
     }
