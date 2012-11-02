@@ -34,6 +34,7 @@ var OUCH_DIVIDER = 3;
 
 var CAM_Y_AVERAGE = 10;
 var ZOOM_AVERAGE = 10;
+var FIXED_ZOOM = 0.7;
 
 var DAMAGE_TO_EXPLODE = 15;
 var DAMAGE_JUMP = 5;
@@ -367,12 +368,12 @@ function viewport() {
   else if (!PLAYER1_DEAD) {
       var x = -1*pspr(1)._x;
       var curY = -1*pspr(1)._y;
-      var curZoom = 1.2;
+      var curZoom = FIXED_ZOOM;
   }
   else if (!PLAYER2_DEAD) {
       var x = -1*pspr(2)._x;
       var curY = -1*pspr(2)._y;
-      var curZoom = 1.2;
+      var curZoom = FIXED_ZOOM;
   }
 
   prevY.push(curY);
