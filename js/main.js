@@ -1,6 +1,6 @@
-var BLOCK_SIZE = 20;
-var PLAYER_HEIGHT = 15;
-var PLAYER_WIDTH = 11;
+var BLOCK_SIZE = 70;
+var PLAYER_HEIGHT = 60;
+var PLAYER_WIDTH = 60;
 var RESOURCE_SIZE = 11;
 var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
@@ -11,18 +11,21 @@ var GRID_HEIGHT = 30;
 var PLAYGROUND_WIDTH = BLOCK_SIZE * GRID_WIDTH;
 var PLAYGROUND_HEIGHT = BLOCK_SIZE * GRID_HEIGHT;
 
+var DISPLAY_WIDTH = 800;
+var DISPLAY_HEIGHT = 600;
+
 // XPOS_P2 and YPOS get a modifier based on sizes to make the board symmetric
 // and to begin with a block for a floor
-var START_XCOORD_P1 = 14;
+var START_XCOORD_P1 = 16;
 var START_XPOS_P1 = START_XCOORD_P1 * BLOCK_SIZE;
-var START_XCOORD_P2 = 25;
+var START_XCOORD_P2 = 23;
 var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
 var START_YCOORD = 15;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
-var GRAVITY_ACCEL = 1; // pixels/s^2 (down is positive)
-var JUMP_VELOCITY = -11;   // pixels/s
-var MOVE_VELOCITY = 2;
+var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
+var JUMP_VELOCITY = -25;   // pixels/s
+var MOVE_VELOCITY = 4;
 
 var WINNING_POINTS = 35;
 
@@ -31,6 +34,7 @@ var OUCH_DIVIDER = 3;
 
 var CAM_Y_AVERAGE = 10;
 var ZOOM_AVERAGE = 10;
+var FIXED_ZOOM = 2.0;
 
 var DAMAGE_TO_EXPLODE = 15;
 var DAMAGE_JUMP = 5;
@@ -45,8 +49,11 @@ var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
+var MAX_ZOOM = 2.8;
+var MIN_ZOOM = 1.0;
+
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
-var SPRITE_GRAPHIC_INDEXES = new Array(2, 8, 6, 3);
+var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4);
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -78,8 +85,8 @@ var resources = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
-  asset_list += ['sprites/blocks.png'];
-  asset_list += ['sprites/players.png'];
+  asset_list += ['sprites/vert_tiles_70.png'];
+  asset_list += ['sprites/player_tiles_60.png'];
   Crafty.load(asset_list);
   //Crafty.background('sprites/800x600.png');
 
@@ -87,20 +94,23 @@ function buildPlayground() {
     resource: [0, 0]
   });
 
-  Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT, 'sprites/players.png', {
+  Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
+      'sprites/player_tiles_60.png', {
     player1: [0, 0],
     player2: [0, 1],
   });
 
-  Crafty.sprite(BLOCK_SIZE, 'sprites/blocks.png', {
+  Crafty.sprite(BLOCK_SIZE,
+      'sprites/vert_tiles_70.png', {
     block1: [0, 0],
-    block2: [1, 0],
-    block3: [2, 0],
-    block4: [3, 0],
-    block5: [4, 0],
-    block6: [5, 0],
-    block7: [6, 0],
-    block8: [7, 0],
+    block2: [0, 1],
+    block3: [0, 2],
+    block4: [0, 3],
+    block5: [0, 4],
+    block6: [0, 5],
+    block7: [0, 6],
+    block8: [0, 7],
+    block8: [0, 9],
   });
   
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
@@ -151,11 +161,11 @@ function addActors() {
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
 
-      resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
+      /*resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
           x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
           y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
           z: 200
-      })));
+      })));*/
     }
   }
   Crafty.c('p1anim', {
@@ -328,7 +338,7 @@ function frameFunctionality() {
 
 function addFunctionality() {
   restartNow = false;
-  
+
   frameDelay = Crafty.e('Delay');
   frameDelay.delay(frameFunctionality, FRAME_DELAY);
   timer = Crafty.e('Delay');
@@ -339,42 +349,33 @@ function addFunctionality() {
 }
 
 var prevY = [];
+var prevX = [];
 var prevZoom = [];
 function viewport() {
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
-    var x = -1*(pspr(1)._x + pspr(2)._x)/2;
-
+    var curX = -1*(pspr(1)._x + pspr(2)._x)/2;
     var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
     var x_scale = pspr(1)._x - pspr(2)._x;
     var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = 1.7 - 0.000005 *
-        (x_scale * x_scale + y_scale * y_scale);
+    var curZoom = MAX_ZOOM - 0.0000019 *
+        Math.max(x_scale * x_scale, y_scale * y_scale);
 
-    if (curZoom < 1.1) {
-      curZoom = 1.1;
+    if (curZoom < MIN_ZOOM) {
+      curZoom = MIN_ZOOM;
     }
   }
   else if (!PLAYER1_DEAD) {
-      var x = -1*pspr(1)._x;
+      var curX = -1*pspr(1)._x;
       var curY = -1*pspr(1)._y;
-      var curZoom = 1.2;
+      var curZoom = FIXED_ZOOM;
   }
   else if (!PLAYER2_DEAD) {
-      var x = -1*pspr(2)._x;
+      var curX = -1*pspr(2)._x;
       var curY = -1*pspr(2)._y;
-      var curZoom = 1.2;
+      var curZoom = FIXED_ZOOM;
   }
 
-  prevY.push(curY);
-  var y = 0;
-  for(var i = 0; i < prevY.length; i++) {
-    y += prevY[i];
-  }
-  y /= prevY.length;
-  if(prevY.length >= CAM_Y_AVERAGE) {
-    prevY.shift();
-  }
 
   prevZoom.push(curZoom);
   var zoom = 0;
@@ -386,9 +387,43 @@ function viewport() {
     prevZoom.shift();
   }
 
-  Crafty.viewport.scale(zoom/Crafty.viewport._zoom);
-  Crafty.viewport.x = x + (PLAYGROUND_WIDTH/zoom)/2;
-  Crafty.viewport.y = y + (PLAYGROUND_HEIGHT/zoom)/2;
+
+  curX += (PLAYGROUND_WIDTH/(zoom*0.73))/2;
+  curY += (PLAYGROUND_HEIGHT/(zoom*0.75))/2;
+
+  if(curX > 0)
+      curX = 0;
+  if(curX < DISPLAY_WIDTH*(1-zoom) )
+      curX = DISPLAY_WIDTH*(1-zoom);
+
+  if(curY > 0)
+      curY = 0;
+  if(curY < DISPLAY_HEIGHT*(1-zoom) )
+      curY = DISPLAY_HEIGHT*(1-zoom);
+
+  prevY.push(curY);
+  var y = 0;
+  for(var i = 0; i < prevY.length; i++) {
+    y += prevY[i];
+  }
+  y /= prevY.length;
+  if(prevY.length >= CAM_Y_AVERAGE) {
+    prevY.shift();
+  }
+
+  prevX.push(curX);
+  var x = 0;
+  for(var i = 0; i < prevX.length; i++) {
+    x += prevX[i];
+  }
+  x /= prevX.length;
+  if(prevX.length >= CAM_Y_AVERAGE) {
+    prevX.shift();
+  }
+
+  Crafty.viewport.scale((zoom*0.286)/Crafty.viewport._zoom);
+  Crafty.viewport.x = x;
+  Crafty.viewport.y = y;
   if (!restartNow) {
     frameDelay.delay(viewport, CAMERA_DELAY);
   }
@@ -451,7 +486,7 @@ function playerMove(player) {
     }
     if (!p(player).runningLeft) {
       pspr(player).unflip('X');
-      pspr(player).stop().animate('walk', 4, -1);
+      pspr(player).stop().animate('walk', 12, -1);
       p(player).runningLeft = true;
       p(player).runningRight = false;
     }
@@ -475,7 +510,7 @@ function playerMove(player) {
     }
     if (!p(player).runningRight) {
       pspr(player).flip('X');
-      pspr(player).stop().animate('walk', 4, -1);
+      pspr(player).stop().animate('walk', 12, -1);
       p(player).runningRight = true;
       p(player).runningLeft = false;
     }
