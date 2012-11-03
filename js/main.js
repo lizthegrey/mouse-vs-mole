@@ -251,11 +251,11 @@ function player(node, playerNum, xpos, ypos) {
   this.groundY = this.node._y;
 
   this.getX = function() {
-    return posToGrid(this.node._x);
+    return posToGrid(this.node._x + PLAYER_WIDTH / 2 - PLAYER_WIDTH / 3);
   };
   
   this.getRightX = function() {
-    return posToGrid(this.node._x - PLAYER_WIDTH + 1);
+    return posToGrid(this.node._x - PLAYER_WIDTH / 2 + PLAYER_WIDTH / 6);
   };
 
   this.getY = function() {
