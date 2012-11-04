@@ -1,6 +1,9 @@
 var BLOCK_SIZE = 70;
 var PLAYER_HEIGHT = 60;
 var PLAYER_WIDTH = 60;
+var HALF_PLAYER_WIDTH = PLAYER_WIDTH / 2;
+var PLAYER_X_ADJUSTMENT = PLAYER_WIDTH / 3;
+var PLAYER_RIGHTX_ADJUSTMENT = PLAYER_WIDTH / 6;
 var RESOURCE_SIZE = 11;
 var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
@@ -251,11 +254,11 @@ function player(node, playerNum, xpos, ypos) {
   this.groundY = this.node._y;
 
   this.getX = function() {
-    return posToGrid(this.node._x);
+    return posToGrid(this.node._x + HALF_PLAYER_WIDTH - PLAYER_X_ADJUSTMENT);
   };
   
   this.getRightX = function() {
-    return posToGrid(this.node._x - PLAYER_WIDTH + 1);
+    return posToGrid(this.node._x - HALF_PLAYER_WIDTH + PLAYER_RIGHTX_ADJUSTMENT);
   };
 
   this.getY = function() {
