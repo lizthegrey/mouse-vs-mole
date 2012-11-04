@@ -258,7 +258,7 @@ function player(node, playerNum, xpos, ypos) {
   };
   
   this.getRightX = function() {
-    return posToGrid(this.node._x - HALF_PLAYER_WIDTH + PLAYER_XRIGHT_ADJUSTMENT);
+    return posToGrid(this.node._x - HALF_PLAYER_WIDTH + PLAYER_RIGHTX_ADJUSTMENT);
   };
 
   this.getY = function() {
