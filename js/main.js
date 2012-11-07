@@ -52,7 +52,7 @@ var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
-var MAX_ZOOM = 2.8;
+var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
@@ -358,10 +358,11 @@ function viewport() {
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
     var curX = -1*(pspr(1)._x + pspr(2)._x)/2;
-    var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
+    var curY = -1*(p(1).groundY + p(2).groundY)/2;
     var x_scale = pspr(1)._x - pspr(2)._x;
-    var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = MAX_ZOOM - 0.0000019 *
+    var y_scale = p(1).groundY - p(2).groundY;
+    //var y_scale = pspr(1)._y - pspr(2)._y;
+    var curZoom = MAX_ZOOM - 0.0000025 *
         Math.max(x_scale * x_scale, y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
@@ -394,15 +395,23 @@ function viewport() {
   curX += (PLAYGROUND_WIDTH/(zoom*0.73))/2;
   curY += (PLAYGROUND_HEIGHT/(zoom*0.75))/2;
 
-  if(curX > 0)
+  if(curX > 0) {
       curX = 0;
-  if(curX < DISPLAY_WIDTH*(1-zoom) )
+      console.log("boop1");
+  }
+  if(curX < DISPLAY_WIDTH*(1-zoom) ) {
       curX = DISPLAY_WIDTH*(1-zoom);
+      console.log("boop2");
+  }
 
-  if(curY > 0)
+  if(curY > 0) {
       curY = 0;
-  if(curY < DISPLAY_HEIGHT*(1-zoom) )
+      console.log("boop3");
+  }
+  if(curY < DISPLAY_HEIGHT*(1-zoom) ) {
       curY = DISPLAY_HEIGHT*(1-zoom);
+      console.log("boop4");
+  }
 
   prevY.push(curY);
   var y = 0;
@@ -567,6 +576,7 @@ function verticalMovement(player) {
   var x = p(player).getX();
   var rx = p(player).getRightX();
   var y = p(player).getY();
+  var origGy = pspr(player)._gy;
 
   var nextpos = parseInt(pspr(player)._y) + pspr(player)._gy;
   if (pspr(player)._gy >= 0) {
@@ -625,8 +635,9 @@ function verticalMovement(player) {
     }
   }
 
-  if(!PLAYER_INAIR[player - 1])
+  if(!PLAYER_INAIR[player - 1] && origGy > 0) {
       p(player).groundY = pspr(player)._y;
+  }
 }
 
 /* Function to stop sound upon player no longer moving */
