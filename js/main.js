@@ -88,7 +88,7 @@ var resources = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
-  asset_list += ['sprites/vert_tiles_70.png'];
+  asset_list += ['sprites/tiles_dmg_placeholder.png'];
   asset_list += ['sprites/player_tiles_60.png'];
   Crafty.load(asset_list);
   //Crafty.background('sprites/800x600.png');
@@ -104,7 +104,7 @@ function buildPlayground() {
   });
 
   Crafty.sprite(BLOCK_SIZE,
-      'sprites/vert_tiles_70.png', {
+      'sprites/tiles_dmg_placeholder.png', {
     block1: [0, 0],
     block2: [0, 1],
     block3: [0, 2],
@@ -113,8 +113,22 @@ function buildPlayground() {
     block6: [0, 5],
     block7: [0, 6],
     block8: [0, 7],
-    block8: [0, 9],
+    block9: [0, 8],
   });
+
+  for (var ii = 1; ii <= 9; ii++) {
+    Crafty.c('block' + ii + 'anim', {
+      init: function() {
+        this.requires('Sprite,SpriteAnimation,Grid')
+            .animate('full', 0, this.type, 0)
+            .animate('75', 1, this.type, 1)
+            .animate('50', 2, this.type, 2)
+            .animate('25', 3, this.type, 3)
+            .animate('10', 4, this.type, 4);
+      },
+      type: ii - 1
+    });
+  }
   
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
@@ -139,9 +153,11 @@ function addActors() {
       }
       rand = Math.floor(Math.random() * NUM_COLORS);
       blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
+      blockColor += ', block' + SPRITE_GRAPHIC_INDEXES[rand] + 'anim';
 
       var b = Crafty.e('2D, DOM, block, ' + blockColor).
           attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
+      b.animate('full', 1, -1);
 
       levelGrid[x][y] = new block(b, rand, 0);
     }
@@ -483,6 +499,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          processDamage(elem);
         }
         pspr(player).x = elem.node._x + BLOCK_SIZE;
       }
@@ -507,6 +524,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          processDamage(elem);
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
       }
@@ -539,9 +557,11 @@ function playerMove(player) {
     var elem2 = lg(rx, y + 1);
     if (elem && elem.node) {
       elem.damage += DAMAGE_DIG;
+      processDamage(elem);
     }
     else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
+      processDamage(elem2);
     }
     p(player).runningLeft = false;
     p(player).runningRight = false;
@@ -608,10 +628,12 @@ function verticalMovement(player) {
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
+        processDamage(elem);
         pspr(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
+        processDamage(elem2);
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
@@ -697,6 +719,28 @@ function maybeChain(x, y, type) {
   var elem = lg(x, y);
   if (elem && elem.blockType == type) {
     elem.damage = DAMAGE_TO_EXPLODE;
+    processDamage(elem);
+  }
+}
+
+function processDamage(elem) {
+  var fractionWhole = 1 - (elem.damage / DAMAGE_TO_EXPLODE);
+  if (fractionWhole == 1) {
+    elem.node.stop();
+  } else if (fractionWhole >= 0.75) {
+    elem.node.stop();
+    // TODO(lizf): instead of using animations, just make the underlying call
+    // to redraw once.
+    elem.node.animate('75', 10000, -1);
+  } else if (fractionWhole >= 0.50) {
+    elem.node.stop();
+    elem.node.animate('50', 10000, -1);
+  } else if (fractionWhole >= 0.25) {
+    elem.node.stop();
+    elem.node.animate('25', 10000, -1);
+  } else {
+    elem.node.stop();
+    elem.node.animate('10', 10000, -1);
   }
 }
 
