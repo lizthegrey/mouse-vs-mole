@@ -16,6 +16,8 @@ var MISSILE_DIAGONAL = Math.sqrt(Math.pow(MISSILE_WIDTH, 2)
 var MISSILE_STARTX_OFFSET = 70;
 var MISSILE_STARTY_OFFSET = MISSILE_STARTX_OFFSET * 1.2;
 var MISSILE_FLIP_OFFSET = 10;
+var EXPLOSION_RADIUS = 2;
+
 var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
 
@@ -43,7 +45,7 @@ var MOVE_VELOCITY = 4;
 var DRAG_VELOCITY = 6; // Yes, I know drag isn't normally a velocity.
 var MISSILE_VELOCITY = 35;
 var INITIAL_FIRE_ANGLE = 30;
-var EXPLOSION_VELOCITY = 30;
+var EXPLOSION_VELOCITY = 35;
 
 var WINNING_POINTS = 35;
 
@@ -273,15 +275,14 @@ function missile(node, angle) {
   this.node = node;
   this.yVel = -Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
   this.xVel = -Math.cos(toRadians(angle)) * MISSILE_VELOCITY;
-  this.angle = angle;
   this.node.rotation = angle;
   
   this.getX = function() {
-    return posToGrid(this.node._x + Math.cos(toRadians(this.node.rotation))
+    return posToGrid(this.node._x - Math.cos(toRadians(this.node.rotation))
                             * MISSILE_DIAGONAL / 2);
   };
   this.getY = function() {
-    return posToGrid(this.node._y + Math.sin(toRadians(this.node.rotation))
+    return posToGrid(this.node._y - Math.sin(toRadians(this.node.rotation))
                             * MISSILE_DIAGONAL / 2);
   };
 }
@@ -443,7 +444,7 @@ function viewport() {
     zoom += prevZoom[i];
   }
   zoom /= prevZoom.length;
-  if(prevZoom.length >= ZOOM_AVERAGE) {
+  if (prevZoom.length >= ZOOM_AVERAGE) {
     prevZoom.shift();
   }
 
@@ -451,14 +452,14 @@ function viewport() {
   curX += (PLAYGROUND_WIDTH/(zoom*0.73))/2;
   curY += (PLAYGROUND_HEIGHT/(zoom*0.75))/2;
 
-  if(curX > 0)
+  if (curX > 0)
       curX = 0;
-  if(curX < DISPLAY_WIDTH*(1-zoom) )
+  if (curX < DISPLAY_WIDTH*(1-zoom) )
       curX = DISPLAY_WIDTH*(1-zoom);
 
-  if(curY > 0)
+  if (curY > 0)
       curY = 0;
-  if(curY < DISPLAY_HEIGHT*(1-zoom) )
+  if (curY < DISPLAY_HEIGHT*(1-zoom) )
       curY = DISPLAY_HEIGHT*(1-zoom);
 
   prevY.push(curY);
@@ -467,7 +468,7 @@ function viewport() {
     y += prevY[i];
   }
   y /= prevY.length;
-  if(prevY.length >= CAM_Y_AVERAGE) {
+  if (prevY.length >= CAM_Y_AVERAGE) {
     prevY.shift();
   }
 
@@ -477,7 +478,7 @@ function viewport() {
     x += prevX[i];
   }
   x /= prevX.length;
-  if(prevX.length >= CAM_Y_AVERAGE) {
+  if (prevX.length >= CAM_Y_AVERAGE) {
     prevX.shift();
   }
 
@@ -506,15 +507,37 @@ function missileRefresh() {
   for (var n = 0; n < missiles.length; n++) {
     var missile = missiles[n];
     var mspr = missile.node;
+    
+    mXGrid = missile.getX();
+    mYGrid = missile.getY();
+    
+    if (lg(mXGrid, mYGrid) && lg(mXGrid, mYGrid).node) {
+      for (var a = -EXPLOSION_RADIUS; a <= EXPLOSION_RADIUS; a++) {
+        if ((mXGrid + a < 0) || (mXGrid + a > GRID_WIDTH))
+          continue;
+        for (var b = -EXPLOSION_RADIUS; b <= EXPLOSION_RADIUS; b++) {
+          if ((mYGrid + b < 0) || (mYGrid + b > GRID_HEIGHT))
+            continue;
+          if (lg(mXGrid + a, mYGrid + b) && lg(mXGrid + a, mYGrid + b).node) {
+            lg(mXGrid + a, mYGrid + b).node.destroy();
+            levelGrid[mXGrid + a][mYGrid + b] = new block(null, null, null);
+          }
+        }
+      }
+      mspr.destroy();
+      missiles.pop(n);
+      continue;
+    }
+    if (mspr._x > PLAYGROUND_WIDTH || mspr._x < 0 ||
+        mspr._y > PLAYGROUND_HEIGHT) {
+      mspr.destroy();
+      missiles.pop(n);
+      continue;
+    }
     mspr.x = mspr._x + missile.xVel;
     mspr.y = mspr._y + missile.yVel;
     
     missile.yVel += GRAVITY_ACCEL;
-    
-    missileXGrid = missile.getX();
-    missileYGrid = missile.getY();
-    
-    
     mspr.rotation = Math.atan2(-missile.yVel, -missile.xVel)
                     * 360 / 2 / Math.PI;
   }
@@ -547,13 +570,13 @@ function bazookaMove(player) {
 
   if (p(player).firingAngle > 90 && p(player).firingAngle < 270) {
     pspr(player).flip('X');
-    b(player).node.flip('Y');
+    baz(player).node.flip('Y');
   }
   else {
     pspr(player).unflip('X');
-    b(player).node.unflip('Y');
+    baz(player).node.unflip('Y');
   }
-  b(player).node.rotation = (p(player).firingAngle);
+  baz(player).node.rotation = (p(player).firingAngle);
   var bazookaTargetCenterX = pspr(player)._x + HALF_PLAYER_WIDTH;
   var bazookaTargetCenterY = pspr(player)._y + .3 * PLAYER_HEIGHT;
   var bazookaOffsetX =
@@ -562,8 +585,8 @@ function bazookaMove(player) {
   var bazookaOffsetY =
     Math.sin(toRadians(p(player).firingAngle))
     * BAZOOKA_DIAGONAL / 2;
-  b(player).node.x = bazookaTargetCenterX - bazookaOffsetX;
-  b(player).node.y = bazookaTargetCenterY - bazookaOffsetY;
+  baz(player).node.x = bazookaTargetCenterX - bazookaOffsetX;
+  baz(player).node.y = bazookaTargetCenterY - bazookaOffsetY;
 }
 
 function missileFire(player) {
@@ -584,8 +607,8 @@ function missileFire(player) {
       }), p(player).firingAngle);
   missiles.push(m);
   p(player).firingAngle = 0;
-  if (b(player) && b(player).node)
-    b(player).node.destroy();
+  if (baz(player) && baz(player).node)
+    baz(player).node.destroy();
 }
 
 function playerMove(player) {
@@ -796,7 +819,7 @@ function verticalMovement(player) {
     }
   }
 
-  if(!PLAYER_INAIR[player - 1])
+  if (!PLAYER_INAIR[player - 1])
       p(player).groundY = pspr(player)._y;
 }
 
@@ -864,7 +887,7 @@ function pspr(n) {
 }
 
 // Returns the bazooka object associated with a player number.
-function b(n) {
+function baz(n) {
   return bazookas[n - 1];
 }
 
@@ -974,10 +997,10 @@ function reboot() {
       missile.node.destroy();
   }
   
-  if (b(1) != null && b(1).node != null)
-    b(1).node.destroy();
-  if (b(2) != null && b(2).node != null)
-    b(2).node.destroy();
+  if (baz(1) != null && baz(1).node != null)
+    baz(1).node.destroy();
+  if (baz(2) != null && baz(2).node != null)
+    baz(2).node.destroy();
   pspr(1).destroy();
   pspr(2).destroy();
   //$('#text').remove();
