@@ -52,7 +52,7 @@ var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
-var MAX_ZOOM = 2.8;
+var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
@@ -242,6 +242,7 @@ function addSounds() {
 function block(node, blockType, damage) {
   this.node = node;
   this.blockType = blockType;
+  this.damagedBy = null;
   this.damage = damage;
 }
 
@@ -261,7 +262,7 @@ function player(node, playerNum, xpos, ypos) {
   this.node.player = this;
   this.playerNum = playerNum;
   this.node._gy = 0;
-  this.points = 0;
+  this.points = new Array();
 
   this.runningLeft = false;
   this.runningRight = false;
@@ -325,7 +326,6 @@ function resourceRefresh() {
         if (!popped) {
           resources.splice(n, 1);
         }
-        updatePoints(playerNum, 1);
         popped = true;
         Crafty.audio.play('resourceGet');
         // I thought about having a break statement in here, but if the players
@@ -374,10 +374,11 @@ function viewport() {
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
     var curX = -1*(pspr(1)._x + pspr(2)._x)/2;
-    var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
+    var curY = -1*(p(1).groundY + p(2).groundY)/2;
     var x_scale = pspr(1)._x - pspr(2)._x;
-    var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = MAX_ZOOM - 0.0000019 *
+    var y_scale = p(1).groundY - p(2).groundY;
+    //var y_scale = pspr(1)._y - pspr(2)._y;
+    var curZoom = MAX_ZOOM - 0.0000025 *
         Math.max(x_scale * x_scale, y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
@@ -410,15 +411,19 @@ function viewport() {
   curX += (PLAYGROUND_WIDTH/(zoom*0.73))/2;
   curY += (PLAYGROUND_HEIGHT/(zoom*0.75))/2;
 
-  if(curX > 0)
+  if(curX > 0) {
       curX = 0;
-  if(curX < DISPLAY_WIDTH*(1-zoom) )
+  }
+  if(curX < DISPLAY_WIDTH*(1-zoom) ) {
       curX = DISPLAY_WIDTH*(1-zoom);
+  }
 
-  if(curY > 0)
+  if(curY > 0) {
       curY = 0;
-  if(curY < DISPLAY_HEIGHT*(1-zoom) )
+  }
+  if(curY < DISPLAY_HEIGHT*(1-zoom) ) {
       curY = DISPLAY_HEIGHT*(1-zoom);
+  }
 
   prevY.push(curY);
   var y = 0;
@@ -500,6 +505,7 @@ function playerMove(player) {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
           processDamage(elem);
+          elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x + BLOCK_SIZE;
       }
@@ -525,6 +531,7 @@ function playerMove(player) {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
           processDamage(elem);
+          elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
       }
@@ -558,10 +565,11 @@ function playerMove(player) {
     if (elem && elem.node) {
       elem.damage += DAMAGE_DIG;
       processDamage(elem);
-    }
-    else if (elem2 && elem2.node) {
+      elem.damagedBy = player;
+    } else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
       processDamage(elem2);
+      elem2.damagedBy = player;
     }
     p(player).runningLeft = false;
     p(player).runningRight = false;
@@ -583,6 +591,7 @@ function verticalMovement(player) {
   var x = p(player).getX();
   var rx = p(player).getRightX();
   var y = p(player).getY();
+  var origGy = pspr(player)._gy;
 
   var nextpos = parseInt(pspr(player)._y) + pspr(player)._gy;
   if (pspr(player)._gy >= 0) {
@@ -629,11 +638,13 @@ function verticalMovement(player) {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
         processDamage(elem);
+        elem.damagedBy = player;
         pspr(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
         processDamage(elem2);
+        elem2.damagedBy = player;
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
@@ -641,8 +652,9 @@ function verticalMovement(player) {
     }
   }
 
-  if(!PLAYER_INAIR[player - 1])
+  if(!PLAYER_INAIR[player - 1] && origGy > 0) {
       p(player).groundY = pspr(player)._y;
+  }
 }
 
 /* Function to stop sound upon player no longer moving */
@@ -682,20 +694,19 @@ function playerStop() {
   }
 }
 
-function updatePoints(playerNum, pointsInc) {
+function updatePoints(playerNum, pointsInc, pointsType) {
   playerNum = parseInt(playerNum);
-  points = p(playerNum).points + pointsInc;
-  if (points > WINNING_POINTS) {
-    points = WINNING_POINTS;
-  } else if (points < 0) {
-      points = 0;
+  if(p(playerNum).points[pointsType] == null) {
+    p(playerNum).points[pointsType] = pointsInc;
   }
+  else {
+    p(playerNum).points[pointsType] += pointsInc;
+  }
+  console.log(pointsType + '-' + p(playerNum).points[pointsType]);
+}
 
-  var h = Math.atan(points / POINT_RAMPING) / (Math.PI / 2);
-  $('#pts' + playerNum).animate({'height':
-      100 - h * 100 + '%'}, 300);
-
-  p(playerNum).points = points;
+function resetPoints(playerNum) {
+  p(playerNum).points = new Array();
 }
 
 // Returns the player object associated with a player number.
@@ -715,9 +726,10 @@ function lg(x, y) {
   return undefined;
 }
 
-function maybeChain(x, y, type) {
+function maybeChain(x, y, type, player) {
   var elem = lg(x, y);
   if (elem && elem.blockType == type) {
+    elem.damagedBy = player;
     elem.damage = DAMAGE_TO_EXPLODE;
     processDamage(elem);
   }
@@ -754,15 +766,21 @@ function removeDestroyed() {
         if (levelGrid[x][y].damage &&
             levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
           evaluateChainReaction = true;
+
           var type = levelGrid[x][y].blockType;
+          var player = levelGrid[x][y].damagedBy;
+          if(player != null) {
+            updatePoints(player, 1, type);
+          }
+
           levelGrid[x][y].node.destroy();
           levelGrid[x][y] = new block(null, null, null);
-          
+
           Crafty.audio.play('blockBreak');
-          maybeChain(x + 1, y, type);
-          maybeChain(x - 1, y, type);
-          maybeChain(x, y + 1, type);
-          maybeChain(x, y - 1, type);
+          maybeChain(x + 1, y, type, player);
+          maybeChain(x - 1, y, type, player);
+          maybeChain(x, y + 1, type, player);
+          maybeChain(x, y - 1, type, player);
         }
       }
     }
@@ -804,16 +822,13 @@ function restart() {
 }
 
 function reboot() {
-  updatePoints(1, -1 * p(1).points);
-  updatePoints(2, -1 * p(2).points);
-  
   PLAYER1_DEAD = false;
   PLAYER2_DEAD = false;
-  
+
   stopMusic();
   death_y = GRID_HEIGHT;
   ENABLE_CREEPING = false;
-  
+
   for (var a = 0; a < levelGrid.length; a++) {
     for(var b = 0; b < levelGrid[a].length; b++) {
       var newBlock = levelGrid[a][b];
@@ -826,12 +841,14 @@ function reboot() {
     if (resource.node != null)
       resource.node.destroy();
   }
+  resetPoints(1);
+  resetPoints(2);
   pspr(1).destroy();
   pspr(2).destroy();
   //$('#text').remove();
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.viewport.init();
-  
+
   addActors();
   addFunctionality();
   startMusic();
