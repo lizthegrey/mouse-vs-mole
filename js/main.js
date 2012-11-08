@@ -56,7 +56,7 @@ var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
-var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4);
+var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -127,29 +127,29 @@ function buildPlayground() {
 
 function addActors() {
   var rand = 0;
-	var colorIndex;
+  var colorIndex;
   levelGrid = new Array(GRID_WIDTH);
-	levelMap=simpleStage();
+  levelMap=simpleStage();
   resources = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
-      if (y == START_YCOORD &&
-          (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
-        levelGrid[x][y] = new block(null, null, null);
-        continue;
-      }
-			if (levelMap[x][y]==10){
-        levelGrid[x][y] = new block(null, null, null);
-        continue;
-			}
-      colorIndex = levelMap[x][y];
-      blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[colorIndex];
+        if (y == START_YCOORD &&
+              (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
+            levelGrid[x][y] = new block(null, null, null);
+            continue;
+        }
+        if (levelMap[x][y]==10){
+            levelGrid[x][y] = new block(null, null, null);
+            continue;
+        }
+        colorIndex = levelMap[x][y];
+        blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[colorIndex];
 
-      var b = Crafty.e('2D, DOM, block, ' + blockColor).
-          attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
+        var b = Crafty.e('2D, DOM, block, ' + blockColor).
+            attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
 
-      levelGrid[x][y] = new block(b, colorIndex, 0);
+        levelGrid[x][y] = new block(b, colorIndex, 0);
     }
   }
 
