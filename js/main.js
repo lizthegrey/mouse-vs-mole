@@ -276,15 +276,18 @@ function missile(node, angle) {
   this.yVel = -Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
   this.xVel = -Math.cos(toRadians(angle)) * MISSILE_VELOCITY;
   this.node.rotation = angle;
+  this.exists = true;
   
   this.getX = function() {
-    return posToGrid(this.node._x - Math.cos(toRadians(this.node.rotation))
-                            * MISSILE_DIAGONAL / 2);
+    return posToGrid(this.node._x - BLOCK_SIZE / 2);
   };
   this.getY = function() {
-    return posToGrid(this.node._y - Math.sin(toRadians(this.node.rotation))
-                            * MISSILE_DIAGONAL / 2);
+    return posToGrid(this.node._y - BLOCK_SIZE / 2);
   };
+  this.destroy = function() {
+    this.exists = false;
+    this.node.destroy();
+  }
 }
 
 function bazooka(node, player) {
@@ -507,6 +510,7 @@ function missileRefresh() {
   for (var n = 0; n < missiles.length; n++) {
     var missile = missiles[n];
     var mspr = missile.node;
+    if (!missile.exists) continue;
     
     mXGrid = missile.getX();
     mYGrid = missile.getY();
@@ -524,14 +528,14 @@ function missileRefresh() {
           }
         }
       }
-      mspr.destroy();
-      missiles.pop(n);
+      missile.destroy();
+      //missiles.pop(n);
       continue;
     }
     if (mspr._x > PLAYGROUND_WIDTH || mspr._x < 0 ||
         mspr._y > PLAYGROUND_HEIGHT) {
-      mspr.destroy();
-      missiles.pop(n);
+      missile.destroy();
+      //missiles.pop(n);
       continue;
     }
     mspr.x = mspr._x + missile.xVel;
