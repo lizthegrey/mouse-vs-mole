@@ -572,7 +572,7 @@ function missileFire(player) {
           y: startY,
           z: 200
       }), p(player).firingAngle);
-  missiles.push(missile);
+  missiles.push(m);
   p(player).firingAngle = 0;
   if (b(player) && b(player).node)
     b(player).node.destroy();
