@@ -1,5 +1,6 @@
 // Level Grid is an int matrix with 0 through 3 representing colored normal blocks and 4 through 7 representing powerups. 10 means empty.
-var PWRUP_COUNT=45;
+var VEIN_COUNT=55;
+var VEIN_CONSTANT = 8;
 var GRID_WIDTH = 40;
 var GRID_HEIGHT = 30;
 
@@ -17,7 +18,7 @@ function singleColorStage(){
 
 function simpleStage(){
 	levelMap=stageGenerate();
-	return powerUpScatter(cheesify(tunnelMaker(levelMap,3,10,15,30,15),4,7))
+	return powerUpExpand(powerUpScatter(cheesify(tunnelMaker(levelMap,3,10,15,30,15),4,7)))
 }
 
 function cheesify(levelMap,r, holeCount){
@@ -43,7 +44,7 @@ function stageGenerate(){
 }
 
 function powerUpScatter(levelMap){
-	for (var i=0;i<PWRUP_COUNT;i++) {
+	for (var i=0;i<VEIN_COUNT;i++) {
 		var x = Math.floor(Math.random() * GRID_WIDTH);
 		var y = Math.floor(Math.random() * GRID_HEIGHT);
         if(levelMap[x][y] != 10) {
@@ -54,6 +55,33 @@ function powerUpScatter(levelMap){
         }
 	}
     return levelMap
+}
+
+function powerUpExpand(levelMap) {
+  for(var x = 1; x < GRID_WIDTH - 1; x++) {
+    for(var y = 1; y < GRID_HEIGHT - 1; y++) {
+        var adjacents = [
+                //levelMap[x+1][y+1],
+                //levelMap[x+1][y-1],
+                levelMap[x+1][y],
+
+                //levelMap[x-1][y+1],
+                //levelMap[x-1][y-1],
+                levelMap[x-1][y],
+
+                levelMap[x][y+1],
+                levelMap[x][y-1]
+        ];
+        for(var i = 0; i < adjacents.length; i++) {
+            if(adjacents[i] != 10 && adjacents[i] >= 4) {
+                if(Math.floor(Math.random() * 100) < VEIN_CONSTANT) {
+                    levelMap[x][y] = adjacents[i];
+                }
+            }
+        }
+    }
+  }
+  return levelMap
 }
 
 function tunnelMaker(levelMap,r,x1,y1,x2,y2){
