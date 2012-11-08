@@ -525,15 +525,15 @@ function bazookaMove(player) {
 
   if (p(player).firingAngle > 90 && p(player).firingAngle < 270) {
     pspr(player).flip('X');
-    b(player).node.flip('X');
+    b(player).node.flip('Y');
   }
   else {
     pspr(player).unflip('X');
-    b(player).node.unflip('X');
+    b(player).node.unflip('Y');
   }
+  b(player).node.rotation = (p(player).firingAngle);
   b(player).node.x = pspr(player)._x;
   b(player).node.y = pspr(player)._y;
-  b(player).node.rotation = (p(player).firingAngle);
 }
 
 function missileFire(player) {
@@ -585,9 +585,11 @@ function playerMove(player) {
   else if (Crafty.keydown[fire]) {
     ENABLE_CREEPING = true;
     p(player).firing = true;
-    p(player).firingAngle += INITIAL_FIRE_ANGLE;
-    if (pspr(player)._flipX) {
-      p(player).firingAngle += 90 - INITIAL_FIRE_ANGLE;
+    if (!pspr(player)._flipX) {
+      p(player).firingAngle = INITIAL_FIRE_ANGLE;
+    }
+    else {
+      p(player).firingAngle = 180 - INITIAL_FIRE_ANGLE;
     }
     bazookas[player - 1] = new bazooka(Crafty.e('2D, DOM, bazooka').attr({
           x: pspr(player)._x,
