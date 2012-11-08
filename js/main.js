@@ -7,8 +7,12 @@ var PLAYER_RIGHTX_ADJUSTMENT = PLAYER_WIDTH / 6;
 var RESOURCE_SIZE = 11;
 var BAZOOKA_HEIGHT = 35;
 var BAZOOKA_WIDTH = 75;
+var BAZOOKA_DIAGONAL = Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2)
+                       + Math.pow(BAZOOKA_HEIGHT, 2));
 var MISSILE_HEIGHT = 17;
 var MISSILE_WIDTH = 44;
+var MISSILE_DIAGONAL = Math.sqrt(Math.pow(MISSILE_WIDTH, 2)
+                       + Math.pow(MISSILE_HEIGHT, 2));
 var MISSILE_STARTX_OFFSET = 70;
 var MISSILE_STARTY_OFFSET = MISSILE_STARTX_OFFSET * 1.2;
 var MISSILE_FLIP_OFFSET = 10;
@@ -268,7 +272,7 @@ function resource(node) {
 function missile(node, angle) {
   this.node = node;
   this.yVel = 0;
-  this.xVel = Math.sin(angle * Math.PI * 2 / 360) * MISSILE_VELOCITY;
+  this.xVel = Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
   this.angle = angle;
   this.node.rotation = angle;
   this.getX = function() {
@@ -497,7 +501,12 @@ function resourceGet(rx, ry, px, py) {
 
 function missileRefresh() {
   for (var n = 0; n < missiles.length; n++) {
-    
+    var missile = missiles[n];
+    var mspr = missile.node;
+    var centerX = mspr._x + Math.cos(toRadians(mspr.rotation))
+                            * MISSILE_DIAGONAL / 2;
+    var centerY = mspr._y + Math.sin(toRadians(mspr.rotation))
+                            * MISSILE_DIAGONAL / 2;
   }
 }
 
@@ -538,11 +547,11 @@ function bazookaMove(player) {
   var bazookaTargetCenterX = pspr(player)._x + HALF_PLAYER_WIDTH;
   var bazookaTargetCenterY = pspr(player)._y + .3 * PLAYER_HEIGHT;
   var bazookaOffsetX =
-    Math.cos(p(player).firingAngle * 2 * Math.PI / 360)
-    * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
+    Math.cos(toRadians(p(player).firingAngle))
+    * BAZOOKA_DIAGONAL / 2;
   var bazookaOffsetY =
-    Math.sin(p(player).firingAngle * 2 * Math.PI / 360)
-    * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
+    Math.sin(toRadians(p(player).firingAngle))
+    * BAZOOKA_DIAGONAL / 2;
   b(player).node.x = bazookaTargetCenterX - bazookaOffsetX;
   b(player).node.y = bazookaTargetCenterY - bazookaOffsetY;
 }
@@ -550,9 +559,9 @@ function bazookaMove(player) {
 function missileFire(player) {
   var startX = p(player).node._x + HALF_PLAYER_WIDTH
     - MISSILE_STARTX_OFFSET
-    * Math.cos(p(player).firingAngle * 2 * Math.PI / 360);
+    * Math.cos(toRadians(p(player).firingAngle));
   var startY = p(player).node._y + .3 * PLAYER_HEIGHT
-    - Math.sin(p(player).firingAngle * 2 * Math.PI / 360)
+    - Math.sin(toRadians(p(player).firingAngle))
     * MISSILE_STARTY_OFFSET;
   if (pspr(player)._flipX) {
     startX += MISSILE_FLIP_OFFSET
@@ -847,6 +856,10 @@ function pspr(n) {
 // Returns the bazooka object associated with a player number.
 function b(n) {
   return bazookas[n - 1];
+}
+
+function toRadians(deg) {
+  return (deg * Math.PI * 2 / 360);
 }
 
 function lg(x, y) {
