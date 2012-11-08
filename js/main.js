@@ -397,20 +397,16 @@ function viewport() {
 
   if(curX > 0) {
       curX = 0;
-      console.log("boop1");
   }
   if(curX < DISPLAY_WIDTH*(1-zoom) ) {
       curX = DISPLAY_WIDTH*(1-zoom);
-      console.log("boop2");
   }
 
   if(curY > 0) {
       curY = 0;
-      console.log("boop3");
   }
   if(curY < DISPLAY_HEIGHT*(1-zoom) ) {
       curY = DISPLAY_HEIGHT*(1-zoom);
-      console.log("boop4");
   }
 
   prevY.push(curY);
