@@ -9,7 +9,9 @@ var BAZOOKA_HEIGHT = 35;
 var BAZOOKA_WIDTH = 75;
 var MISSILE_HEIGHT = 17;
 var MISSILE_WIDTH = 44;
-var MISSILE_START_OFFSET = 40;
+var MISSILE_STARTX_OFFSET = 70;
+var MISSILE_STARTY_OFFSET = MISSILE_STARTX_OFFSET * 1.2;
+var MISSILE_FLIP_OFFSET = 10;
 var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
 
@@ -533,23 +535,29 @@ function bazookaMove(player) {
     b(player).node.unflip('Y');
   }
   b(player).node.rotation = (p(player).firingAngle);
-  var bazookaTargetCenterX = pspr(player)._x + .5*PLAYER_WIDTH;
-  var bazookaTargetCenterY = pspr(player)._y + .3*PLAYER_HEIGHT;
-  var bazookaOffsetX = Math.cos(p(player).firingAngle * 2 * Math.PI / 360) * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
-  var bazookaOffsetY = Math.sin(p(player).firingAngle * 2 * Math.PI / 360) * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
+  var bazookaTargetCenterX = pspr(player)._x + HALF_PLAYER_WIDTH;
+  var bazookaTargetCenterY = pspr(player)._y + .3 * PLAYER_HEIGHT;
+  var bazookaOffsetX =
+    Math.cos(p(player).firingAngle * 2 * Math.PI / 360)
+    * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
+  var bazookaOffsetY =
+    Math.sin(p(player).firingAngle * 2 * Math.PI / 360)
+    * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
   b(player).node.x = bazookaTargetCenterX - bazookaOffsetX;
   b(player).node.y = bazookaTargetCenterY - bazookaOffsetY;
 }
 
 function missileFire(player) {
-  if (b(player) && b(player).node)
-    b(player).node.destroy();
-  var startX = p(player).node._x;
-  if (p(player).node._flipX)
-    startX += MISSILE_START_OFFSET;
-  else
-    startX -= MISSILE_START_OFFSET;
-  var startY = p(player).node._y;
+  var startX = p(player).node._x + HALF_PLAYER_WIDTH
+    - MISSILE_STARTX_OFFSET
+    * Math.cos(p(player).firingAngle * 2 * Math.PI / 360);
+  var startY = p(player).node._y + .3 * PLAYER_HEIGHT
+    - Math.sin(p(player).firingAngle * 2 * Math.PI / 360)
+    * MISSILE_STARTY_OFFSET;
+  if (pspr(player)._flipX) {
+    startX += MISSILE_FLIP_OFFSET
+    startY += MISSILE_FLIP_OFFSET;
+  }
   var m = new missile(Crafty.e('2D, DOM, missile').attr({
           x: startX,
           y: startY,
@@ -557,6 +565,8 @@ function missileFire(player) {
       }), p(player).firingAngle);
   missiles.push(missile);
   p(player).firingAngle = 0;
+  if (b(player) && b(player).node)
+    b(player).node.destroy();
 }
 
 function playerMove(player) {
