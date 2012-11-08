@@ -266,7 +266,7 @@ function resource(node) {
 function missile(node, angle) {
   this.node = node;
   this.yVel = 0;
-  this.xVel = Math.sin(angle * Math.pi * 2 / 360) * MISSILE_VELOCITY;
+  this.xVel = Math.sin(angle * Math.PI * 2 / 360) * MISSILE_VELOCITY;
   this.angle = angle;
   this.node.rotation = angle;
   this.getX = function() {
@@ -521,6 +521,7 @@ function bazookaMove(player) {
   if (Crafty.keydown[counterClock]) {
     p(player).firingAngle -= 5;
   }
+  p(player).firingAngle += 360;
   p(player).firingAngle %= 360;
 
   if (p(player).firingAngle > 90 && p(player).firingAngle < 270) {
@@ -532,8 +533,12 @@ function bazookaMove(player) {
     b(player).node.unflip('Y');
   }
   b(player).node.rotation = (p(player).firingAngle);
-  b(player).node.x = pspr(player)._x;
-  b(player).node.y = pspr(player)._y;
+  var bazookaTargetCenterX = pspr(player)._x + .5*PLAYER_WIDTH;
+  var bazookaTargetCenterY = pspr(player)._y + .3*PLAYER_HEIGHT;
+  var bazookaOffsetX = Math.cos(p(player).firingAngle * 2 * Math.PI / 360) * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
+  var bazookaOffsetY = Math.sin(p(player).firingAngle * 2 * Math.PI / 360) * Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) + Math.pow(BAZOOKA_HEIGHT, 2))/2;
+  b(player).node.x = bazookaTargetCenterX - bazookaOffsetX;
+  b(player).node.y = bazookaTargetCenterY - bazookaOffsetY;
 }
 
 function missileFire(player) {
@@ -637,7 +642,7 @@ function playerMove(player) {
       p(player).runningRight = false;
     }
     isRunning = true;
-    p(player).xVel += Math.min(-1*p(player).xVel, DRAG_VELOCITY);
+    p(player).xVel += Math.min(-1 * p(player).xVel, DRAG_VELOCITY);
   }
   else if (p(player).xVel > 0) {
     var elem = lg(x + 1, y);
