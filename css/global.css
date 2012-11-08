@@ -1,5 +1,6 @@
 body {
     background: tan;
+    overflow-y: scroll !important;
 }
 
 #metawrapper, #gamewrapper, #undergame {
