@@ -3,39 +3,43 @@ var PWRUP_COUNT=15;
 var GRID_WIDTH = 40;
 var GRID_HEIGHT = 30;
 
-levelMap=new Array(GRID_WIDTH);
 
 function singleColorStage(){
+	levelMap=new Array(GRID_WIDTH);
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelMap[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
 	  levelMap[x][y] = Math.floor(0);
 	  }
   }
+	return levelMap
 }
 
 function simpleStage(){
-	stageGenerate();
-	tunnelMaker(5,10,15,30,15)
+	levelMap=stageGenerate();
+	return cheesify(tunnelMaker(levelMap,3,10,15,30,15),4,7)
 }
 
-function cheesify(r, holeCount){
+function cheesify(levelMap,r, holeCount){
 	var x;
 	var y;
 	for (var i=0;i<holeCount;i++){
 		x=Math.floor(Math.random() * GRID_WIDTH);
 		y=Math.floor(Math.random() * GRID_HEIGHT);
-		holeMaker(r, x, y)
+		holeMaker(levelMap,r, x, y)
 	}
+	return levelMap
 }
 
 function stageGenerate(){
+	levelMap=new Array(GRID_WIDTH);
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelMap[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
 	  levelMap[x][y] = Math.floor(Math.random() * 4);
 	  }
   }
+	return levelMap
 }
 
 function powerUpScatter(){
@@ -46,14 +50,15 @@ function powerUpScatter(){
 	}
 }
 
-function tunnelMaker(r,x1,y1,x2,y2){
+function tunnelMaker(levelMap,r,x1,y1,x2,y2){
   var mx=Math.floor((x1+x2)/2);
 	var my=Math.floor((y1+y2)/2);
-	holeMaker(r,mx,my);
+	levelMap=holeMaker(levelMap,r,mx,my);
 	if (distance(x1,y1,mx,my)>r/4){
-		tunnelMaker(Math.floor(r*(0.5+Math.random()+5)/6), mx, my, x1, y1);
-		tunnelMaker(Math.floor(r*(0.5+Math.random()+5)/6), mx, my, x2, y2);
+		tunnelMaker(levelMap,Math.floor(r*(0.5+Math.random()+5)/6), mx, my, x1, y1);
+		tunnelMaker(levelMap,Math.floor(r*(0.5+Math.random()+5)/6), mx, my, x2, y2);
 	}
+	return levelMap
 }
 
 function distance( x1,y1,x2,y2){
@@ -62,7 +67,7 @@ function distance( x1,y1,x2,y2){
 	return Math.sqrt( xs + ys );
 }
 
-function holeMaker(r, centerX, centerY){
+function holeMaker(levelMap,r, centerX, centerY){
   for (var x = 0; x < GRID_WIDTH; x++) {
     for (var y = 0; y < GRID_HEIGHT; y++) {
 			if (distance(x,y,centerX,centerY)<r){
@@ -70,7 +75,5 @@ function holeMaker(r, centerX, centerY){
 			}
 		}
   }
+	return levelMap
 }
-
-simpleStage();
-console.log(levelMap);

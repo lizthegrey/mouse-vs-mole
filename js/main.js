@@ -108,9 +108,10 @@ function buildPlayground() {
 }
 
 function addActors() {
-	simpleStage()
   var rand = 0;
+	var colorIndex;
   levelGrid = new Array(GRID_WIDTH);
+	levelMap=simpleStage();
   resources = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
@@ -124,13 +125,13 @@ function addActors() {
         levelGrid[x][y] = new block(null, null, null);
         continue;
 			}
-      rand = levelMap[x][y];
-      blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
+      colorIndex = levelMap[x][y];
+      blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[colorIndex];
 
       var b = Crafty.e('2D, DOM, block, ' + blockColor).
           attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
 
-      levelGrid[x][y] = new block(b, rand, 0);
+      levelGrid[x][y] = new block(b, colorIndex, 0);
     }
   }
 
