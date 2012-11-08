@@ -41,7 +41,7 @@ var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -25;   // pixels/s
 var MOVE_VELOCITY = 4;
 var DRAG_VELOCITY = 6; // Yes, I know drag isn't normally a velocity.
-var MISSILE_VELOCITY = 10;
+var MISSILE_VELOCITY = 35;
 var INITIAL_FIRE_ANGLE = 30;
 var EXPLOSION_VELOCITY = 30;
 
@@ -271,15 +271,18 @@ function resource(node) {
 
 function missile(node, angle) {
   this.node = node;
-  this.yVel = 0;
-  this.xVel = Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
+  this.yVel = -Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
+  this.xVel = -Math.cos(toRadians(angle)) * MISSILE_VELOCITY;
   this.angle = angle;
   this.node.rotation = angle;
+  
   this.getX = function() {
-    return posToGrid(this.node._x);
+    return posToGrid(this.node._x + Math.cos(toRadians(this.node.rotation))
+                            * MISSILE_DIAGONAL / 2);
   };
   this.getY = function() {
-    return posToGrid(this.node._y);
+    return posToGrid(this.node._y + Math.sin(toRadians(this.node.rotation))
+                            * MISSILE_DIAGONAL / 2);
   };
 }
 
@@ -503,10 +506,17 @@ function missileRefresh() {
   for (var n = 0; n < missiles.length; n++) {
     var missile = missiles[n];
     var mspr = missile.node;
-    var centerX = mspr._x + Math.cos(toRadians(mspr.rotation))
-                            * MISSILE_DIAGONAL / 2;
-    var centerY = mspr._y + Math.sin(toRadians(mspr.rotation))
-                            * MISSILE_DIAGONAL / 2;
+    mspr.x = mspr._x + missile.xVel;
+    mspr.y = mspr._y + missile.yVel;
+    
+    missile.yVel += GRAVITY_ACCEL;
+    
+    missileXGrid = missile.getX();
+    missileYGrid = missile.getY();
+    
+    
+    mspr.rotation = Math.atan2(-missile.yVel, -missile.xVel)
+                    * 360 / 2 / Math.PI;
   }
 }
 
