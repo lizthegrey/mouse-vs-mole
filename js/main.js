@@ -61,11 +61,13 @@ var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
-var MAX_ZOOM = 2.8;
+var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
-var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4);
+var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
+
+var MAXPOINTS = {5: 10};
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -77,7 +79,7 @@ var RESOURCE_GET = 'sounds/chime.ogg';
 var PLAYER1_RUNNING = false;
 var PLAYER2_RUNNING = false;
 
-var PLAYER_INAIR = [false, false]
+var PLAYER_INAIR = [false, false];
 
 var MUSIC_PLAYING = false;
 var PLAYER1_DEAD = false;
@@ -111,7 +113,7 @@ function buildPlayground() {
   Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
       'sprites/player_tiles_60.png', {
     player1: [0, 0],
-    player2: [0, 1],
+    player2: [0, 1]
   });
 
   Crafty.sprite(BLOCK_SIZE,
@@ -124,7 +126,7 @@ function buildPlayground() {
     block6: [0, 5],
     block7: [0, 6],
     block8: [0, 7],
-    block8: [0, 9],
+    block8: [0, 9]
   });
   
   Crafty.sprite(BAZOOKA_WIDTH, BAZOOKA_HEIGHT,
@@ -148,25 +150,31 @@ function buildPlayground() {
 
 function addActors() {
   var rand = 0;
+  var colorIndex;
   levelGrid = new Array(GRID_WIDTH);
   bazookas = new Array(2);
+  levelMap = simpleStage();
   resources = [];
   missiles = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
-      if (y == START_YCOORD &&
-          (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
-        levelGrid[x][y] = new block(null, null, null);
-        continue;
-      }
-      rand = Math.floor(Math.random() * NUM_COLORS);
-      blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[rand];
+        if (y == START_YCOORD &&
+              (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
+            levelGrid[x][y] = new block(null, null, null);
+            continue;
+        }
+        if (levelMap[x][y] == 10) {
+            levelGrid[x][y] = new block(null, null, null);
+            continue;
+        }
+        colorIndex = levelMap[x][y];
+        blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[colorIndex];
 
-      var b = Crafty.e('2D, DOM, block, ' + blockColor).
-          attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
+        var b = Crafty.e('2D, DOM, block, ' + blockColor).
+            attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
 
-      levelGrid[x][y] = new block(b, rand, 0);
+        levelGrid[x][y] = new block(b, colorIndex, 0);
     }
   }
 
@@ -249,6 +257,7 @@ function addSounds() {
 function block(node, blockType, damage) {
   this.node = node;
   this.blockType = blockType;
+  this.damagedBy = null;
   this.damage = damage;
 }
 
@@ -287,10 +296,10 @@ function player(node, playerNum, xpos, ypos) {
   this.node.player = this;
   this.playerNum = playerNum;
   this.node._gy = 0;
-  this.points = 0;
   this.xVel = 0;
   this.firing = false;
   this.firingAngle = 0;
+  this.points = new Array();
 
   this.runningLeft = false;
   this.runningRight = false;
@@ -301,7 +310,7 @@ function player(node, playerNum, xpos, ypos) {
   this.getX = function() {
     return posToGrid(this.node._x + HALF_PLAYER_WIDTH - PLAYER_X_ADJUSTMENT);
   };
-  
+
   this.getRightX = function() {
     return posToGrid(this.node._x - HALF_PLAYER_WIDTH + PLAYER_RIGHTX_ADJUSTMENT);
   };
@@ -354,7 +363,6 @@ function resourceRefresh() {
         if (!popped) {
           resources.splice(n, 1);
         }
-        updatePoints(playerNum, 1);
         popped = true;
         Crafty.audio.play('resourceGet');
         // I thought about having a break statement in here, but if the players
@@ -405,11 +413,12 @@ var prevZoom = [];
 function viewport() {
 
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
-    var curX = -1*(pspr(1)._x + pspr(2)._x)/2;
-    var curY = -1*(pspr(1)._y + pspr(2)._y)/2;
+    var curX = -1 * (pspr(1)._x + pspr(2)._x) / 2;
+    var curY = -1 * (p(1).groundY + p(2).groundY) / 2;
     var x_scale = pspr(1)._x - pspr(2)._x;
-    var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = MAX_ZOOM - 0.0000019 *
+    var y_scale = p(1).groundY - p(2).groundY;
+    //var y_scale = pspr(1)._y - pspr(2)._y;
+    var curZoom = MAX_ZOOM - 0.0000025 *
         Math.max(x_scale * x_scale, y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
@@ -417,62 +426,66 @@ function viewport() {
     }
   }
   else if (!PLAYER1_DEAD) {
-      var curX = -1*pspr(1)._x;
-      var curY = -1*pspr(1)._y;
+      var curX = -1 * pspr(1)._x;
+      var curY = -1 * pspr(1)._y;
       var curZoom = FIXED_ZOOM;
   }
   else if (!PLAYER2_DEAD) {
-      var curX = -1*pspr(2)._x;
-      var curY = -1*pspr(2)._y;
+      var curX = -1 * pspr(2)._x;
+      var curY = -1 * pspr(2)._y;
       var curZoom = FIXED_ZOOM;
   }
 
 
   prevZoom.push(curZoom);
   var zoom = 0;
-  for(var i = 0; i < prevZoom.length; i++) {
+  for (var i = 0; i < prevZoom.length; i++) {
     zoom += prevZoom[i];
   }
   zoom /= prevZoom.length;
-  if(prevZoom.length >= ZOOM_AVERAGE) {
+  if (prevZoom.length >= ZOOM_AVERAGE) {
     prevZoom.shift();
   }
 
 
-  curX += (PLAYGROUND_WIDTH/(zoom*0.73))/2;
-  curY += (PLAYGROUND_HEIGHT/(zoom*0.75))/2;
+  curX += (PLAYGROUND_WIDTH / (zoom * 0.73)) / 2;
+  curY += (PLAYGROUND_HEIGHT / (zoom * 0.75)) / 2;
 
-  if(curX > 0)
+  if (curX > 0) {
       curX = 0;
-  if(curX < DISPLAY_WIDTH*(1-zoom) )
-      curX = DISPLAY_WIDTH*(1-zoom);
+  }
+  if (curX < DISPLAY_WIDTH * (1 - zoom)) {
+      curX = DISPLAY_WIDTH * (1 - zoom);
+  }
 
-  if(curY > 0)
+  if (curY > 0) {
       curY = 0;
-  if(curY < DISPLAY_HEIGHT*(1-zoom) )
-      curY = DISPLAY_HEIGHT*(1-zoom);
+  }
+  if (curY < DISPLAY_HEIGHT * (1 - zoom)) {
+      curY = DISPLAY_HEIGHT * (1 - zoom);
+  }
 
   prevY.push(curY);
   var y = 0;
-  for(var i = 0; i < prevY.length; i++) {
+  for (var i = 0; i < prevY.length; i++) {
     y += prevY[i];
   }
   y /= prevY.length;
-  if(prevY.length >= CAM_Y_AVERAGE) {
+  if (prevY.length >= CAM_Y_AVERAGE) {
     prevY.shift();
   }
 
   prevX.push(curX);
   var x = 0;
-  for(var i = 0; i < prevX.length; i++) {
+  for (var i = 0; i < prevX.length; i++) {
     x += prevX[i];
   }
   x /= prevX.length;
-  if(prevX.length >= CAM_Y_AVERAGE) {
+  if (prevX.length >= CAM_Y_AVERAGE) {
     prevX.shift();
   }
 
-  Crafty.viewport.scale((zoom*0.286)/Crafty.viewport._zoom);
+  Crafty.viewport.scale((zoom * 0.286) / Crafty.viewport._zoom);
   Crafty.viewport.x = x;
   Crafty.viewport.y = y;
   if (!restartNow) {
@@ -624,6 +637,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x + BLOCK_SIZE;
       }
@@ -647,6 +661,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
       }
@@ -680,9 +695,11 @@ function playerMove(player) {
     var elem2 = lg(rx, y + 1);
     if (elem && elem.node) {
       elem.damage += DAMAGE_DIG;
+      elem.damagedBy = player;
     }
     else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
+      elem2.damagedBy = player;
     }
     p(player).runningLeft = false;
     p(player).runningRight = false;
@@ -704,6 +721,7 @@ function verticalMovement(player) {
   var x = p(player).getX();
   var rx = p(player).getRightX();
   var y = p(player).getY();
+  var origGy = pspr(player)._gy;
 
   var nextpos = parseInt(pspr(player)._y) + pspr(player)._gy;
   if (pspr(player)._gy >= 0) {
@@ -749,10 +767,12 @@ function verticalMovement(player) {
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
+        elem.damagedBy = player;
         pspr(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
+        elem2.damagedBy = player;
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
@@ -760,8 +780,9 @@ function verticalMovement(player) {
     }
   }
 
-  if(!PLAYER_INAIR[player - 1])
+  if (!PLAYER_INAIR[player - 1] && origGy > 0) {
       p(player).groundY = pspr(player)._y;
+  }
 }
 
 /* Function to stop sound upon player no longer moving */
@@ -801,20 +822,36 @@ function playerStop() {
   }
 }
 
-function updatePoints(playerNum, pointsInc) {
+function updatePoints(playerNum, pointsInc, pointsType) {
   playerNum = parseInt(playerNum);
-  points = p(playerNum).points + pointsInc;
-  if (points > WINNING_POINTS) {
-    points = WINNING_POINTS;
-  } else if (points < 0) {
-      points = 0;
+  if (p(playerNum).points[pointsType] == null) {
+    p(playerNum).points[pointsType] = pointsInc;
+  }
+  else {
+    p(playerNum).points[pointsType] += pointsInc;
+  }
+  if(MAXPOINTS[pointsType] != null &&
+      p(playerNum).points[pointsType] > MAXPOINTS[pointsType]) {
+    p(playerNum).points[pointsType] = MAXPOINTS[pointsType];
+  }
+  else if(p(playerNum).points[pointsType] < 0) {
+    p(playerNum).points[pointsType] = 0;
   }
 
-  var h = Math.atan(points / POINT_RAMPING) / (Math.PI / 2);
-  $('#pts' + playerNum).animate({'height':
-      100 - h * 100 + '%'}, 300);
+  if(MAXPOINTS[pointsType] != null) {
+    var widthPerc = ((p(playerNum).points[pointsType] /
+                    MAXPOINTS[pointsType])*100)+'%';
+    $('#'+pointsType+'Bar'+playerNum).animate({
+        width: widthPerc }, 200);
+    console.log(widthPerc);
+  }
 
-  p(playerNum).points = points;
+}
+
+function resetPoints(playerNum) {
+  p(playerNum).points = new Array();
+  $('.innerBar').animate({
+      width: '0%'}, 100);
 }
 
 // Returns the player object associated with a player number.
@@ -839,9 +876,10 @@ function lg(x, y) {
   return undefined;
 }
 
-function maybeChain(x, y, type) {
+function maybeChain(x, y, type, player) {
   var elem = lg(x, y);
   if (elem && elem.blockType == type) {
+    elem.damagedBy = player;
     elem.damage = DAMAGE_TO_EXPLODE;
   }
 }
@@ -856,15 +894,21 @@ function removeDestroyed() {
         if (levelGrid[x][y].damage &&
             levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
           evaluateChainReaction = true;
+
           var type = levelGrid[x][y].blockType;
+          var player = levelGrid[x][y].damagedBy;
+          if (player != null) {
+            updatePoints(player, 1, type);
+          }
+
           levelGrid[x][y].node.destroy();
           levelGrid[x][y] = new block(null, null, null);
-          
+
           Crafty.audio.play('blockBreak');
-          maybeChain(x + 1, y, type);
-          maybeChain(x - 1, y, type);
-          maybeChain(x, y + 1, type);
-          maybeChain(x, y - 1, type);
+          maybeChain(x + 1, y, type, player);
+          maybeChain(x - 1, y, type, player);
+          maybeChain(x, y + 1, type, player);
+          maybeChain(x, y - 1, type, player);
         }
       }
     }
@@ -906,18 +950,15 @@ function restart() {
 }
 
 function reboot() {
-  updatePoints(1, -1 * p(1).points);
-  updatePoints(2, -1 * p(2).points);
-  
   PLAYER1_DEAD = false;
   PLAYER2_DEAD = false;
-  
+
   stopMusic();
   death_y = GRID_HEIGHT;
   ENABLE_CREEPING = false;
-  
+
   for (var a = 0; a < levelGrid.length; a++) {
-    for(var b = 0; b < levelGrid[a].length; b++) {
+    for (var b = 0; b < levelGrid[a].length; b++) {
       var newBlock = levelGrid[a][b];
       if (newBlock.node != null)
         newBlock.node.destroy();
@@ -938,12 +979,14 @@ function reboot() {
     b(1).node.destroy();
   if (b(2) != null && b(2).node != null)
     b(2).node.destroy();
+  resetPoints(1);
+  resetPoints(2);
   pspr(1).destroy();
   pspr(2).destroy();
   //$('#text').remove();
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.viewport.init();
-  
+
   addActors();
   addFunctionality();
   startMusic();
@@ -970,7 +1013,7 @@ function gameOver() {
     }
 
     //stopMusic();
-    
+
     /*$.playground().addGroup('text', {
       height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
     if (pl != 0) {
