@@ -399,6 +399,7 @@ function frameFunctionality() {
   verticalMovement(2);
   resourceRefresh();
   gameOver();
+  MUSIC.update();
   //viewport();
 }
 
@@ -1045,17 +1046,11 @@ function deathFromBelow() {
 }
 
 function startMusic() {
-  if (!MUSIC_PLAYING) {
-    Crafty.audio.play('bgMusic', -1, 1.0);
-    MUSIC_PLAYING = true;
-  }
+  MUSIC.play();
 }
 
 function stopMusic() {
-  if (MUSIC_PLAYING) {
-    Crafty.audio.stop('bgMusic');
-    MUSIC_PLAYING = false;
-  }
+  MUSIC.reset();
 }
 
 function restart() {
@@ -1146,7 +1141,6 @@ Crafty.scene('mainLevel', function() {
   addActors();
   addSounds();
   addFunctionality();
-  startMusic();
 });
 
 $(document).ready(function() {
