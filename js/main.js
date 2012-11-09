@@ -137,20 +137,6 @@ function buildPlayground() {
     block9: [0, 8],
   });
 
-  for (var ii = 1; ii <= 9; ii++) {
-    Crafty.c('block' + ii + 'anim', {
-      init: function() {
-        this.requires('Sprite,SpriteAnimation,Grid')
-            .animate('full', 0, this.type, 0)
-            .animate('75', 1, this.type, 1)
-            .animate('50', 2, this.type, 2)
-            .animate('25', 3, this.type, 3)
-            .animate('10', 4, this.type, 4);
-      },
-      type: ii - 1
-    });
-  }
-  
   Crafty.sprite(BAZOOKA_WIDTH, BAZOOKA_HEIGHT,
     'sprites/arm_bazooka.png', {
     bazooka: [0, 0]
@@ -192,11 +178,9 @@ function addActors() {
         }
         colorIndex = levelMap[x][y];
         blockColor = 'block' + SPRITE_GRAPHIC_INDEXES[colorIndex];
-        blockColor += ', block' + SPRITE_GRAPHIC_INDEXES[colorIndex] + 'anim';
 
         var b = Crafty.e('2D, DOM, block, ' + blockColor).
             attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
-        b.animate('full', 1, -1);
 
         levelGrid[x][y] = new block(b, colorIndex, 0);
     }
@@ -218,12 +202,6 @@ function addActors() {
                   Math.round(3 * Math.random() - 1.5);
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
-
-      /*resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
-          x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
-          y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
-          z: 200
-      })));*/
     }
   }
   Crafty.c('p1anim', {
@@ -987,22 +965,17 @@ function maybeChain(x, y, type, player) {
 function processDamage(elem) {
   var fractionWhole = 1 - (elem.damage / DAMAGE_TO_EXPLODE);
   if (fractionWhole == 1) {
-    elem.node.stop();
+    elem.node.__coord[0] = 0 * BLOCK_SIZE;
   } else if (fractionWhole >= 0.75) {
-    elem.node.stop();
-    // TODO(lizf): instead of using animations, just make the underlying call
-    // to redraw once.
-    elem.node.animate('75', 10000, -1);
+    elem.node.__coord[0] = 1 * BLOCK_SIZE;
   } else if (fractionWhole >= 0.50) {
-    elem.node.stop();
-    elem.node.animate('50', 10000, -1);
+    elem.node.__coord[0] = 2 * BLOCK_SIZE;
   } else if (fractionWhole >= 0.25) {
-    elem.node.stop();
-    elem.node.animate('25', 10000, -1);
+    elem.node.__coord[0] = 3 * BLOCK_SIZE;
   } else {
-    elem.node.stop();
-    elem.node.animate('10', 10000, -1);
+    elem.node.__coord[0] = 4 * BLOCK_SIZE;
   }
+  elem.node.trigger("Change");
 }
 
 // Removes fully damaged blocks from the board.
