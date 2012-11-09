@@ -109,7 +109,7 @@ var missiles = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
-  asset_list += ['sprites/vert_tiles_70.png'];
+  asset_list += ['sprites/tiles_dmg_placeholder.png'];
   asset_list += ['sprites/player_tiles_60.png'];
   Crafty.load(asset_list);
   //Crafty.background('sprites/800x600.png');
@@ -125,7 +125,7 @@ function buildPlayground() {
   });
 
   Crafty.sprite(BLOCK_SIZE,
-      'sprites/vert_tiles_70.png', {
+      'sprites/tiles_dmg_placeholder.png', {
     block1: [0, 0],
     block2: [0, 1],
     block3: [0, 2],
@@ -134,9 +134,9 @@ function buildPlayground() {
     block6: [0, 5],
     block7: [0, 6],
     block8: [0, 7],
-    block8: [0, 9]
+    block9: [0, 8],
   });
-  
+
   Crafty.sprite(BAZOOKA_WIDTH, BAZOOKA_HEIGHT,
     'sprites/arm_bazooka.png', {
     bazooka: [0, 0]
@@ -202,12 +202,6 @@ function addActors() {
                   Math.round(3 * Math.random() - 1.5);
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
-
-      /*resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
-          x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
-          y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
-          z: 200
-      })));*/
     }
   }
   Crafty.c('p1anim', {
@@ -711,6 +705,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          processDamage(elem);
           elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x + BLOCK_SIZE;
@@ -735,6 +730,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          processDamage(elem);
           elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
@@ -769,10 +765,11 @@ function playerMove(player) {
     var elem2 = lg(rx, y + 1);
     if (elem && elem.node) {
       elem.damage += DAMAGE_DIG;
+      processDamage(elem);
       elem.damagedBy = player;
-    }
-    else if (elem2 && elem2.node) {
+    } else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
+      processDamage(elem2);
       elem2.damagedBy = player;
     }
     p(player).runningLeft = false;
@@ -841,11 +838,13 @@ function verticalMovement(player) {
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
+        processDamage(elem);
         elem.damagedBy = player;
         pspr(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
+        processDamage(elem2);
         elem2.damagedBy = player;
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
@@ -959,7 +958,24 @@ function maybeChain(x, y, type, player) {
   if (elem && elem.blockType == type) {
     elem.damagedBy = player;
     elem.damage = DAMAGE_TO_EXPLODE;
+    processDamage(elem);
   }
+}
+
+function processDamage(elem) {
+  var fractionWhole = 1 - (elem.damage / DAMAGE_TO_EXPLODE);
+  if (fractionWhole == 1) {
+    elem.node.__coord[0] = 0 * BLOCK_SIZE;
+  } else if (fractionWhole >= 0.75) {
+    elem.node.__coord[0] = 1 * BLOCK_SIZE;
+  } else if (fractionWhole >= 0.50) {
+    elem.node.__coord[0] = 2 * BLOCK_SIZE;
+  } else if (fractionWhole >= 0.25) {
+    elem.node.__coord[0] = 3 * BLOCK_SIZE;
+  } else {
+    elem.node.__coord[0] = 4 * BLOCK_SIZE;
+  }
+  elem.node.trigger("Change");
 }
 
 // Removes fully damaged blocks from the board.
