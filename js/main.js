@@ -512,7 +512,8 @@ function missileRefresh() {
       for (var a = -EXPLOSION_RADIUS; a <= EXPLOSION_RADIUS; a++) {
         if ((mXGrid + a < 0) || (mXGrid + a > GRID_WIDTH))
           continue;
-        for (var b = -EXPLOSION_RADIUS; b <= EXPLOSION_RADIUS; b++) {
+        for (var b = -(EXPLOSION_RADIUS - Math.abs(a));
+             b <= (EXPLOSION_RADIUS - Math.abs(a)); b++) {
           if ((mYGrid + b < 0) || (mYGrid + b > GRID_HEIGHT))
             continue;
           if (lg(mXGrid + a, mYGrid + b) && lg(mXGrid + a, mYGrid + b).node) {
@@ -523,6 +524,12 @@ function missileRefresh() {
       }
       mspr.destroy();
       missiles.splice(n, 1);
+      for (a = 1; a <= 2; a++) {
+        var pl = p(a);
+        var ps = pspr(a);
+        var pXGrid = pl.getX();
+        var pYGrid = pl.getY();
+      }
       n -= 1;
       continue;
     }
