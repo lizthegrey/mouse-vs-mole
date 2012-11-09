@@ -1,5 +1,5 @@
 // Level Grid is an int matrix with 0 through 3 representing colored normal blocks and 4 through 7 representing powerups. 10 means empty.
-var VEIN_COUNT = 35;
+var VEIN_COUNT = 45;
 var VEIN_CONSTANT = 2;
 var GRID_WIDTH = 40;
 var GRID_HEIGHT = 30;
