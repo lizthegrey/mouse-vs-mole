@@ -77,11 +77,18 @@ body {
     background-image: url('../sprites/greenbar.png');
 }
 
-.bazookaIcon
+.Icon5
 {
     height: 48px;
     background-image: url('../sprites/powerup2.png');
 }
+.Icon5_dis
+{
+    height: 48px;
+    background-image: url('../sprites/powerup2_dis.png');
+}
+
+
 
 
 h2
