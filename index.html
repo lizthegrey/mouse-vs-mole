@@ -1,92 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>Spelunker Deathmatch</title>
-<link rel="stylesheet" type="text/css" href="css/global.css"></style>
-<script type="text/javascript" src="js/inc/jquery.js"></script>
-<script type="text/javascript" src="js/inc/crafty.js"></script>
-<script type="text/javascript" src="js/maps.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+    <title>Spelunker Deathmatch</title>
+    <link rel="stylesheet" type="text/css" href="css/global.css"></style>
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Chela+One">
+    <script type="text/javascript" src="js/inc/jquery.js"></script>
+    <script type="text/javascript" src="js/inc/crafty.js"></script>
+    <script type="text/javascript" src="js/maps.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
 </head>
 <body>
 
+<h1>
+    <img src="sprites/title1.png">
+    Spelunker Deathmatch
+    <img src="sprites/title2.png">
+</h1>
+
 <div id="metawrapper">
+    <div id="side1" class="side">
+        <div id="bazooka1" class="powerup bazooka">
+            <div class="bazookaIcon powerupIcon"></div>
+            <div class="powerupBar">
+                <div class="innerBar bazookaBar" id="5Bar1"></div>
+            </div>
+        </div>
+    </div>
 
-<div id="side1" class="side">
-<div id="bazooka1" class="powerup bazooka">
-<div class="bazookaIcon powerupIcon"></div>
-<div class="powerupBar"><div class="innerBar bazookaBar" id="5Bar1"></div></div>
+    <div id="gamewrapper">
+        <div id="cr-stage-wrap">
+            <div id="cr-stage"></div>
+        </div>
+    </div>
 
+    <div id="side2" class="side">
+        <div id="bazooka2" class="powerup bazooka">
+            <div class="bazookaIcon powerupIcon"></div>
+            <div class="powerupBar">
+                <div class="innerBar bazookaBar" id="5Bar2"></div>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
 
-<div id="gamewrapper"><div id="cr-stage-wrap"><div id="cr-stage"></div></div> </div>
-
-<div id="side2" class="side">
-<div id="bazooka2" class="powerup bazooka">
-<div class="bazookaIcon powerupIcon"></div>
-<div class="powerupBar"><div class="innerBar bazookaBar" id="5Bar2"></div></div>
-
-</div>
-</div>
-
-</div>
 <div id="undergame">
-<div id="instructions">
-<p id="start">Move a character to start the game.</p>
+    <div class="right">
+        <div id="controls">
+            <div id="p1controls" class="smcontrols">
+                <h4>Player 1</h4>
+                <span class="key">W</span>: Jump<br>
+                <span class="key">A</span>: Left<br>
+                <span class="key">S</span>: Down<br>
+                <span class="key">D</span>: Right<br>
+            </div>
 
-<div id="left">
-<div id="credits" class="instbox">
-<h2>Spelunker Deathmatch</h2>
-
-<p>By Kai Ma, Liz Fong-Jones, Alan Huang,
-Nathan Arce, and Alex Goins.</p>
-
-Created using <a href="http://craftyjs.com/">Crafty</a>.
-
-<p><b>Sound Credits:</b>
-<br/><a href="http://www.freesound.org/people/Robinhood76/sounds/55690/">steps on a forest road</a>, by Robinhood76
-<br/><a href="http://www.freesound.org/people/bevangoldswain/sounds/54779/">running hard surface</a>, by bevangoldswain
-<br/><a href="http://www.freesound.org/people/SlykMrByches/sounds/55234/">splattt</a>, by SlykMrByches
-<br/><a href="http://www.freesound.org/people/BristolStories/sounds/51715/">u_chimes_short3</a>, by BristolStories
-</p>
-</div>
-
-<div id="objective" class="instbox">
-<h3>Objective</h3>
-Collect the most stars before both players die by falling off the bottom of the stage!
-The bars on each side of the screen represent their respective player's scores.
-</div>
-
-
-</div>
-
-<div id="controls" class="instbox">
-<h3>Controls</h3>
-<span class="key">R</span>: Restart<br />
-<br />
-Destroy clusters of blocks by running into them.<br />
-
-<div id="p1controls" class="smcontrols">
-<h4>Player 1</h4>
-   <span class="key">W</span>: Jump<br />
-   <span class="key">A</span>: Left<br />
-   <span class="key">S</span>: Down<br />
-   <span class="key">D</span>: Right<br />
-</div>
-
-<div id="p2controls" class="smcontrols">
-<h4>Player 2</h4>
-   <span class="key">Up</span>: Jump<br />
-   <span class="key">Left</span>: Left<br />
-   <span class="key">Down</span>: Down<br />
-   <span class="key">Right</span>: Right<br />
-</div>
-
-</div>
-
-
-</div>
+            <div id="p2controls" class="smcontrols">
+                <h4>Player 2</h4>
+                <span class="key">I</span>: Jump<br>
+                <span class="key">J</span>: Left<br>
+                <span class="key">K</span>: Down<br>
+                <span class="key">L</span>: Right<br>
+            </div>
+            
+            <div id="commoncontrols">
+                <span class="key">R</span>: Restart<br>
+            </div>
+        </div>
+    
+        <div id="credits">
+            <b>Sound Credits:</b>
+            <br><a href="http://www.freesound.org/people/Robinhood76/sounds/55690/">steps on a forest road</a>, by Robinhood76
+            <br><a href="http://www.freesound.org/people/bevangoldswain/sounds/54779/">running hard surface</a>, by bevangoldswain
+            <br><a href="http://www.freesound.org/people/SlykMrByches/sounds/55234/">splattt</a>, by SlykMrByches
+            <br><a href="http://www.freesound.org/people/BristolStories/sounds/51715/">u_chimes_short3</a>, by BristolStories
+        </div>
+    </div>
+    
+    <ul id="start">
+        <li>Move a character to start the game.
+        <li>Destroy clusters of blocks by running into them.
+        <li>Jewels and ores power up your tools.
+        <li>Try to knock your opponent off the bottom of the screen!
+    </ul>
+    
+    <footer>
+        Kai Ma, Liz Fong-Jones, Alan Huang, Nathan Arce, Alex Goins, Tommy Liu.
+        Created using <a href="http://craftyjs.com/">Crafty</a>.
+    </footer>
+</table>
 
 </body>
 </html>

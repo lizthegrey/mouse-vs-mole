@@ -1,6 +1,7 @@
 body {
     background: tan;
     overflow-y: scroll !important;
+    font-family: 'Chela One', sans-serif;
 }
 
 #metawrapper, #gamewrapper, #undergame {
@@ -83,7 +84,13 @@ body {
     background-image: url('../sprites/powerup2.png');
 }
 
-
+h1
+{
+    text-align: center;
+    vertical-align: top;
+    font-size: 60px;
+    margin: 0;
+}
 h2
 {
     margin-top: 0px;
@@ -94,17 +101,10 @@ h3
 }
 h4
 {
+    font-size: 1.5em;
     font-weight: normal;
     text-decoration: underline;
-}
-.instbox
-{
-    border-style: dotted;
-    border-width: 1px;
-
-    padding: 10px;
-    margin: 5px;
-    margin-bottom: 15px;
+    margin: 0;
 }
 .smcontrols
 {
@@ -118,25 +118,44 @@ h4
 }
 #start
 {
-    margin-left: 15px;
     font-style: italic;
+    font-size: 1.5em;
+    list-style: none;
+}
+#start li
+{
+    margin-bottom: 1em;
 }
 #undergame
 {
     width: 890px;
-    font-family: sans-serif;
-}
-#left
-{
-    float: left;
-    width: 520px;
-}
-#controls{
-    float: right;
+    font-size: 16pt;
+    table-layout: fixed;
 }
 #p1controls{
     float: left;
 }
 #p2controls{
     float: right;
+}
+#commoncontrols{
+    text-align: center;
+    clear: both;
+}
+.right{
+    float: right;
+}
+.right > div
+{
+    border-style: dotted;
+    border-width: 1px;
+
+    padding: 10px;
+    margin: 5px;
+    margin-bottom: 15px;
+}
+footer {
+    clear: both;
+    text-align: center;
+    font-size: 80%;
 }
