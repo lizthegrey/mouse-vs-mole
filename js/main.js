@@ -75,7 +75,10 @@ var MIN_ZOOM = 1.0;
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 
-var MAXPOINTS = {5: 10};
+var BAZOOKA_POINTS_TYPE = 5;
+
+var MAXPOINTS = {};
+MAXPOINTS[BAZOOKA_POINTS_TYPE] = 5;
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -657,11 +660,14 @@ function playerMove(player) {
   }
   if (p(player).firing) {
     if (!Crafty.keydown[fire]) {
+      updatePoints(player, -p(player).points[BAZOOKA_POINTS_TYPE],
+                   BAZOOKA_POINTS_TYPE);
       missileFire(player);
       p(player).firing = false;
     }
-  }
-  else if (Crafty.keydown[fire]) {
+  } else if (Crafty.keydown[fire] &&
+             p(player).points[BAZOOKA_POINTS_TYPE] ==
+                 MAXPOINTS[BAZOOKA_POINTS_TYPE]) {
     ENABLE_CREEPING = true;
     p(player).firing = true;
     if (!pspr(player)._flipX) {
@@ -903,15 +909,15 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   else {
     p(playerNum).points[pointsType] += pointsInc;
   }
-  if(MAXPOINTS[pointsType] != null &&
+  if (MAXPOINTS[pointsType] != null &&
       p(playerNum).points[pointsType] > MAXPOINTS[pointsType]) {
     p(playerNum).points[pointsType] = MAXPOINTS[pointsType];
   }
-  else if(p(playerNum).points[pointsType] < 0) {
+  else if (p(playerNum).points[pointsType] < 0) {
     p(playerNum).points[pointsType] = 0;
   }
 
-  if(MAXPOINTS[pointsType] != null) {
+  if (MAXPOINTS[pointsType] != null) {
     var widthPerc = ((p(playerNum).points[pointsType] /
                     MAXPOINTS[pointsType])*100)+'%';
     $('#'+pointsType+'Bar'+playerNum).animate({
@@ -1101,37 +1107,18 @@ function gameOver() {
     Crafty.audio.play('playerDeath');
   }
 
-  if (PLAYER1_DEAD && PLAYER2_DEAD && !restartNow) {
+  if ((PLAYER1_DEAD || PLAYER2_DEAD) && !restartNow) {
     restartNow = true;
     var pl = 0;
-    if (p(1).points > p(2).points) {
-      pl = 1;
-    }
-    else if (p(1).points < p(2).points) {
-      pl = 2;
-    }
 
-    //stopMusic();
-
-    /*$.playground().addGroup('text', {
-      height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
-    if (pl != 0) {
-      $('#text').append('<div style="position: absolute; top: 290px;' +
-        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
-        'id="restartbutton">Player ' + pl + ' Wins!</a></center></div>'); }
-    else { $('#text').append('<div style="position: absolute; top: 290px;' +
-       'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
-       'id="restartbutton">Draw!</a></center></div>'); } */
     setTimeout(restart, 3000);
   }
 }
 
-var ar = new Array(33, 34, 35, 36, 37, 38, 39, 40);
+var ar = new Array(32, 33, 34, 35, 36, 37, 38, 39, 40);
 
 $(document).keydown(function(e) {
      var key = e.which;
-      //console.log(key);
-      //if (key==35 || key == 36 || key == 37 || key == 39)
       if ($.inArray(key, ar) > -1) {
           e.preventDefault();
           return false;
