@@ -78,7 +78,7 @@ var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 var BAZOOKA_POINTS_TYPE = 5;
 
 var MAXPOINTS = {};
-MAXPOINTS[BAZOOKA_POINTS_TYPE] = 5;
+MAXPOINTS[BAZOOKA_POINTS_TYPE] = 3;
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -661,7 +661,7 @@ function playerMove(player) {
   }
   if (p(player).firing) {
     if (!Crafty.keydown[fire]) {
-      updatePoints(player, -2,
+      updatePoints(player, -1,
                    BAZOOKA_POINTS_TYPE);
       missileFire(player);
       p(player).firing = false;
@@ -916,7 +916,7 @@ function updatePoints(playerNum, pointsInc, pointsType) {
 	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
 	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
   }
-  else if (p(playerNum).points[pointsType] < 0) {
+  else if (p(playerNum).points[pointsType] <= 0) {
     p(playerNum).points[pointsType] = 0;
 	p(playerNum).enablePowerup[pointsType] = false; 
 	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
