@@ -715,6 +715,7 @@ function playerMove(player) {
           elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x + BLOCK_SIZE;
+        p(player).xVel = 0;
       }
     }
     if (!p(player).runningLeft) {
@@ -740,6 +741,7 @@ function playerMove(player) {
           elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
+        p(player).xVel = 0;
       }
     }
     if (!p(player).runningRight) {
