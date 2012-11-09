@@ -1,46 +1,94 @@
 body {
     background: tan;
+    overflow-y: scroll !important;
 }
 
-#gamewrapper, #undergame {
+#metawrapper, #gamewrapper, #undergame {
     margin: auto;
 }
 
-#game
+#cr-stage-wrap
 {
+    display: inline-block;
     width: 800px;
     height: 600px;
-    margin-left: 60px;
-    margin-right: 60px;
+}
+#metawrapper
+{
+    width: 1016px;
+    height: 600px;
+    background-color: black;
+    overflow:hidden;
 }
 #gamewrapper
 {
-    width: 920px;
+    width: 800px;
     height: 600px;
     background-color: black;
+    display: inline-block;
+    overflow: hidden;
 }
-#pto1
+
+#side1
 {
+    display: inline-block;
     float: left;
+    background-image: url('../sprites/sidebar_p1.png');
 }
-#pto2
+#side2
 {
+    display: inline-block;
+    margin-left: -5px;
     float: right;
+    background-image: url('../sprites/sidebar_p2.png');
 }
-.ptsouter
+.side
 {
-    width: 60px;
+    width: 108px;
     height: 600px;
-    background-color: green;
-    background-image: url('../sprites/Score.png');
-}
-.pts
-{
-    width: 60px;
-    height: 600px;
+    padding-top: 100px;
     background-color: black;
-    background-image: url('../sprites/ScoreBg.png');
+    text-align: center;
 }
+
+.powerUp
+{
+    width: 73px;
+    text-align: center;
+    display: inline-block;
+}
+.powerupIcon
+{
+    width: 70px;
+    display: inline-block;
+}
+.powerupBar
+{
+    width: 73px;
+    height: 9px;
+    margin-top: 10px;
+    display: inline-block;
+    background-image: url('../sprites/emptybar.png');
+}
+.bazookaBar
+{
+    width: 0%;
+    height: 100%;
+    background-image: url('../sprites/greenbar.png');
+}
+
+.Icon5
+{
+    height: 48px;
+    background-image: url('../sprites/powerup2.png');
+}
+.Icon5_dis
+{
+    height: 48px;
+    background-image: url('../sprites/powerup2_dis.png');
+}
+
+
 
 
 h2
