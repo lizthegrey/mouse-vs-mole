@@ -58,6 +58,8 @@ var MIN_ZOOM = 1.0;
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 
+var MAXPOINTS = {5: 10};
+
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
 var PLAYER2_RUN = 'sounds/running_diff.ogg';
@@ -687,11 +689,28 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   else {
     p(playerNum).points[pointsType] += pointsInc;
   }
-  console.log(pointsType + '-' + p(playerNum).points[pointsType]);
+  if(MAXPOINTS[pointsType] != null &&
+      p(playerNum).points[pointsType] > MAXPOINTS[pointsType]) {
+    p(playerNum).points[pointsType] = MAXPOINTS[pointsType];
+  }
+  else if(p(playerNum).points[pointsType] < 0) {
+    p(playerNum).points[pointsType] = 0;
+  }
+
+  if(MAXPOINTS[pointsType] != null) {
+    var widthPerc = ((p(playerNum).points[pointsType] /
+                    MAXPOINTS[pointsType])*100)+'%';
+    $('#'+pointsType+'Bar'+playerNum).animate({
+        width: widthPerc }, 200);
+    console.log(widthPerc);
+  }
+
 }
 
 function resetPoints(playerNum) {
   p(playerNum).points = new Array();
+  $('.innerBar').animate({
+      width: '0%'}, 100);
 }
 
 // Returns the player object associated with a player number.
