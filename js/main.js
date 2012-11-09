@@ -2,8 +2,8 @@ var BLOCK_SIZE = 70;
 var PLAYER_HEIGHT = 60;
 var PLAYER_WIDTH = 60;
 var HALF_PLAYER_WIDTH = PLAYER_WIDTH / 2;
-var PLAYER_X_ADJUSTMENT = PLAYER_WIDTH / 3;
-var PLAYER_RIGHTX_ADJUSTMENT = PLAYER_WIDTH / 6;
+var P_X_ADJUSTMENT = PLAYER_WIDTH / 3;
+var P_RIGHTX_ADJUSTMENT = PLAYER_WIDTH / 6;
 var RESOURCE_SIZE = 11;
 var BAZOOKA_HEIGHT = 35;
 var BAZOOKA_WIDTH = 75;
@@ -42,10 +42,10 @@ var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -25;   // pixels/s
 var MOVE_VELOCITY = 4;
-var DRAG_VELOCITY = 6; // Yes, I know drag isn't normally a velocity.
+var DRAG_VELOCITY = 4; // Yes, I know drag isn't normally a velocity.
 var MISSILE_VELOCITY = 35;
 var INITIAL_FIRE_ANGLE = 30;
-var EXPLOSION_VELOCITY = 35;
+var EXPLOSION_VELOCITY = 100;
 
 var WINNING_POINTS = 35;
 
@@ -307,11 +307,11 @@ function player(node, playerNum, xpos, ypos) {
   this.groundY = this.node._y;
 
   this.getX = function() {
-    return posToGrid(this.node._x + HALF_PLAYER_WIDTH - PLAYER_X_ADJUSTMENT);
+    return posToGrid(this.node._x + HALF_PLAYER_WIDTH - P_X_ADJUSTMENT);
   };
   
   this.getRightX = function() {
-    return posToGrid(this.node._x - HALF_PLAYER_WIDTH + PLAYER_RIGHTX_ADJUSTMENT);
+    return posToGrid(this.node._x - HALF_PLAYER_WIDTH + P_RIGHTX_ADJUSTMENT);
   };
 
   this.getY = function() {
@@ -529,6 +529,15 @@ function missileRefresh() {
         var ps = pspr(a);
         var pXGrid = pl.getX();
         var pYGrid = pl.getY();
+        var explosionMagnitude = EXPLOSION_VELOCITY * (1 -
+                 (Math.sqrt(Math.pow(mXGrid - pXGrid, 2)
+                 + Math.pow(mYGrid - pYGrid,2)) / EXPLOSION_RADIUS));
+        if (explosionMagnitude <= 0)
+          continue;
+        pl.xVel += 2 * explosionMagnitude * Math.cos(Math.atan2(
+                            pYGrid - mYGrid, pXGrid - mXGrid));
+        ps._gy += explosionMagnitude * Math.sin(Math.atan2(
+                            pYGrid - mYGrid, pXGrid - mXGrid));
       }
       n -= 1;
       continue;
