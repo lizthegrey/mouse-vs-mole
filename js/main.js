@@ -41,7 +41,7 @@ var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
 var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -25;   // pixels/s
-var MOVE_VELOCITY = 4;
+var MOVE_VELOCITY = 4.3;
 var DRAG_VELOCITY = 4; // Yes, I know drag isn't normally a velocity.
 var MISSILE_VELOCITY = 35;
 var INITIAL_FIRE_ANGLE = 30;
