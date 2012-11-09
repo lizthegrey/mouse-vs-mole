@@ -621,8 +621,9 @@ function missileFire(player) {
       }), p(player).firingAngle);
   missiles.push(m);
   p(player).firingAngle = 0;
-  if (baz(player) && baz(player).node)
+  if (baz(player) && baz(player).node) {
     baz(player).node.destroy();
+  }
 }
 
 function playerMove(player) {
@@ -833,8 +834,9 @@ function verticalMovement(player) {
     }
   }
 
-  if (!PLAYER_INAIR[player - 1])
-      p(player).groundY = pspr(player)._y;
+  if (!PLAYER_INAIR[player - 1]) {
+    p(player).groundY = pspr(player)._y;
+  }
 }
 
 /* Function to stop sound upon player no longer moving */
@@ -996,25 +998,30 @@ function reboot() {
   for (var a = 0; a < levelGrid.length; a++) {
     for(var b = 0; b < levelGrid[a].length; b++) {
       var newBlock = levelGrid[a][b];
-      if (newBlock.node != null)
+      if (newBlock.node != null) {
         newBlock.node.destroy();
+      }
     }
   }
   for (a = 0; a < resources.length; a++) {
     var resource = resources[a];
-    if (resource.node != null)
+    if (resource.node != null) {
       resource.node.destroy();
+    }
   }
   for (a = 0; a < missiles.length; a++) {
     var missile = missiles[a];
-    if (missile.node != null)
+    if (missile.node != null) {
       missile.node.destroy();
+    }
   }
   
-  if (baz(1) != null && baz(1).node != null)
+  if (baz(1) != null && baz(1).node != null) {
     baz(1).node.destroy();
-  if (baz(2) != null && baz(2).node != null)
+  }
+  if (baz(2) != null && baz(2).node != null) {
     baz(2).node.destroy();
+  }
   pspr(1).destroy();
   pspr(2).destroy();
   //$('#text').remove();
