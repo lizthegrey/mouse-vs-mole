@@ -78,7 +78,7 @@ var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 var BAZOOKA_POINTS_TYPE = 5;
 
 var MAXPOINTS = {};
-MAXPOINTS[BAZOOKA_POINTS_TYPE] = 5;
+MAXPOINTS[BAZOOKA_POINTS_TYPE] = 3;
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -302,6 +302,7 @@ function player(node, playerNum, xpos, ypos) {
   this.playerNum = playerNum;
   this.node._gy = 0;
   this.xVel = 0;
+  this.enablePowerup = {BAZOOKA_POINTS_TYPE: false};
   this.firing = false;
   this.firingAngle = 0;
   this.points = new Array();
@@ -660,14 +661,13 @@ function playerMove(player) {
   }
   if (p(player).firing) {
     if (!Crafty.keydown[fire]) {
-      updatePoints(player, -p(player).points[BAZOOKA_POINTS_TYPE],
+      updatePoints(player, -1,
                    BAZOOKA_POINTS_TYPE);
       missileFire(player);
       p(player).firing = false;
     }
   } else if (Crafty.keydown[fire] &&
-             p(player).points[BAZOOKA_POINTS_TYPE] ==
-                 MAXPOINTS[BAZOOKA_POINTS_TYPE]) {
+             p(player).enablePowerup[BAZOOKA_POINTS_TYPE]) {
     ENABLE_CREEPING = true;
     p(player).firing = true;
     if (!pspr(player)._flipX) {
@@ -910,11 +910,17 @@ function updatePoints(playerNum, pointsInc, pointsType) {
     p(playerNum).points[pointsType] += pointsInc;
   }
   if (MAXPOINTS[pointsType] != null &&
-      p(playerNum).points[pointsType] > MAXPOINTS[pointsType]) {
+      p(playerNum).points[pointsType] >= MAXPOINTS[pointsType]) {
     p(playerNum).points[pointsType] = MAXPOINTS[pointsType];
+	p(playerNum).enablePowerup[pointsType] = true;
+	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
+	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
   }
-  else if (p(playerNum).points[pointsType] < 0) {
+  else if (p(playerNum).points[pointsType] <= 0) {
     p(playerNum).points[pointsType] = 0;
+	p(playerNum).enablePowerup[pointsType] = false; 
+	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
+	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
   }
 
   if (MAXPOINTS[pointsType] != null) {
