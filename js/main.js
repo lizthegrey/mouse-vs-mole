@@ -75,7 +75,10 @@ var MIN_ZOOM = 1.0;
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 
-var MAXPOINTS = {5: 10};
+var BAZOOKA_POINTS_TYPE = 5;
+
+var MAXPOINTS = {};
+MAXPOINTS[BAZOOKA_POINTS_TYPE] = 3;
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -109,7 +112,7 @@ var missiles = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
-  asset_list += ['sprites/vert_tiles_70.png'];
+  asset_list += ['sprites/tiles_dmg_placeholder.png'];
   asset_list += ['sprites/player_tiles_60.png'];
   Crafty.load(asset_list);
   //Crafty.background('sprites/800x600.png');
@@ -125,7 +128,7 @@ function buildPlayground() {
   });
 
   Crafty.sprite(BLOCK_SIZE,
-      'sprites/vert_tiles_70.png', {
+      'sprites/tiles_dmg_placeholder.png', {
     block1: [0, 0],
     block2: [0, 1],
     block3: [0, 2],
@@ -134,9 +137,9 @@ function buildPlayground() {
     block6: [0, 5],
     block7: [0, 6],
     block8: [0, 7],
-    block8: [0, 9]
+    block9: [0, 8],
   });
-  
+
   Crafty.sprite(BAZOOKA_WIDTH, BAZOOKA_HEIGHT,
     'sprites/arm_bazooka.png', {
     bazooka: [0, 0]
@@ -202,12 +205,6 @@ function addActors() {
                   Math.round(3 * Math.random() - 1.5);
       var twidy = RESOURCE_RANDOM_OFFSET *
                   Math.round(3 * Math.random() - 1.5);
-
-      /*resources.push(new resource(Crafty.e('2D, DOM, resource').attr({
-          x: x * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidx,
-          y: y * BLOCK_SIZE + 0.5 * (BLOCK_SIZE - RESOURCE_SIZE) + twidy,
-          z: 200
-      })));*/
     }
   }
   Crafty.c('p1anim', {
@@ -305,6 +302,7 @@ function player(node, playerNum, xpos, ypos) {
   this.playerNum = playerNum;
   this.node._gy = 0;
   this.xVel = 0;
+  this.enablePowerup = {BAZOOKA_POINTS_TYPE: false};
   this.firing = false;
   this.firingAngle = 0;
   this.points = new Array();
@@ -663,11 +661,13 @@ function playerMove(player) {
   }
   if (p(player).firing) {
     if (!Crafty.keydown[fire]) {
+      updatePoints(player, -1,
+                   BAZOOKA_POINTS_TYPE);
       missileFire(player);
       p(player).firing = false;
     }
-  }
-  else if (Crafty.keydown[fire]) {
+  } else if (Crafty.keydown[fire] &&
+             p(player).enablePowerup[BAZOOKA_POINTS_TYPE]) {
     ENABLE_CREEPING = true;
     p(player).firing = true;
     if (!pspr(player)._flipX) {
@@ -711,6 +711,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          processDamage(elem);
           elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x + BLOCK_SIZE;
@@ -735,6 +736,7 @@ function playerMove(player) {
       } else {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
+          processDamage(elem);
           elem.damagedBy = player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
@@ -769,10 +771,11 @@ function playerMove(player) {
     var elem2 = lg(rx, y + 1);
     if (elem && elem.node) {
       elem.damage += DAMAGE_DIG;
+      processDamage(elem);
       elem.damagedBy = player;
-    }
-    else if (elem2 && elem2.node) {
+    } else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
+      processDamage(elem2);
       elem2.damagedBy = player;
     }
     p(player).runningLeft = false;
@@ -841,11 +844,13 @@ function verticalMovement(player) {
     } else {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
+        processDamage(elem);
         elem.damagedBy = player;
         pspr(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
+        processDamage(elem2);
         elem2.damagedBy = player;
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
@@ -904,15 +909,21 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   else {
     p(playerNum).points[pointsType] += pointsInc;
   }
-  if(MAXPOINTS[pointsType] != null &&
-      p(playerNum).points[pointsType] > MAXPOINTS[pointsType]) {
+  if (MAXPOINTS[pointsType] != null &&
+      p(playerNum).points[pointsType] >= MAXPOINTS[pointsType]) {
     p(playerNum).points[pointsType] = MAXPOINTS[pointsType];
+	p(playerNum).enablePowerup[pointsType] = true;
+	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
+	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
   }
-  else if(p(playerNum).points[pointsType] < 0) {
+  else if (p(playerNum).points[pointsType] <= 0) {
     p(playerNum).points[pointsType] = 0;
+	p(playerNum).enablePowerup[pointsType] = false; 
+	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
+	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
   }
 
-  if(MAXPOINTS[pointsType] != null) {
+  if (MAXPOINTS[pointsType] != null) {
     var widthPerc = ((p(playerNum).points[pointsType] /
                     MAXPOINTS[pointsType])*100)+'%';
     $('#'+pointsType+'Bar'+playerNum).animate({
@@ -959,7 +970,24 @@ function maybeChain(x, y, type, player) {
   if (elem && elem.blockType == type) {
     elem.damagedBy = player;
     elem.damage = DAMAGE_TO_EXPLODE;
+    processDamage(elem);
   }
+}
+
+function processDamage(elem) {
+  var fractionWhole = 1 - (elem.damage / DAMAGE_TO_EXPLODE);
+  if (fractionWhole == 1) {
+    elem.node.__coord[0] = 0 * BLOCK_SIZE;
+  } else if (fractionWhole >= 0.75) {
+    elem.node.__coord[0] = 1 * BLOCK_SIZE;
+  } else if (fractionWhole >= 0.50) {
+    elem.node.__coord[0] = 2 * BLOCK_SIZE;
+  } else if (fractionWhole >= 0.25) {
+    elem.node.__coord[0] = 3 * BLOCK_SIZE;
+  } else {
+    elem.node.__coord[0] = 4 * BLOCK_SIZE;
+  }
+  elem.node.trigger("Change");
 }
 
 // Removes fully damaged blocks from the board.
@@ -1085,37 +1113,18 @@ function gameOver() {
     Crafty.audio.play('playerDeath');
   }
 
-  if (PLAYER1_DEAD && PLAYER2_DEAD && !restartNow) {
+  if ((PLAYER1_DEAD || PLAYER2_DEAD) && !restartNow) {
     restartNow = true;
     var pl = 0;
-    if (p(1).points > p(2).points) {
-      pl = 1;
-    }
-    else if (p(1).points < p(2).points) {
-      pl = 2;
-    }
 
-    //stopMusic();
-
-    /*$.playground().addGroup('text', {
-      height: PLAYGROUND_HEIGHT, width: PLAYGROUND_WIDTH});
-    if (pl != 0) {
-      $('#text').append('<div style="position: absolute; top: 290px;' +
-        'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
-        'id="restartbutton">Player ' + pl + ' Wins!</a></center></div>'); }
-    else { $('#text').append('<div style="position: absolute; top: 290px;' +
-       'width: 800px; color: white;"><center><a style="cursor: pointer;"' +
-       'id="restartbutton">Draw!</a></center></div>'); } */
     setTimeout(restart, 3000);
   }
 }
 
-var ar = new Array(33, 34, 35, 36, 37, 38, 39, 40);
+var ar = new Array(32, 33, 34, 35, 36, 37, 38, 39, 40);
 
 $(document).keydown(function(e) {
      var key = e.which;
-      //console.log(key);
-      //if (key==35 || key == 36 || key == 37 || key == 39)
       if ($.inArray(key, ar) > -1) {
           e.preventDefault();
           return false;
