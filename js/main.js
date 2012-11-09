@@ -76,6 +76,7 @@ var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 
 var BAZOOKA_POINTS_TYPE = 5;
+var POINT_TYPES = [BAZOOKA_POINTS_TYPE];
 
 var MAXPOINTS = {};
 MAXPOINTS[BAZOOKA_POINTS_TYPE] = 3;
@@ -302,7 +303,7 @@ function player(node, playerNum, xpos, ypos) {
   this.playerNum = playerNum;
   this.node._gy = 0;
   this.xVel = 0;
-  this.enablePowerup = {BAZOOKA_POINTS_TYPE: false};
+  this.enablePowerup = new Array();
   this.firing = false;
   this.firingAngle = 0;
   this.points = new Array();
@@ -921,7 +922,7 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   }
   else if (p(playerNum).points[pointsType] <= 0) {
     p(playerNum).points[pointsType] = 0;
-	p(playerNum).enablePowerup[pointsType] = false; 
+	p(playerNum).enablePowerup[pointsType] = false;
 	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
 	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
   }
@@ -938,8 +939,14 @@ function updatePoints(playerNum, pointsInc, pointsType) {
 
 function resetPoints(playerNum) {
   p(playerNum).points = new Array();
+  p(playerNum).enablePowerup = new Array();
   $('.innerBar').animate({
       width: '0%'}, 100);
+  for(var i = 0; i < POINT_TYPES.length; i++) {
+    var pointsType = POINT_TYPES[i];
+	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
+	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
+  }
 }
 
 // Returns the player object associated with a player number.
