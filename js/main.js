@@ -114,7 +114,7 @@ var missiles = [];
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
   asset_list += ['sprites/tiles_dmg_placeholder.png'];
-  asset_list += ['sprites/player_tiles_60.png'];
+  asset_list += ['sprites/player_onearm_rboots.png'];
   Crafty.load(asset_list);
   //Crafty.background('sprites/800x600.png');
 
@@ -123,7 +123,7 @@ function buildPlayground() {
   });
 
   Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
-      'sprites/player_tiles_60.png', {
+      'sprites/player_onearm_rboots.png', {
     player1: [0, 0],
     player2: [0, 1]
   });
