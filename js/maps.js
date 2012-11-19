@@ -48,7 +48,7 @@ function powerUpScatter(levelMap) {
 		var x = Math.floor(Math.random() * GRID_WIDTH);
 		var y = Math.floor(Math.random() * GRID_HEIGHT);
         if (levelMap[x][y] != 10) {
-            levelMap[x][y] = Math.floor(Math.random() * 1) + 5;
+            levelMap[x][y] = Math.floor(Math.random() * 2) + 4;
         }
         else {
             i -= 1;
