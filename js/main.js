@@ -654,11 +654,11 @@ function playerMove(player) {
     fire = Crafty.keys['C'];
     break;
    case 2:
-    left = Crafty.keys['J'];
-    right = Crafty.keys['L'];
-    up = Crafty.keys['I'];
-    dig = Crafty.keys['K'];
-    fire = Crafty.keys['N'];
+    left = Crafty.keys['LEFT_ARROW'];
+    right = Crafty.keys['RIGHT_ARROW'];
+    up = Crafty.keys['UP_ARROW'];
+    dig = Crafty.keys['DOWN_ARROW'];
+    fire = Crafty.keys['CTRL'];
     break;
   }
   if (p(player).firing) {
@@ -884,9 +884,9 @@ function playerStop() {
     p(1).runningLeft = false;
     p(1).runningRight = false;
   }
-  if (!Crafty.keydown[73] &&
-      !Crafty.keydown[74] &&
-      !Crafty.keydown[76]) {
+  if (!Crafty.keydown[38] &&
+      !Crafty.keydown[37] &&
+      !Crafty.keydown[39]) {
     if (PLAYER2_RUNNING) {
       PLAYER2_RUNNING = false;
       Crafty.audio.stop('player2Run');
