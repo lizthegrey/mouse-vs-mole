@@ -41,6 +41,7 @@ var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
 var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
 var JUMP_VELOCITY = -25;   // pixels/s
+var JET_VELOCITY = -25;   // pixels/s
 var MOVE_VELOCITY = 4.3;
 var DRAG_VELOCITY = 4; // Yes, I know drag isn't normally a velocity.
 var MISSILE_VELOCITY = 35;
@@ -52,6 +53,7 @@ var WINNING_POINTS = 35;
 var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
+var JET_Y_OFFSET = 0;
 var CAM_Y_AVERAGE = 10;
 var ZOOM_AVERAGE = 10;
 var FIXED_ZOOM = 2.0;
@@ -76,10 +78,16 @@ var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
 
 var BAZOOKA_POINTS_TYPE = 5;
-var POINT_TYPES = [BAZOOKA_POINTS_TYPE];
+var JET_POINTS_TYPE = 4;
+var POINT_TYPES = [BAZOOKA_POINTS_TYPE, JET_POINTS_TYPE];
 
 var MAXPOINTS = {};
 MAXPOINTS[BAZOOKA_POINTS_TYPE] = 3;
+MAXPOINTS[JET_POINTS_TYPE] = 15;
+
+var POINTS_PER_BLOCK = {}
+POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE] = 1;
+POINTS_PER_BLOCK[JET_POINTS_TYPE] = 5;
 
 var BG_MUSIC = 'sounds/bg.ogg';
 var PLAYER1_RUN = 'sounds/running.ogg';
@@ -283,7 +291,7 @@ function missile(node, angle) {
   this.yVel = -Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
   this.xVel = -Math.cos(toRadians(angle)) * MISSILE_VELOCITY;
   this.node.rotation = angle;
-  
+
   this.getX = function() {
     return posToGrid(this.node._x - BLOCK_SIZE / 2);
   };
@@ -305,11 +313,14 @@ function player(node, playerNum, xpos, ypos) {
   this.xVel = 0;
   this.enablePowerup = new Array();
   this.firing = false;
-  this.firingAngle = 0;
+  this.firingAngle = 180;
   this.points = new Array();
+  this.jumped = false;
+  this.showingBazooka = false;
 
   this.runningLeft = false;
   this.runningRight = false;
+  this.bazookaLeft = false;
   this.miningSprite = false;
 
   this.groundY = this.node._y;
@@ -388,6 +399,8 @@ function frameFunctionality() {
     frameDelay.delay(frameFunctionality, FRAME_DELAY);
   }
   missileRefresh();
+  showBazooka(1);
+  showBazooka(2);
   playerMove(1);
   bazookaMove(1);
   playerMove(2);
@@ -564,7 +577,7 @@ function missileRefresh() {
     }
     mspr.x = mspr._x + missile.xVel;
     mspr.y = mspr._y + missile.yVel;
-    
+
     missile.yVel += GRAVITY_ACCEL;
     mspr.rotation = Math.atan2(-missile.yVel, -missile.xVel) *
                     360 / 2 / Math.PI;
@@ -572,9 +585,8 @@ function missileRefresh() {
 }
 
 function bazookaMove(player) {
-  if (!p(player).firing)
-    return;
-
+  if(!p(player).showingBazooka)
+      return
   var clockwise = 0;
   var counterClock = 0;
   switch (player) {
@@ -583,27 +595,35 @@ function bazookaMove(player) {
     counterClock = Crafty.keys['A'];
     break;
    case 2:
-    clockwise = Crafty.keys['L'];
-    counterClock = Crafty.keys['J'];
+    clockwise = Crafty.keys['RIGHT_ARROW'];
+    counterClock = Crafty.keys['LEFT_ARROW'];
     break;
   }
-  if (Crafty.keydown[clockwise]) {
+  if ( Crafty.keydown[clockwise] &&
+      p(player).firing ) {
     p(player).firingAngle += 5;
   }
-  if (Crafty.keydown[counterClock]) {
+  if (Crafty.keydown[counterClock] &&
+      p(player).firing ) {
     p(player).firingAngle -= 5;
   }
+
   p(player).firingAngle += 360;
   p(player).firingAngle %= 360;
 
   if (p(player).firingAngle > 90 && p(player).firingAngle < 270) {
-    pspr(player).flip('X');
+    if(p(player).firing)
+        pspr(player).flip('X');
+    p(player).bazookaLeft = false;
     baz(player).node.flip('Y');
   }
   else {
-    pspr(player).unflip('X');
+    if(p(player).firing)
+        pspr(player).unflip('X');
+    p(player).bazookaLeft = true;
     baz(player).node.unflip('Y');
   }
+
   baz(player).node.rotation = (p(player).firingAngle);
   var bazookaTargetCenterX = pspr(player)._x + HALF_PLAYER_WIDTH;
   var bazookaTargetCenterY = pspr(player)._y + .3 * PLAYER_HEIGHT;
@@ -622,7 +642,6 @@ function missileFire(player) {
     MISSILE_STARTX_OFFSET * Math.cos(toRadians(p(player).firingAngle));
   var startY = p(player).node._y + .3 * PLAYER_HEIGHT -
     MISSILE_STARTY_OFFSET * Math.sin(toRadians(p(player).firingAngle));
-    
   if (pspr(player)._flipX) {
     startX += MISSILE_FLIP_OFFSET
     startY += MISSILE_FLIP_OFFSET;
@@ -633,10 +652,39 @@ function missileFire(player) {
           z: 200
       }), p(player).firingAngle);
   missiles.push(m);
-  p(player).firingAngle = 0;
-  if (baz(player) && baz(player).node) {
-    baz(player).node.destroy();
+}
+
+function jet(player) {
+  if(p(player).enablePowerup[JET_POINTS_TYPE] &&
+     PLAYER_INAIR[player - 1] &&
+     !p(player).jumped ) {
+
+    updatePoints(player, -1, JET_POINTS_TYPE);
+    pspr(player)._gy = JET_VELOCITY;
+    p(player).groundY = pspr(player)._y - JET_Y_OFFSET;
+    p(player).jumped = true;
   }
+}
+
+function showBazooka(player) {
+    if(p(player).enablePowerup[BAZOOKA_POINTS_TYPE] &&
+       !p(player).showingBazooka) {
+      bazookas[player - 1] = new bazooka(Crafty.e('2D, DOM, bazooka').attr({
+          x: pspr(player)._x,
+          y: pspr(player)._y,
+          z: 200
+      }), player);
+
+      p(player).showingBazooka = true;
+    }
+    else if(!p(player).enablePowerup[BAZOOKA_POINTS_TYPE] &&
+            p(player).showingBazooka) {
+      if (baz(player) && baz(player).node) {
+        baz(player).node.destroy();
+      }
+
+      p(player).showingBazooka = false;
+    }
 }
 
 function playerMove(player) {
@@ -661,44 +709,46 @@ function playerMove(player) {
     fire = Crafty.keys['CTRL'];
     break;
   }
+
+  if (!Crafty.keydown[up]) {
+    p(player).jumped = false;
+  }
+  else {
+    jet(player);
+  }
+
   if (p(player).firing) {
     if (!Crafty.keydown[fire]) {
-      updatePoints(player, -1,
-                   BAZOOKA_POINTS_TYPE);
-      missileFire(player);
-      p(player).firing = false;
+      if(Crafty.keydown[dig]) {
+        p(player).firing = false;
+      }
+      else {
+        updatePoints(player, -1,
+                     BAZOOKA_POINTS_TYPE);
+        missileFire(player);
+        p(player).firing = false;
+      }
     }
   } else if (Crafty.keydown[fire] &&
              p(player).enablePowerup[BAZOOKA_POINTS_TYPE]) {
     ENABLE_CREEPING = true;
     p(player).firing = true;
-    if (!pspr(player)._flipX) {
-      p(player).firingAngle = INITIAL_FIRE_ANGLE;
-    }
-    else {
-      p(player).firingAngle = 180 - INITIAL_FIRE_ANGLE;
-    }
-    bazookas[player - 1] = new bazooka(Crafty.e('2D, DOM, bazooka').attr({
-          x: pspr(player)._x,
-          y: pspr(player)._y,
-          z: 200
-      }), player);
   }
   var x = p(player).getX();
   var rx = p(player).getRightX();
   var y = p(player).getY();
-  
+
   var isRunning = false;
-  
+
   if (!p(player).firing) {
     if (Crafty.keydown[left]) {
       ENABLE_CREEPING = true;
-    
+
       p(player).xVel -= MOVE_VELOCITY;
     }
     if (Crafty.keydown[right]) {
       ENABLE_CREEPING = true;
-    
+
       p(player).xVel += MOVE_VELOCITY;
     }
   }
@@ -725,6 +775,11 @@ function playerMove(player) {
       pspr(player).stop().animate('walk', 12, -1);
       p(player).runningLeft = true;
       p(player).runningRight = false;
+
+      if(!p(player).bazookaLeft) {
+        p(player).firingAngle = 180 - p(player).firingAngle;
+        p(player).bazookaLeft = true;
+      }
     }
     isRunning = true;
     p(player).xVel += Math.min(-1 * p(player).xVel, DRAG_VELOCITY);
@@ -751,12 +806,18 @@ function playerMove(player) {
       pspr(player).stop().animate('walk', 12, -1);
       p(player).runningRight = true;
       p(player).runningLeft = false;
+
+      if(p(player).bazookaLeft) {
+        p(player).firingAngle = 180 - p(player).firingAngle;
+        p(player).bazookaLeft = false;
+      }
     }
     isRunning = true;
     p(player).xVel -= Math.min(p(player).xVel, DRAG_VELOCITY);
   }
   if (Crafty.keydown[up] && !p(player).firing) {
     ENABLE_CREEPING = true;
+    p(player).jumped = true;
     // Ensure the player is standing on solid ground.
     var elem = lg(x, y + 1);
     var elem2 = lg(rx, y + 1);
@@ -859,12 +920,14 @@ function verticalMovement(player) {
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
-      PLAYER_INAIR[player - 1] = false;
+      //PLAYER_INAIR[player - 1] = false;
     }
   }
-
   if (!PLAYER_INAIR[player - 1]) {
     p(player).groundY = pspr(player)._y;
+    if(pspr(player).isPlaying('jump')) {
+      pspr(player).stop();
+    }
   }
 }
 
@@ -872,8 +935,7 @@ function verticalMovement(player) {
 /* Also changes player animation back to standing still */
 function playerStop() {
   if (!Crafty.keydown[65] &&
-      !Crafty.keydown[68] &&
-      !Crafty.keydown[87]) {
+      !Crafty.keydown[68]) {
     if (PLAYER1_RUNNING) {
       PLAYER1_RUNNING = false;
       Crafty.audio.stop('player1Run');
@@ -916,9 +978,6 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   if (MAXPOINTS[pointsType] != null &&
       p(playerNum).points[pointsType] >= MAXPOINTS[pointsType]) {
     p(playerNum).points[pointsType] = MAXPOINTS[pointsType];
-	p(playerNum).enablePowerup[pointsType] = true;
-	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
-	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
   }
   else if (p(playerNum).points[pointsType] <= 0) {
     p(playerNum).points[pointsType] = 0;
@@ -927,12 +986,17 @@ function updatePoints(playerNum, pointsInc, pointsType) {
 	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
   }
 
+  if(p(playerNum).points[pointsType] > 0) {
+	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
+	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
+	p(playerNum).enablePowerup[pointsType] = true;
+  }
+
   if (MAXPOINTS[pointsType] != null) {
     var widthPerc = ((p(playerNum).points[pointsType] /
                     MAXPOINTS[pointsType])*100)+'%';
     $('#'+pointsType+'Bar'+playerNum).animate({
         width: widthPerc }, 200);
-    console.log(widthPerc);
   }
 
 }
@@ -1013,8 +1077,8 @@ function removeDestroyed() {
 
           var type = levelGrid[x][y].blockType;
           var player = levelGrid[x][y].damagedBy;
-          if (player != null) {
-            updatePoints(player, 1, type);
+          if (player != null && POINTS_PER_BLOCK[type]) {
+            updatePoints(player, POINTS_PER_BLOCK[type], type);
           }
 
           levelGrid[x][y].node.destroy();
@@ -1087,7 +1151,6 @@ function reboot() {
       missile.node.destroy();
     }
   }
-  
   if (baz(1) != null && baz(1).node != null) {
     baz(1).node.destroy();
   }

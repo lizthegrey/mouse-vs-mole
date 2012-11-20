@@ -46,13 +46,14 @@ body {
 {
     width: 108px;
     height: 600px;
-    padding-top: 100px;
+    padding-top: 75px;
     background-color: black;
     text-align: center;
 }
 
-.powerUp
+.powerup
 {
+    padding-top: 45px;
     width: 73px;
     text-align: center;
     display: inline-block;
@@ -66,9 +67,13 @@ body {
 {
     width: 73px;
     height: 9px;
-    margin-top: 10px;
-    display: inline-block;
     background-image: url('../sprites/emptybar.png');
+    display: inline-block;
+}
+
+.bazookaPBar
+{
+    margin-top: 10px;
 }
 .bazookaBar
 {
@@ -76,7 +81,6 @@ body {
     height: 100%;
     background-image: url('../sprites/greenbar.png');
 }
-
 .Icon5
 {
     height: 48px;
@@ -89,6 +93,26 @@ body {
 }
 
 
+.jetPBar
+{
+    margin-top: 0px;
+}
+.jetBar
+{
+    width: 0%;
+    height: 100%;
+    background-image: url('../sprites/redbar.png');
+}
+.Icon4
+{
+    height: 80px;
+    background-image: url('../sprites/powerup1.png');
+}
+.Icon4_dis
+{
+    height: 80px;
+    background-image: url('../sprites/powerup1_dis.png');
+}
 
 
 h2
