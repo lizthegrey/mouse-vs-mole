@@ -40,6 +40,7 @@ var START_YCOORD = 15;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
 var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
+var BAZOOKA_GRAVITY = GRAVITY_ACCEL/2;
 var JUMP_VELOCITY = -25;   // pixels/s
 var JET_VELOCITY = -25;   // pixels/s
 var MOVE_VELOCITY = 4.3;
@@ -574,7 +575,7 @@ function missileRefresh() {
     mspr.x = mspr._x + missile.xVel;
     mspr.y = mspr._y + missile.yVel;
     
-    missile.yVel += GRAVITY_ACCEL;
+    missile.yVel += BAZOOKA_GRAVITY;
     mspr.rotation = Math.atan2(-missile.yVel, -missile.xVel) *
                     360 / 2 / Math.PI;
   }
