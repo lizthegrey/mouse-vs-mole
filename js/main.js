@@ -706,7 +706,7 @@ function playerMove(player) {
     right = Crafty.keys['RIGHT_ARROW'];
     up = Crafty.keys['UP_ARROW'];
     dig = Crafty.keys['DOWN_ARROW'];
-    fire = Crafty.keys['CTRL'];
+    fire = Crafty.keys['SPACE'];
     break;
   }
 
