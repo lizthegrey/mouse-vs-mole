@@ -16,7 +16,10 @@ var MISSILE_DIAGONAL = Math.sqrt(Math.pow(MISSILE_WIDTH, 2) +
 var MISSILE_STARTX_OFFSET = 70;
 var MISSILE_STARTY_OFFSET = MISSILE_STARTX_OFFSET * 1.2;
 var MISSILE_FLIP_OFFSET = 10;
+var MISSILE_WAIT_FRAME = 1;
 var EXPLOSION_RADIUS = 2;
+var EXPLOSION_SIZE = 138;
+var EXPLOSION_DURATION = 30;
 
 var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
@@ -48,6 +51,7 @@ var DRAG_VELOCITY = 4; // Yes, I know drag isn't normally a velocity.
 var MISSILE_VELOCITY = 35;
 var INITIAL_FIRE_ANGLE = 30;
 var EXPLOSION_VELOCITY = 100;
+var DIRECT_HIT_MULTIPLIER = 3;
 
 var WINNING_POINTS = 35;
 
@@ -119,11 +123,13 @@ var players = new Array(null, null);
 var bazookas = new Array(2);
 var resources = [];
 var missiles = [];
+var explosions = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
   asset_list += ['sprites/tiles_dmg_placeholder.png'];
   asset_list += ['sprites/player_onearm_rboots.png'];
+  asset_list += ['sprites/explosion.png'];
   Crafty.load(asset_list);
   //Crafty.background('sprites/800x600.png');
 
@@ -160,6 +166,11 @@ function buildPlayground() {
     missile: [0, 0]
   });
   
+  Crafty.sprite(EXPLOSION_SIZE,
+    'sprites/explosion.png', {
+    explosion: [0, 0]
+  });
+  
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
       if (!restartNow) {
@@ -177,6 +188,7 @@ function addActors() {
   levelMap = simpleStage();
   resources = [];
   missiles = [];
+  explosions = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
@@ -232,6 +244,13 @@ function addActors() {
           .animate('stand', 0, 1, 0)
           .animate('walk', 1, 1, 4)
           .animate('jump', 5, 1, 5);
+    }
+  });
+  
+  Crafty.c('explanim', {
+    init: function() {
+      this.requires('SpriteAnimation, Grid')
+          .animate('explode', 0, 0, 0)
     }
   });
 
@@ -292,6 +311,7 @@ function missile(node, angle) {
   this.yVel = -Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
   this.xVel = -Math.cos(toRadians(angle)) * MISSILE_VELOCITY;
   this.node.rotation = angle;
+  this.directHitTimer = MISSILE_WAIT_FRAME;
 
   this.getX = function() {
     return posToGrid(this.node._x - BLOCK_SIZE / 2);
@@ -299,6 +319,11 @@ function missile(node, angle) {
   this.getY = function() {
     return posToGrid(this.node._y - BLOCK_SIZE / 2);
   };
+}
+
+function explodeObj(node) {
+  this.node = node;
+  this.timeLeft = EXPLOSION_DURATION;
 }
 
 function bazooka(node, player) {
@@ -400,6 +425,7 @@ function frameFunctionality() {
     frameDelay.delay(frameFunctionality, FRAME_DELAY);
   }
   missileRefresh();
+  explosionRefresh();
   showBazooka(1);
   showBazooka(2);
   playerMove(1);
@@ -532,10 +558,30 @@ function missileRefresh() {
   for (var n = 0; n < missiles.length; n++) {
     var missile = missiles[n];
     var mspr = missile.node;
-    mXGrid = missile.getX();
-    mYGrid = missile.getY();
+    var mXGrid = missile.getX();
+    var mYGrid = missile.getY();
+    
+    var exploded = false;
+    
+    var playerHit = 0;
+    
+    for (a = 1; a <= 2 && missile.directHitTimer <= 0; a++) {
+      var pl = p(a);
+      var pXGrid = pl.getX();
+      var pYGrid = pl.getY();
+      if (pXGrid == mXGrid && pYGrid == mYGrid) {
+        exploded = true;
+        playerHit += a;
+      }
+    }
+    
+    missile.directHitTimer--;
     
     if (lg(mXGrid, mYGrid) && lg(mXGrid, mYGrid).node) {
+      exploded = true;
+    }
+    
+    if (exploded) {
       for (var a = -EXPLOSION_RADIUS; a <= EXPLOSION_RADIUS; a++) {
         if ((mXGrid + a < 0) || (mXGrid + a > GRID_WIDTH))
           continue;
@@ -551,20 +597,37 @@ function missileRefresh() {
       }
       mspr.destroy();
       missiles.splice(n, 1);
+      
+      var explosion = new explodeObj(Crafty.e('2D, DOM, explosion,' +
+                                             'explanim').attr({
+              x: mXGrid * BLOCK_SIZE,
+              y: mYGrid * BLOCK_SIZE,
+              z: 200
+          }));
+      explosion.node.stop().animate('explode', 1, -1);
+      explosions.push(explosion);
+      
       for (a = 1; a <= 2; a++) {
         var pl = p(a);
         var ps = pspr(a);
-        var pXGrid = pl.getX();
-        var pYGrid = pl.getY();
-        var explosionMagnitude = EXPLOSION_VELOCITY * (1 -
-                 (Math.sqrt(Math.pow(mXGrid - pXGrid, 2) +
-                 Math.pow(mYGrid - pYGrid,2)) / EXPLOSION_RADIUS));
-        if (explosionMagnitude <= 0)
-          continue;
-        pl.xVel += 2 * explosionMagnitude * Math.cos(Math.atan2(
-                            pYGrid - mYGrid, pXGrid - mXGrid));
-        ps._gy += explosionMagnitude * Math.sin(Math.atan2(
-                            pYGrid - mYGrid, pXGrid - mXGrid));
+        if ((playerHit & a) == a) {
+          pl.xVel += missile.xVel * DIRECT_HIT_MULTIPLIER;
+          pl._gy += missile.yVel * DIRECT_HIT_MULTIPLIER;
+        }
+        else {
+          var pXGrid = pl.getX();
+          var pYGrid = pl.getY();
+          var explosionMagnitude = EXPLOSION_VELOCITY * (1 -
+                   (Math.sqrt(Math.pow(mXGrid - pXGrid, 2) +
+                   Math.pow(mYGrid - pYGrid,2)) / EXPLOSION_RADIUS));
+          if (explosionMagnitude <= 0) {
+            continue;
+          }
+          pl.xVel += 2 * explosionMagnitude * Math.cos(Math.atan2(
+                              pYGrid - mYGrid, pXGrid - mXGrid));
+          ps._gy += explosionMagnitude * Math.sin(Math.atan2(
+                              pYGrid - mYGrid, pXGrid - mXGrid));
+        }
       }
       n -= 1;
       continue;
@@ -581,6 +644,20 @@ function missileRefresh() {
     missile.yVel += BAZOOKA_GRAVITY;
     mspr.rotation = Math.atan2(-missile.yVel, -missile.xVel) *
                     360 / 2 / Math.PI;
+  }
+}
+
+function explosionRefresh() {
+  for (var n = 0; n < explosions.length; n++) {
+    var explosion = explosions[n];
+    explosion.timeLeft--;
+    if (explosion.timeLeft <= 0) {
+      if (explosion.node != null) {
+        explosion.node.destroy();
+      }
+      explosions.splice(n, 1);
+      n--;
+    }
   }
 }
 
@@ -1149,6 +1226,12 @@ function reboot() {
     var missile = missiles[a];
     if (missile.node != null) {
       missile.node.destroy();
+    }
+  }
+  for (a = 0; a < explosions.length; a++) {
+    var explosion = explosions[a];
+    if (explosion.node != null) {
+      explosion.node.destroy();
     }
   }
   if (baz(1) != null && baz(1).node != null) {
