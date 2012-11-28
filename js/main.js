@@ -599,11 +599,13 @@ function missileRefresh() {
       missiles.splice(n, 1);
       
       var explosion = new explodeObj(Crafty.e('2D, DOM, explosion,' +
-                                             'explanim').attr({
-              x: mXGrid * BLOCK_SIZE,
-              y: mYGrid * BLOCK_SIZE,
-              z: 200
-          }));
+                                             'explanim, Tween').attr({
+                                     alpha: 1.0,
+                                     x: mXGrid * BLOCK_SIZE,
+                                     y: mYGrid * BLOCK_SIZE,
+                                     z: 200}).tween({
+                                     alpha: 0.0
+                      }, 30));
       explosion.node.stop().animate('explode', 1, -1);
       explosions.push(explosion);
       
