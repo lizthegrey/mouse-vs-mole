@@ -981,15 +981,15 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   }
   else if (p(playerNum).points[pointsType] <= 0) {
     p(playerNum).points[pointsType] = 0;
-	p(playerNum).enablePowerup[pointsType] = false;
-	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
-	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
+    p(playerNum).enablePowerup[pointsType] = false;
+    $('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
+    $('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
   }
 
   if(p(playerNum).points[pointsType] > 0) {
-	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
-	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
-	p(playerNum).enablePowerup[pointsType] = true;
+    $('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
+    $('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
+    p(playerNum).enablePowerup[pointsType] = true;
   }
 
   if (MAXPOINTS[pointsType] != null) {
@@ -1008,8 +1008,8 @@ function resetPoints(playerNum) {
       width: '0%'}, 100);
   for(var i = 0; i < POINT_TYPES.length; i++) {
     var pointsType = POINT_TYPES[i];
-	$('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
-	$('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
+    $('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
+    $('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
   }
 }
 
