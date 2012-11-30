@@ -192,11 +192,15 @@ function buildPlayground() {
     lava_deep: [0, 1]
   });
 
-  restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
+  Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
       if (!restartNow) {
         restart();
       }
+    }
+    if (this.isDown('M')) {
+      console.log(true);
+      MUSIC.mute();
     }
   });
 }
@@ -802,6 +806,7 @@ function jet(player) {
     updatePoints(player, -1, JET_POINTS_TYPE);
     pspr(player)._gy = JET_VELOCITY;
     p(player).groundY = pspr(player)._y - JET_Y_OFFSET;
+    Crafty.audio.play('playerJump');
 
     p(player).jetfire = Crafty.e('2D, DOM, jetfire, Tween').attr({
         alpha: 1.0,
@@ -1399,7 +1404,7 @@ Crafty.scene('mainLevel', function() {
   addActors();
   addSounds();
   addFunctionality();
-  startMusic();
+  stopMusic();
 });
 
 $(document).ready(function() {
