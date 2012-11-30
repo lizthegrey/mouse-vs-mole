@@ -32,6 +32,8 @@ var GRID_HEIGHT = 30;
 var PLAYGROUND_WIDTH = BLOCK_SIZE * GRID_WIDTH;
 var PLAYGROUND_HEIGHT = BLOCK_SIZE * GRID_HEIGHT;
 
+var LAVA_SIZE = 128;
+
 var DISPLAY_WIDTH = 800;
 var DISPLAY_HEIGHT = 600;
 
@@ -130,12 +132,14 @@ var bazookas = new Array(2);
 var resources = [];
 var missiles = [];
 var explosions = [];
+var lava_list = [];
 
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
   asset_list += ['sprites/tiles_dmg_placeholder.png'];
   asset_list += ['sprites/player_sprites.png'];
   asset_list += ['sprites/explosion.png'];
+  asset_list += ['sprites/lava_tiles.png'];
   Crafty.load(asset_list);
 
   Crafty.sprite(RESOURCE_SIZE, 'sprites/Resource.png', {
@@ -182,6 +186,12 @@ function buildPlayground() {
     explosion: [0, 0]
   });
 
+  Crafty.sprite(LAVA_SIZE,
+    'sprites/lava_tiles.png', {
+    lava_surface: [0, 0],
+    lava_deep: [0, 1]
+  });
+
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
       if (!restartNow) {
@@ -225,24 +235,6 @@ function addActors() {
     }
   }
 
-  for (var x = 0; x < GRID_WIDTH; x++) {
-    for (var y = 0; y < GRID_HEIGHT; y++) {
-      if (y == START_YCOORD &&
-          (x == START_XCOORD_P1 || x == START_XCOORD_P2)) {
-        continue;
-      }
-      rand = Math.random();
-      if (rand > RESOURCE_PROBABILITY) {
-        continue;
-      }
-
-      // Ensure resources don't exactly overlap after falling
-      var twidx = RESOURCE_RANDOM_OFFSET *
-                  Math.round(3 * Math.random() - 1.5);
-      var twidy = RESOURCE_RANDOM_OFFSET *
-                  Math.round(3 * Math.random() - 1.5);
-    }
-  }
   Crafty.c('p1anim', {
     init: function() {
       this.requires('Sprite,SpriteAnimation, Grid')
@@ -285,6 +277,14 @@ function addActors() {
     }
   });
 
+  Crafty.c('lavaanim', {
+    init: function() {
+      this.requires('SpriteAnimation, Grid')
+          .animate('bubble_surface', 0, 0, 3)
+          .animate('bubble_deep', 0, 1, 3)
+    }
+  });
+
   Crafty.c('explanim', {
     init: function() {
       this.requires('SpriteAnimation, Grid')
@@ -303,6 +303,20 @@ function addActors() {
                           START_XPOS_P1, START_YPOS);
   players[1] = new player(p2, 2,
                           START_XPOS_P2, START_YPOS);
+
+  for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE; y += LAVA_SIZE) {
+    for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
+      var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
+                          'lavaanim')
+          .attr({x: x, y: y + (GRID_HEIGHT - 0.5) * BLOCK_SIZE, z: 300})
+      if (y == 0) {
+        lava.animate('bubble_surface', 30, -1);
+      } else {
+        lava.animate('bubble_deep', 30, -1);
+      }
+      lava_list.push(lava);
+    }
+  }
 }
 
 function doCreep() {
@@ -318,11 +332,9 @@ function doCreep() {
 /* Block initializes sounds in gameworld */
 function addSounds() {
   Crafty.audio.add({
-    //bgMusic: [BG_MUSIC],
     player1Run: [PLAYER1_RUN],
     player2Run: [PLAYER2_RUN],
     blockBreak: [BLOCK_BREAK],
-    //resourceGet: [RESOURCE_GET],
     playerDeath: [PLAYER_DEATH],
     playerJump: [PLAYER_JUMP],
     bazookaFire: [BAZOOKA_FIRE],
@@ -1275,6 +1287,11 @@ function deathFromBelow() {
     }
   }
   should_creep = false;
+
+  for (var n = 0; n < lava_list.length; n++) {
+    var lava = lava_list[n];
+    lava.tween({y: lava.y - BLOCK_SIZE}, 60);
+  }
 }
 
 function startMusic() {
@@ -1324,6 +1341,10 @@ function reboot() {
       explosion.node.destroy();
     }
   }
+  for (a = 0; a < lava_list.length; a++) {
+    var lava = lava_list[a];
+    lava.destroy();
+  }
   if (baz(1) != null && baz(1).node != null) {
     baz(1).node.destroy();
   }
@@ -1344,10 +1365,10 @@ function reboot() {
 }
 
 function gameOver() {
-  if (!PLAYER1_DEAD && pspr(1)._y > PLAYGROUND_HEIGHT) {
+  if (!PLAYER1_DEAD && pspr(1)._y > death_y * BLOCK_SIZE) {
     PLAYER1_DEAD = true;
   }
-  if (!PLAYER2_DEAD && pspr(2)._y > PLAYGROUND_HEIGHT) {
+  if (!PLAYER2_DEAD && pspr(2)._y > death_y * BLOCK_SIZE) {
     PLAYER2_DEAD = true;
   }
 
