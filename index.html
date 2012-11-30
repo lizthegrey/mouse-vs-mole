@@ -3,7 +3,7 @@
 <head>
     <title>Spelunker Deathmatch</title>
     <link rel="stylesheet" type="text/css" href="css/global.css">
-    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Chela+One">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Chewy">
     <script type="text/javascript" src="js/inc/jquery.js"></script>
     <script type="text/javascript" src="js/inc/crafty.js"></script>
     <script type="text/javascript" src="js/maps.js"></script>
@@ -17,71 +17,73 @@
     <button id="start-game"
       onclick="$('#splash').hide(); $('#game').show(); startMusic();">
         Start Game</button>
-    <button id="show-instructions"
-      onclick="$('#splash').hide(); $('#instructions').show();">
-        Instructions</button>
-    <button id="show-credits"
-      onclick="$('#splash').hide(); $('#credits').show();">
-        Credits</button>
-  </div>
-  <div id="instructions">
-    <button id="back"
-      onclick="$('#instructions').hide(); $('#splash').show();">
-        Back</button>
-    <div id="objective" class="instbox">
-      <h3>Objective</h3>
+
+    <div id="objectives">
       <ul>
         <li>Destroy clusters of blocks by running into them.</li>
         <li>Jewels and ores power up your tools.</li>
-        <li>Try to knock your opponent off the bottom of the screen!</li>
+        <li>Try to knock your opponent into the lava!</li>
       </ul>
     </div>
-    <div id="controls" class="instbox">
-      <h3>Controls</h3>
-      <span class="key">R</span>: Restart<br>
-      <span class="key">M</span>: Mute/Unmute<br>
-      <div id="p1controls" class="smcontrols">
-        <h4>Player 1</h4>
-        <span class="key">W</span>: Jump<br>
-        <span class="key">A</span>: Left<br>
-        <span class="key">S</span>: Down<br>
-        <span class="key">D</span>: Right<br>
-        <span class="key">C</span>: Aim/Fire<br>
-      </div>
-      <div id="p2controls" class="smcontrols">
-        <h4>Player 2</h4>
-        <span class="key">Up</span>: Jump<br>
-        <span class="key">Left</span>: Left<br>
-        <span class="key">Down</span>: Down<br>
-        <span class="key">Right</span>: Right<br>
-        <span class="key">Space</span>: Aim/Fire<br>
-      </div>
+
+    <div id="instructions">
+      <table>
+        <tr>
+          <td colspan=4>Restart <span class="key">R</span>
+          <td>
+          <td colspan=4><span class="key">M</span> Mute
+        </tr>
+        <tr>
+          <td colspan=3><span class="key">W</span>
+          <td colspan=3>Jump
+          <td colspan=3><span class="key">&uarr;</span>
+        </tr>
+        <tr>
+          <td colspan=3><span class="key">A</span><span class="key">D</span>
+          <td colspan=3>Walk
+          <td colspan=3><span class="key">&larr;</span><span class="key">&rarr;</span>
+        </tr>
+        <tr>
+          <td colspan=3><span class="key">S</span>
+          <td colspan=3>Dig
+          <td colspan=3><span class="key">&darr;</span>
+        </tr>
+        <tr>
+          <td colspan=3><span class="key">C</span>
+          <td colspan=3>Aim/Fire
+          <td colspan=3><span class="key" style="width:72px;"> </span>
+        </tr>
+      </table>
+    </div>
+
+    <div id="credits">
+      By
+        Kai Ma,
+        Liz Fong-Jones,
+        Alan Huang,
+        Nathan Arce,
+        Alex Goins,
+        and
+        Tommy Liu,
+        2012.
+      Created using <a href="http://craftyjs.com/">Crafty</a>.
+      <p><b>Sound Credits:</b>
+        <br><a href="http://www.freesound.org/people/Robinhood76/sounds/55690/">crunch</a>,
+        by Robinhood76
+        <br><a href="http://www.freesound.org/people/bevangoldswain/sounds/54779/">running</a>,
+        by bevangoldswain
+        <br><a href="http://www.freesound.org/people/FreqMan/sounds/43603/">splat</a>,
+        by FreqMan
+        <br><a href="http://www.freesound.org/people/JCH321/sounds/66206/">jump</a>,
+        by JCH321
+        <br><a href="http://www.freesound.org/people/Syna-Max/sounds/56600/">shot</a>,
+        by Syna-Max
+        <br><a href="http://www.freesound.org/people/qubodup/sounds/162258/">boom</a>,
+        by qubodup
+      </p>
     </div>
   </div>
-  <div id="credits">
-    <button id="back2"
-      onclick="$('#credits').hide(); $('#splash').show();">
-        Back</button>
-    <h2>Spelunker Deathmatch</h2>
-    <p>By
-      Kai Ma,
-      Liz Fong-Jones,
-      Alan Huang,
-      Nathan Arce,
-      Alex Goins,
-      and
-      Tommy Liu.
-    </p>
-    Created using <a href="http://craftyjs.com/">Crafty</a>.
-    <p><b>Sound Credits:</b>
-      <br><a href="http://www.freesound.org/people/Robinhood76/sounds/55690/">crunch</a>, by Robinhood76
-      <br><a href="http://www.freesound.org/people/bevangoldswain/sounds/54779/">running</a>, by bevangoldswain
-      <br><a href="http://www.freesound.org/people/FreqMan/sounds/43603/">splat</a>, by FreqMan
-      <br><a href="http://www.freesound.org/people/JCH321/sounds/66206/">jump</a>, by JCH321
-      <br><a href="http://www.freesound.org/people/Syna-Max/sounds/56600/">shot</a>, by Syna-Max
-      <br><a href="http://www.freesound.org/people/qubodup/sounds/162258/">boom</a>, by qubodup
-    </p>
-  </div>
+
   <div id="game">
     <div id="side1" class="side">
       <div id="bazooka1" class="powerup bazooka">
