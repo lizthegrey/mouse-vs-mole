@@ -24,7 +24,6 @@ body {
 {
     width: 1016px;
     height: 600px;
-    background-color: black;
     overflow:hidden;
 }
 #splash
@@ -33,7 +32,7 @@ body {
     height: 600px;
     background: url('../sprites/title_screen.png');
 }
-#instructions
+#instructions, #credits
 {
     width: 1016px;
     height: 600px;
@@ -57,6 +56,12 @@ button
     position: absolute;
     left: 700px;
     top: 330px;
+}
+#show-credits
+{
+    position: absolute;
+    left: 700px;
+    top: 380px;
 }
 #game
 {
@@ -217,7 +222,7 @@ h4
 }
 #undergame
 {
-    width: 890px;
+    width: 910px;
     font-family: sans-serif;
 }
 #left
@@ -226,7 +231,7 @@ h4
     width: 520px;
 }
 #controls{
-    float: right;
+    float: left;
 }
 #p1controls{
     float: left;
