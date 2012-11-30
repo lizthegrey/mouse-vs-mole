@@ -27,6 +27,43 @@ body {
     background-color: black;
     overflow:hidden;
 }
+#splash
+{
+    width: 1016px;
+    height: 600px;
+    background: url('../sprites/title_screen.png');
+}
+#instructions
+{
+    width: 1016px;
+    height: 600px;
+    display: none;
+}
+#start-game
+{
+    position: absolute;
+    left: 700px;
+    top: 280px;
+}
+button
+{
+    border-width: 5px;
+    border-color: #a78b55;
+    border-radius: 15px;
+    background-color: #ecaa5e;
+}
+#show-instructions
+{
+    position: absolute;
+    left: 700px;
+    top: 330px;
+}
+#game
+{
+    width: 1016px;
+    height: 600px;
+    display: none;
+}
 #gamewrapper
 {
     width: 800px;
