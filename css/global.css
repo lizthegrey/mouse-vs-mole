@@ -7,6 +7,13 @@ body {
     margin: auto;
 }
 
+#cr-stage
+{
+    background-image: url('../sprites/bg_300_dark.png');
+    background-repeat: repeat;
+}
+
+
 #cr-stage-wrap
 {
     display: inline-block;
@@ -81,15 +88,25 @@ body {
     height: 100%;
     background-image: url('../sprites/greenbar.png');
 }
-.Icon5
+.bazookaIcon
 {
     height: 48px;
-    background-image: url('../sprites/powerup2.png');
 }
-.Icon5_dis
+.Icon5_1
 {
-    height: 48px;
-    background-image: url('../sprites/powerup2_dis.png');
+    background-image: url('../sprites/powerup2_mole.png');
+}
+.Icon5_1_dis
+{
+    background-image: url('../sprites/powerup2_mole_dis.png');
+}
+.Icon5_2
+{
+    background-image: url('../sprites/powerup2_mouse.png');
+}
+.Icon5_2_dis
+{
+    background-image: url('../sprites/powerup2_mouse_dis.png');
 }
 
 
@@ -103,17 +120,26 @@ body {
     height: 100%;
     background-image: url('../sprites/redbar.png');
 }
-.Icon4
+.jetIcon
 {
-    height: 80px;
-    background-image: url('../sprites/powerup1.png');
+    height: 59px;
 }
-.Icon4_dis
+.Icon4_1
 {
-    height: 80px;
-    background-image: url('../sprites/powerup1_dis.png');
+    background-image: url('../sprites/powerup1_mole.png');
 }
-
+.Icon4_1_dis
+{
+    background-image: url('../sprites/powerup1_mole_dis.png');
+}
+.Icon4_2
+{
+    background-image: url('../sprites/powerup1_mouse.png');
+}
+.Icon4_2_dis
+{
+    background-image: url('../sprites/powerup1_mouse_dis.png');
+}
 
 h2
 {
