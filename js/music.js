@@ -42,8 +42,8 @@ var MUSIC = (function() {
     });
     
     return {
-        mute: function(status) {
-            muted = status;
+        mute: function() {
+            muted = !muted;
             volume();
         },
         

@@ -46,6 +46,8 @@ body {
 }
 button
 {
+    font-family: "Chela One", sans-serif;
+    font-size: 2em;
     border-width: 5px;
     border-color: #a78b55;
     border-radius: 15px;
@@ -55,13 +57,13 @@ button
 {
     position: absolute;
     left: 700px;
-    top: 330px;
+    top: 350px;
 }
 #show-credits
 {
     position: absolute;
     left: 700px;
-    top: 380px;
+    top: 420px;
 }
 #game
 {
