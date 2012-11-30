@@ -7,6 +7,8 @@ var P_RIGHTX_ADJUSTMENT = PLAYER_WIDTH / 6;
 var RESOURCE_SIZE = 11;
 var BAZOOKA_HEIGHT = 35;
 var BAZOOKA_WIDTH = 75;
+var JETFIRE_WIDTH = 60;
+var JETFIRE_HEIGHT = 120;
 var BAZOOKA_DIAGONAL = Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) +
                        Math.pow(BAZOOKA_HEIGHT, 2));
 var MISSILE_HEIGHT = 17;
@@ -128,17 +130,16 @@ var explosions = [];
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
   asset_list += ['sprites/tiles_dmg_placeholder.png'];
-  asset_list += ['sprites/player_onearm_rboots.png'];
+  asset_list += ['sprites/player_sprites.png'];
   asset_list += ['sprites/explosion.png'];
   Crafty.load(asset_list);
-  //Crafty.background('sprites/800x600.png');
 
   Crafty.sprite(RESOURCE_SIZE, 'sprites/Resource.png', {
     resource: [0, 0]
   });
 
   Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
-      'sprites/player_onearm_rboots.png', {
+      'sprites/player_sprites.png', {
     player1: [0, 0],
     player2: [0, 1]
   });
@@ -158,19 +159,25 @@ function buildPlayground() {
 
   Crafty.sprite(BAZOOKA_WIDTH, BAZOOKA_HEIGHT,
     'sprites/arm_bazooka.png', {
-    bazooka: [0, 0]
+    bazooka1: [0, 0],
+    bazooka2: [0, 1]
   });
-  
+
+  Crafty.sprite(JETFIRE_WIDTH, JETFIRE_HEIGHT,
+    'sprites/rocket_fire.png', {
+    jetfire: [0, 0]
+  });
+
   Crafty.sprite(MISSILE_WIDTH, MISSILE_HEIGHT,
     'sprites/bazooka_missile.png', {
     missile: [0, 0]
   });
-  
+
   Crafty.sprite(EXPLOSION_SIZE,
     'sprites/explosion.png', {
     explosion: [0, 0]
   });
-  
+
   restarter = Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
       if (!restartNow) {
@@ -234,7 +241,19 @@ function addActors() {
       this.requires('Sprite,SpriteAnimation, Grid')
           .animate('stand', 0, 0, 0)
           .animate('walk', 1, 0, 4)
-          .animate('jump', 5, 0, 5);
+          .animate('jump', 5, 0, 5)
+
+          .animate('standJ', 0, 6, 0)
+          .animate('walkJ', 1, 6, 4)
+          .animate('jumpJ', 5, 6, 5)
+
+          .animate('standBJ', 0, 4, 0)
+          .animate('walkBJ', 1, 4, 4)
+          .animate('jumpBJ', 5, 4, 5)
+
+          .animate('standB', 0, 2, 0)
+          .animate('walkB', 1, 2, 4)
+          .animate('jumpB', 5, 2, 5);
     }
   });
 
@@ -243,10 +262,22 @@ function addActors() {
       this.requires('SpriteAnimation, Grid')
           .animate('stand', 0, 1, 0)
           .animate('walk', 1, 1, 4)
-          .animate('jump', 5, 1, 5);
+          .animate('jump', 5, 1, 5)
+
+          .animate('standJ', 0, 7, 0)
+          .animate('walkJ', 1, 7, 4)
+          .animate('jumpJ', 5, 7, 5)
+
+          .animate('standBJ', 0, 5, 0)
+          .animate('walkBJ', 1, 5, 4)
+          .animate('jumpBJ', 5, 5, 5)
+
+          .animate('standB', 0, 3, 0)
+          .animate('walkB', 1, 3, 4)
+          .animate('jumpB', 5, 3, 5);
     }
   });
-  
+
   Crafty.c('explanim', {
     init: function() {
       this.requires('SpriteAnimation, Grid')
@@ -343,6 +374,7 @@ function player(node, playerNum, xpos, ypos) {
   this.points = new Array();
   this.jumped = false;
   this.showingBazooka = false;
+  this.jetfire = null;
 
   this.runningLeft = false;
   this.runningRight = false;
@@ -430,8 +462,10 @@ function frameFunctionality() {
   showBazooka(2);
   playerMove(1);
   bazookaMove(1);
+  jetFireMove(1);
   playerMove(2);
   bazookaMove(2);
+  jetFireMove(2);
   playerStop();
   deathFromBelow();
   removeDestroyed();
@@ -741,14 +775,40 @@ function jet(player) {
     updatePoints(player, -1, JET_POINTS_TYPE);
     pspr(player)._gy = JET_VELOCITY;
     p(player).groundY = pspr(player)._y - JET_Y_OFFSET;
+
+    p(player).jetfire = Crafty.e('2D, DOM, jetfire, Tween').attr({
+        alpha: 1.0,
+        x: pspr(player)._x,
+        y: pspr(player)._y,
+        z: 200
+    }).tween({alpha: 0.0}, 5);
+
+    if(pspr(player)._flipX) {
+      p(player).jetfire.flip('X');
+    }
+
     p(player).jumped = true;
   }
+}
+
+function jetFireMove(player) {
+    if(p(player).jetfire) {
+      p(player).jetfire.x = pspr(player)._x;
+      p(player).jetfire.y = pspr(player)._y;
+
+      if(pspr(player)._flipX) {
+        p(player).jetfire.flip('X');
+      }
+      else {
+        p(player).jetfire.unflip('X');
+      }
+    }
 }
 
 function showBazooka(player) {
     if(p(player).enablePowerup[BAZOOKA_POINTS_TYPE] &&
        !p(player).showingBazooka) {
-      bazookas[player - 1] = new bazooka(Crafty.e('2D, DOM, bazooka').attr({
+      bazookas[player - 1] = new bazooka(Crafty.e('2D, DOM, bazooka'+player).attr({
           x: pspr(player)._x,
           y: pspr(player)._y,
           z: 200
@@ -851,7 +911,7 @@ function playerMove(player) {
     }
     if (!p(player).runningLeft) {
       pspr(player).unflip('X');
-      pspr(player).stop().animate('walk', 12, -1);
+      pspr(player).stop().animate('walk'+getAnimTag(player), 12, -1);
       p(player).runningLeft = true;
       p(player).runningRight = false;
 
@@ -882,7 +942,7 @@ function playerMove(player) {
     }
     if (!p(player).runningRight) {
       pspr(player).flip('X');
-      pspr(player).stop().animate('walk', 12, -1);
+      pspr(player).stop().animate('walk'+getAnimTag(player), 12, -1);
       p(player).runningRight = true;
       p(player).runningLeft = false;
 
@@ -954,7 +1014,7 @@ function verticalMovement(player) {
         nextpos < elem2.node._y - PLAYER_HEIGHT)) {
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).stop().animate('jump', 1, -1);
+      pspr(player).stop().animate('jump'+getAnimTag(player), 1, -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
@@ -980,7 +1040,7 @@ function verticalMovement(player) {
       }
       pspr(player).y = nextpos;
       pspr(player)._gy += GRAVITY_ACCEL;
-      pspr(player).stop().animate('jump', 1, -1);
+      pspr(player).stop().animate('jump'+getAnimTag(player), 1, -1);
       p(player).miningSprite = false;
       p(player).runningLeft = false;
       p(player).runningRight = false;
@@ -1010,6 +1070,18 @@ function verticalMovement(player) {
   }
 }
 
+function getAnimTag(player) {
+  var tag = '';
+  if(p(player).enablePowerup[BAZOOKA_POINTS_TYPE]) {
+    tag += 'B';
+  }
+  if(p(player).enablePowerup[JET_POINTS_TYPE]) {
+    tag += 'J';
+  }
+  return tag;
+}
+
+
 /* Function to stop sound upon player no longer moving */
 /* Also changes player animation back to standing still */
 function playerStop() {
@@ -1018,7 +1090,7 @@ function playerStop() {
     if (PLAYER1_RUNNING) {
       PLAYER1_RUNNING = false;
       Crafty.audio.stop('player1Run');
-      pspr(1).stop().animate('stand', 1, -1);
+      pspr(1).stop().animate('stand'+getAnimTag(1), 1, -1);
     }
     //pspr(1).stop();
     p(1).miningSprite = false;
@@ -1031,7 +1103,7 @@ function playerStop() {
     if (PLAYER2_RUNNING) {
       PLAYER2_RUNNING = false;
       Crafty.audio.stop('player2Run');
-      pspr(2).stop().animate('stand', 1, -1);
+      pspr(2).stop().animate('stand'+getAnimTag(2), 1, -1);
     }
     //pspr(2).stop();
     p(2).miningSprite = false;
@@ -1039,15 +1111,16 @@ function playerStop() {
     p(2).runningRight = false;
   }
   if (!PLAYER_INAIR[0] && !PLAYER1_RUNNING) {
-    pspr(1).stop().animate('stand', 1, -1);
+    pspr(1).stop().animate('stand'+getAnimTag(1), 1, -1);
   }
   if (!PLAYER_INAIR[1] && !PLAYER2_RUNNING) {
-    pspr(2).stop().animate('stand', 1, -1);
+    pspr(2).stop().animate('stand'+getAnimTag(2), 1, -1);
   }
 }
 
 function updatePoints(playerNum, pointsInc, pointsType) {
   playerNum = parseInt(playerNum);
+  pspr(playerNum).sprite(0, 2);
   if (p(playerNum).points[pointsType] == null) {
     p(playerNum).points[pointsType] = pointsInc;
   }
@@ -1061,13 +1134,13 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   else if (p(playerNum).points[pointsType] <= 0) {
     p(playerNum).points[pointsType] = 0;
     p(playerNum).enablePowerup[pointsType] = false;
-    $('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
-    $('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
+    $('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_'+playerNum);
+    $('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_'+playerNum+'_dis');
   }
 
   if(p(playerNum).points[pointsType] > 0) {
-    $('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_dis');
-    $('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType);
+    $('#'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_'+playerNum+'_dis');
+    $('#'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_'+playerNum);
     p(playerNum).enablePowerup[pointsType] = true;
   }
 
