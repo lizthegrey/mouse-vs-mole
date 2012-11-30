@@ -1,8 +1,6 @@
-// Level Grid is an int matrix with 0 through 3 representing colored normal blocks and 4 through 7 representing powerups. 10 means empty.
+// Level Grid is an int matrix with 0 through 3 representing colored normal blocks and 4 through 7 representing powerups. 9 is the invincible block.
 var VEIN_COUNT = 45;
 var VEIN_CONSTANT = 2;
-var GRID_WIDTH = 40;
-var GRID_HEIGHT = 30;
 
 
 function singleColorStage() {
@@ -18,10 +16,44 @@ function singleColorStage() {
 
 function simpleStage() {
 	levelMap = stageGenerate();
-	return powerUpExpand(powerUpScatter(cheesify(tunnelMaker(levelMap, 3, 10, 15, 30, 15), 4, 7)));
+	return cage(powerUpExpand(powerUpScatter(landforms(tunnelMaker(levelMap, 3, 10, 15, 30, 15), 10))));
 }
 
-function cheesify(levelMap,r, holeCount) {
+function cage(levelMap){
+
+	for (var y = 0; y < GRID_HEIGHT; y++) {
+	  levelMap[0][y] = 8;
+		levelMap[39][y] = 8;
+  }
+	return levelMap;
+}
+
+function landforms(levelMap, numCaves){
+	var x;
+	var y;
+	var r;
+	var c1;
+	var c2;
+	var coord = new Array();
+	var caveCenters = new Array();
+	for (var i = 0; i < numCaves; i++) {
+		x = Math.floor(Math.random() * (GRID_WIDTH));
+		y = Math.floor(Math.random() * (GRID_HEIGHT-5))+2;
+		r = Math.floor(Math.random() * 3)+2
+		coord[0] = x;
+		coord[1] = y;
+		caveCenters[i] = coord;
+		holeMaker(levelMap, r, x, y);
+	}
+	for (var i = 0; i < numCaves/5; i++) {
+		c1 = caveCenters[Math.floor(Math.random()*caveCenters.length)]
+		c2 = caveCenters[Math.floor(Math.random()*caveCenters.length)]
+		tunnelMaker(levelMap,r,c1[0],c1[1],c2[0],c2[1])
+	}
+	return levelMap;
+}
+
+function cheesify(levelMap, r, holeCount) {
 	var x;
 	var y;
 	for (var i = 0; i < holeCount; i++) {
@@ -37,6 +69,10 @@ function stageGenerate() {
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelMap[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
+		if (y<5){
+		levelMap[x][y]=null
+		continue;
+		}
 	  levelMap[x][y] = Math.floor(Math.random() * 4);
     }
   }
@@ -47,7 +83,7 @@ function powerUpScatter(levelMap) {
 	for (var i = 0; i < VEIN_COUNT; i++) {
 		var x = Math.floor(Math.random() * GRID_WIDTH);
 		var y = Math.floor(Math.random() * GRID_HEIGHT);
-        if (levelMap[x][y] != 10) {
+        if (levelMap[x][y] != null) {
             levelMap[x][y] = Math.floor(Math.random() * 2) + 4;
         }
         else {
@@ -73,7 +109,7 @@ function powerUpExpand(levelMap) {
                 levelMap[x][y - 1]
         ];
         for (var i = 0; i < adjacents.length; i++) {
-            if (adjacents[i] != 10 && adjacents[i] >= 4) {
+            if (adjacents[i] != null && adjacents[i] >= 4) {
                 if (Math.floor(Math.random() * 100) < VEIN_CONSTANT) {
                     levelMap[x][y] = adjacents[i];
                 }
@@ -101,11 +137,11 @@ function distance(x1,y1,x2,y2) {
 	return Math.sqrt(xs + ys);
 }
 
-function holeMaker(levelMap,r, centerX, centerY) {
+function holeMaker(levelMap, r, centerX, centerY) {
   for (var x = 0; x < GRID_WIDTH; x++) {
     for (var y = 0; y < GRID_HEIGHT; y++) {
 			if (distance(x, y, centerX, centerY) < r) {
-				levelMap[x][y] = 10;
+				levelMap[x][y] = null;
 			}
 		}
   }
