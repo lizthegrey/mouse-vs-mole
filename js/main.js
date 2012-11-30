@@ -117,6 +117,7 @@ var frameDelay;
 var viewportDelay;
 var restartNow = false;
 var should_creep = false;
+var creeping_death_timer = CREEPING_DEATH_MS;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
 
 var players = new Array(null, null);
@@ -269,10 +270,11 @@ function addActors() {
 
 function doCreep() {
   if (ENABLE_CREEPING) {
-    should_creep = true;
+    creeping_death_timer -= FRAME_DELAY;
   }
-  if (!restartNow) {
-    timer.delay(doCreep, CREEPING_DEATH_MS);
+  if (creeping_death_timer <= 0) {
+    should_creep = true;
+    creeping_death_timer = CREEPING_DEATH_MS;
   }
 }
 
@@ -433,6 +435,7 @@ function frameFunctionality() {
   playerMove(2);
   bazookaMove(2);
   playerStop();
+  doCreep();
   deathFromBelow();
   removeDestroyed();
   verticalMovement(1);
@@ -445,11 +448,12 @@ function frameFunctionality() {
 
 function addFunctionality() {
   restartNow = false;
+  should_creep = false;
+  creeping_death_timer = CREEPING_DEATH_MS;
 
   frameDelay = Crafty.e('Delay');
   frameDelay.delay(frameFunctionality, FRAME_DELAY);
   timer = Crafty.e('Delay');
-  timer.delay(doCreep, CREEPING_DEATH_MS);
 
   viewportDelay = Crafty.e('Delay');
   viewportDelay.delay(viewport, CAMERA_DELAY);
