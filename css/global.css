@@ -1,8 +1,7 @@
 body {
     background: tan;
     font-family: Chewy, sans-serif;
-    color: #a78b55;
-    text-shadow: 0 0 3px #553d2a;
+    margin: 0;
 }
 
 #metawrapper, #gamewrapper {
@@ -28,6 +27,8 @@ body {
     height: 600px;
     overflow: hidden;
     position: relative;
+    color: #a78b55;
+    text-shadow: 0 0 3px #553d2a;
 }
 #splash
 {
@@ -38,13 +39,8 @@ body {
 #splash > div
 {
     position: absolute;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     padding: 1em;
-}
-#splash > div:not(#objectives):not(:hover)
-{
-    opacity: 0.3;
-    background: rgba(0, 0, 0, 0.2);
 }
 #instructions
 {
@@ -52,14 +48,6 @@ body {
     bottom: 30px;
     left: 30px;
     right: 500px;
-}
-#credits
-{
-    top: 260px;
-    bottom: 30px;
-    left: 726px;
-    right: 30px;
-    font-size: 13pt;
 }
 #objectives
 {
@@ -263,4 +251,9 @@ h4
     vertical-align: middle;
     text-shadow: none;
     font-weight: bolder;
+}
+footer
+{
+    text-align: center;
+    font-size: 12pt;
 }
