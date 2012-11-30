@@ -25,12 +25,12 @@ var MUSIC = (function() {
             }
         }
         start = +new Date;
-        setInterval(tick, 12000);
+        setInterval(tick, 8000);
         tick();
     }
 
     $.each([ 'atmo', 'drum', 'bass', 'tena', 'tenb', 'alto', 'sopr' ], function(i, e) {
-        var track = $('<audio>').attr('src', 'sounds/deepgreen/ma' + e + '.ogg')
+        var track = $('<audio>').attr('src', 'sounds/deepgreen/mi' + e + '.ogg')
                                 .attr('loop', true)
                                 .bind('canplaythrough', loaded)[0];
         track.load();
