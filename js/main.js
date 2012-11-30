@@ -34,7 +34,7 @@ var DISPLAY_HEIGHT = 600;
 // and to begin with a block for a floor
 var START_XCOORD_P1 = 16;
 var START_XPOS_P1 = START_XCOORD_P1 * BLOCK_SIZE;
-var START_XCOORD_P2 = 23;
+var START_XCOORD_P2 = 24;
 var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
 var START_YCOORD = 15;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
@@ -75,7 +75,7 @@ var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
 
 var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
-var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7);
+var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
 var BAZOOKA_POINTS_TYPE = 5;
 var JET_POINTS_TYPE = 4;
@@ -184,7 +184,7 @@ function addActors() {
             levelGrid[x][y] = new block(null, null, null);
             continue;
         }
-        if (levelMap[x][y] == 10) {
+        if (levelMap[x][y] == null) {
             levelGrid[x][y] = new block(null, null, null);
             continue;
         }
@@ -193,7 +193,10 @@ function addActors() {
 
         var b = Crafty.e('2D, DOM, block, ' + blockColor).
             attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
-
+				if (levelMap[x][y] == 8) {
+            levelGrid[x][y] = new block(b, colorIndex, -5000);
+            continue;
+        }
         levelGrid[x][y] = new block(b, colorIndex, 0);
     }
   }
