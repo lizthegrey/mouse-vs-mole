@@ -95,11 +95,14 @@ POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE] = 1;
 POINTS_PER_BLOCK[JET_POINTS_TYPE] = 5;
 
 var BG_MUSIC = 'sounds/bg.ogg';
-var PLAYER1_RUN = 'sounds/running.ogg';
-var PLAYER2_RUN = 'sounds/running_diff.ogg';
+var PLAYER1_RUN = 'sounds/running1.ogg';
+var PLAYER2_RUN = 'sounds/running2.ogg';
 var BLOCK_BREAK = 'sounds/crunch.ogg';
 var PLAYER_DEATH = 'sounds/splat.ogg';
 var RESOURCE_GET = 'sounds/chime.ogg';
+var BAZOOKA_FIRE = 'sounds/shot.ogg';
+var BAZOOKA_IMPACT = 'sounds/boom.ogg';
+var PLAYER_JUMP = 'sounds/jump.ogg';
 
 var PLAYER1_RUNNING = false;
 var PLAYER2_RUNNING = false;
@@ -279,12 +282,15 @@ function doCreep() {
 /* Block initializes sounds in gameworld */
 function addSounds() {
   Crafty.audio.add({
-    bgMusic: [BG_MUSIC],
+    //bgMusic: [BG_MUSIC],
     player1Run: [PLAYER1_RUN],
     player2Run: [PLAYER2_RUN],
     blockBreak: [BLOCK_BREAK],
-    resourceGet: [RESOURCE_GET],
-    playerDeath: [PLAYER_DEATH]
+    //resourceGet: [RESOURCE_GET],
+    playerDeath: [PLAYER_DEATH],
+    playerJump: [PLAYER_JUMP],
+    bazookaFire: [BAZOOKA_FIRE],
+    bazookaImpact: [BAZOOKA_IMPACT],
   });
 }
 
@@ -596,6 +602,7 @@ function missileRefresh() {
         }
       }
       mspr.destroy();
+      Crafty.audio.play('bazookaImpact');
       missiles.splice(n, 1);
       
       var explosion = new explodeObj(Crafty.e('2D, DOM, explosion,' +
@@ -725,6 +732,7 @@ function missileFire(player) {
     startX += MISSILE_FLIP_OFFSET
     startY += MISSILE_FLIP_OFFSET;
   }
+  Crafty.audio.play('bazookaFire');
   var m = new missile(Crafty.e('2D, DOM, missile').attr({
           x: startX,
           y: startY,
@@ -905,6 +913,7 @@ function playerMove(player) {
         elem2 && elem2.node &&
         pspr(player)._y == elem2.node._y - PLAYER_HEIGHT) {
       pspr(player)._gy = JUMP_VELOCITY;
+      Crafty.audio.play('playerJump');
     }
     isRunning = true;
   }
@@ -1189,11 +1198,11 @@ function deathFromBelow() {
 }
 
 function startMusic() {
-  MUSIC.play();
+  MUSIC.toggle(true);
 }
 
 function stopMusic() {
-  MUSIC.reset();
+  MUSIC.toggle(false);
 }
 
 function restart() {
@@ -1206,7 +1215,6 @@ function reboot() {
   PLAYER1_DEAD = false;
   PLAYER2_DEAD = false;
 
-  stopMusic();
   death_y = GRID_HEIGHT;
   ENABLE_CREEPING = false;
 
@@ -1258,17 +1266,18 @@ function reboot() {
 function gameOver() {
   if (!PLAYER1_DEAD && pspr(1)._y > PLAYGROUND_HEIGHT) {
     PLAYER1_DEAD = true;
-    Crafty.audio.play('playerDeath');
   }
   if (!PLAYER2_DEAD && pspr(2)._y > PLAYGROUND_HEIGHT) {
     PLAYER2_DEAD = true;
-    Crafty.audio.play('playerDeath');
   }
 
   if ((PLAYER1_DEAD || PLAYER2_DEAD) && !restartNow) {
     restartNow = true;
     var pl = 0;
 
+    stopMusic();
+    Crafty.audio.stop();
+    Crafty.audio.play('playerDeath');
     setTimeout(restart, 3000);
   }
 }
@@ -1289,6 +1298,7 @@ Crafty.scene('mainLevel', function() {
   addActors();
   addSounds();
   addFunctionality();
+  startMusic();
 });
 
 $(document).ready(function() {
