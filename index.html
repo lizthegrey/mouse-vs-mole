@@ -1,104 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Spelunker Deathmatch</title>
-<link rel="stylesheet" type="text/css" href="css/global.css"></style>
+<link rel="stylesheet" type="text/css" href="css/global.css" />
 <script type="text/javascript" src="js/inc/jquery.js"></script>
 <script type="text/javascript" src="js/inc/crafty.js"></script>
 <script type="text/javascript" src="js/maps.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
 <script type="text/javascript" src="js/music.js"></script>
 </head>
+
 <body>
-
 <div id="metawrapper">
-
-<div id="side1" class="side">
-
-<div id="bazooka1" class="powerup bazooka">
-<div class="bazookaIcon Icon5_1_dis powerupIcon" id="5Icon1"></div>
-<div class="powerupBar bazookaPBar"><div class="innerBar bazookaBar" id="5Bar1"></div></div>
-</div>
-
-<div id="jet1" class="powerup jet">
-<div class="jetIcon Icon4_1_dis powerupIcon" id="4Icon1"></div>
-<div class="powerupBar jetPBar"><div class="innerBar jetBar" id="4Bar1"></div></div>
-</div>
-
-</div>
-
-<div id="gamewrapper"><div id="cr-stage-wrap"><div id="cr-stage"></div></div> </div>
-
-<div id="side2" class="side">
-<div id="bazooka2" class="powerup bazooka">
-<div class="bazookaIcon Icon5_2_dis powerupIcon" id="5Icon2"></div>
-<div class="powerupBar bazookaPBar"><div class="innerBar bazookaBar" id="5Bar2"></div></div>
-
-<div id="jet2" class="powerup jet">
-<div class="jetIcon Icon4_2_dis powerupIcon" id="4Icon2"></div>
-<div class="powerupBar jetPBar"><div class="innerBar jetBar" id="4Bar2"></div></div>
-</div>
-
-</div>
-</div>
-
+  <div id="splash">
+    <button id="start-game"
+      onclick="$('#splash').hide(); $('#game').show();">
+        Start Game</button>
+    <button id="show-instructions"
+      onclick="$('#splash').hide(); $('#instructions').show();">
+        Instructions</button>
+  </div>
+  <div id="instructions">
+    Lorem ipsum dolore
+    <button id="back"
+      onclick="$('#instructions').hide(); $('#splash').show();">
+        Back</button>
+  </div>
+  <div id="game">
+    <div id="side1" class="side">
+      <div id="bazooka1" class="powerup bazooka">
+        <div class="bazookaIcon Icon5_1_dis powerupIcon" id="_5Icon1"></div>
+        <div class="powerupBar bazookaPBar">
+          <div class="innerBar bazookaBar" id="_5Bar1"></div>
+        </div>
+      </div>
+      <div id="jet1" class="powerup jet">
+        <div class="jetIcon Icon4_1_dis powerupIcon" id="_4Icon1"></div>
+        <div class="powerupBar jetPBar">
+          <div class="innerBar jetBar" id="_4Bar1"></div>
+        </div>
+      </div>
+    </div>
+    <div id="gamewrapper">
+      <div id="cr-stage-wrap">
+        <div id="cr-stage"></div>
+      </div>
+    </div>
+    <div id="side2" class="side">
+      <div id="bazooka2" class="powerup bazooka">
+        <div class="bazookaIcon Icon5_2_dis powerupIcon" id="_5Icon2"></div>
+        <div class="powerupBar bazookaPBar">
+          <div class="innerBar bazookaBar" id="_5Bar2"></div>
+        </div>
+      </div>
+      <div id="jet2" class="powerup jet">
+        <div class="jetIcon Icon4_2_dis powerupIcon" id="_4Icon2"></div>
+        <div class="powerupBar jetPBar">
+          <div class="innerBar jetBar" id="_4Bar2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div id="undergame">
-<div id="instructions">
-<p id="start">Move a character to start the game.</p>
-
-<div id="left">
-<div id="credits" class="instbox">
-<h2>Spelunker Deathmatch</h2>
-
-<p>By Kai Ma, Liz Fong-Jones, Alan Huang,
-Nathan Arce, and Alex Goins.</p>
-
-Created using <a href="http://craftyjs.com/">Crafty</a>.
-
-<p><b>Sound Credits:</b>
-<br/><a href="http://www.freesound.org/people/Robinhood76/sounds/55690/">steps on a forest road</a>, by Robinhood76
-<br/><a href="http://www.freesound.org/people/bevangoldswain/sounds/54779/">running hard surface</a>, by bevangoldswain
-<br/><a href="http://www.freesound.org/people/SlykMrByches/sounds/55234/">splattt</a>, by SlykMrByches
-<br/><a href="http://www.freesound.org/people/BristolStories/sounds/51715/">u_chimes_short3</a>, by BristolStories
-</p>
+  <div id="info">
+    <p id="start">Move a character to start the game.</p>
+    <div id="left">
+      <div id="credits" class="instbox">
+      <h2>Spelunker Deathmatch</h2>
+        <p>By Kai Ma, Liz Fong-Jones, Alan Huang,
+           Nathan Arce, and Alex Goins.</p>
+        Created using <a href="http://craftyjs.com/">Crafty</a>.
+        <p><b>Sound Credits:</b>
+          <br/><a href="http://www.freesound.org/people/Robinhood76/sounds/55690/">steps on a forest road</a>, by Robinhood76
+          <br/><a href="http://www.freesound.org/people/bevangoldswain/sounds/54779/">running hard surface</a>, by bevangoldswain
+          <br/><a href="http://www.freesound.org/people/SlykMrByches/sounds/55234/">splattt</a>, by SlykMrByches
+          <br/><a href="http://www.freesound.org/people/BristolStories/sounds/51715/">u_chimes_short3</a>, by BristolStories
+        </p>
+      </div>
+      <div id="objective" class="instbox">
+        <h3>Objective</h3>
+          Collect the most stars before both players die by falling off the bottom of the stage!
+          The bars on each side of the screen represent their respective player's scores.
+      </div>
+    </div>
+    <div id="controls" class="instbox">
+      <h3>Controls</h3>
+      <span class="key">R</span>: Restart<br />
+      <br />
+      Destroy clusters of blocks by running into them.<br />
+      <div id="p1controls" class="smcontrols">
+        <h4>Player 1</h4>
+        <span class="key">W</span>: Jump<br />
+        <span class="key">A</span>: Left<br />
+        <span class="key">S</span>: Down<br />
+        <span class="key">D</span>: Right<br />
+      </div>
+      <div id="p2controls" class="smcontrols">
+        <h4>Player 2</h4>
+        <span class="key">Up</span>: Jump<br />
+        <span class="key">Left</span>: Left<br />
+        <span class="key">Down</span>: Down<br />
+        <span class="key">Right</span>: Right<br />
+      </div>
+    </div>
+  </div>
 </div>
-
-<div id="objective" class="instbox">
-<h3>Objective</h3>
-Collect the most stars before both players die by falling off the bottom of the stage!
-The bars on each side of the screen represent their respective player's scores.
-</div>
-
-
-</div>
-
-<div id="controls" class="instbox">
-<h3>Controls</h3>
-<span class="key">R</span>: Restart<br />
-<br />
-Destroy clusters of blocks by running into them.<br />
-
-<div id="p1controls" class="smcontrols">
-<h4>Player 1</h4>
-   <span class="key">W</span>: Jump<br />
-   <span class="key">A</span>: Left<br />
-   <span class="key">S</span>: Down<br />
-   <span class="key">D</span>: Right<br />
-</div>
-
-<div id="p2controls" class="smcontrols">
-<h4>Player 2</h4>
-   <span class="key">Up</span>: Jump<br />
-   <span class="key">Left</span>: Left<br />
-   <span class="key">Down</span>: Down<br />
-   <span class="key">Right</span>: Right<br />
-</div>
-
-</div>
-
-
-</div>
-
 </body>
 </html>
