@@ -797,6 +797,8 @@ function missileFire(player) {
           y: startY,
           z: 200
       }), p(player).firingAngle);
+  m.xVel += p(player).xVel;
+  m.yVel += pspr(player)._gy;
   missiles.push(m);
 }
 
