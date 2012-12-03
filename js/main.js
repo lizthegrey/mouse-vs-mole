@@ -68,6 +68,7 @@ var ZOOM_AVERAGE = 10;
 var FIXED_ZOOM = 2.0;
 
 var DAMAGE_TO_EXPLODE = 15;
+var INDESTRUCTIBLE_BLOCK_ID = 8;
 var DAMAGE_JUMP = 5;
 var DAMAGE_DIG = 5;
 var DAMAGE_COLLIDE = 2;
@@ -231,8 +232,8 @@ function addActors() {
 
         var b = Crafty.e('2D, DOM, block, ' + blockColor).
             attr({x: x * BLOCK_SIZE, y: y * BLOCK_SIZE, z: 200});
-				if (levelMap[x][y] == 8) {
-            levelGrid[x][y] = new block(b, colorIndex, -5000);
+        if (levelMap[x][y] == INDESTRUCTIBLE_BLOCK_ID) {
+            levelGrid[x][y] = new block(b, colorIndex, -0x7fffffff);
             continue;
         }
         levelGrid[x][y] = new block(b, colorIndex, 0);
@@ -653,8 +654,7 @@ function missileRefresh() {
           if ((mYGrid + b < 0) || (mYGrid + b > GRID_HEIGHT))
             continue;
           if (lg(mXGrid + a, mYGrid + b) && lg(mXGrid + a, mYGrid + b).node) {
-            lg(mXGrid + a, mYGrid + b).node.destroy();
-            levelGrid[mXGrid + a][mYGrid + b] = new block(null, null, null);
+            lg(mXGrid + a, mYGrid + b).damage += DAMAGE_TO_EXPLODE;
           }
         }
       }
@@ -1009,11 +1009,11 @@ function playerMove(player) {
     if (elem && elem.node) {
       elem.damage += DAMAGE_DIG;
       processDamage(elem);
-      elem.damagedBy = player;
+      elem.damagedBy |= player;
     } else if (elem2 && elem2.node) {
       elem2.damage += DAMAGE_DIG;
       processDamage(elem2);
-      elem2.damagedBy = player;
+      elem2.damagedBy |= player;
     }
     p(player).runningLeft = false;
     p(player).runningRight = false;
@@ -1082,13 +1082,13 @@ function verticalMovement(player) {
       if (elem && elem.node) {
         elem.damage += DAMAGE_JUMP;
         processDamage(elem);
-        elem.damagedBy = player;
+        elem.damagedBy |= player;
         pspr(player).y = elem.node._y + BLOCK_SIZE;
       }
       else if (elem2 && elem2.node) {
         elem2.damage += DAMAGE_JUMP;
         processDamage(elem2);
-        elem2.damagedBy = player;
+        elem2.damagedBy |= player;
         pspr(player).y = elem2.node._y + BLOCK_SIZE;
       }
       pspr(player)._gy = 0;
@@ -1153,6 +1153,9 @@ function playerStop() {
 
 function updatePoints(playerNum, pointsInc, pointsType) {
   playerNum = parseInt(playerNum);
+  if (playerNum <= 0) {
+    return;
+  }
   pspr(playerNum).sprite(0, 2);
   if (p(playerNum).points[pointsType] == null) {
     p(playerNum).points[pointsType] = pointsInc;
@@ -1227,7 +1230,7 @@ function lg(x, y) {
 function maybeChain(x, y, type, player) {
   var elem = lg(x, y);
   if (elem && elem.blockType == type) {
-    elem.damagedBy = player;
+    elem.damagedBy |= player;
     elem.damage = DAMAGE_TO_EXPLODE;
     processDamage(elem);
   }
@@ -1263,7 +1266,8 @@ function removeDestroyed() {
           var type = levelGrid[x][y].blockType;
           var player = levelGrid[x][y].damagedBy;
           if (player != null && POINTS_PER_BLOCK[type]) {
-            updatePoints(player, POINTS_PER_BLOCK[type], type);
+            updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
+            updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
           }
 
           levelGrid[x][y].node.destroy();
@@ -1274,6 +1278,9 @@ function removeDestroyed() {
           maybeChain(x - 1, y, type, player);
           maybeChain(x, y + 1, type, player);
           maybeChain(x, y - 1, type, player);
+        }
+        else if(levelGrid[x][y].node) {
+          levelGrid[x][y].damagedBy = 0;
         }
       }
     }
