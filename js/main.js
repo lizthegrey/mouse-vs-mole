@@ -63,8 +63,8 @@ var OUCH_VELOCITY = 999;
 var OUCH_DIVIDER = 3;
 
 var JET_Y_OFFSET = 0;
-var CAM_Y_AVERAGE = 10;
-var ZOOM_AVERAGE = 10;
+var CAM_Y_AVERAGE = 30;
+var ZOOM_AVERAGE = 30;
 var FIXED_ZOOM = 2.0;
 
 var DAMAGE_TO_EXPLODE = 15;
@@ -562,20 +562,6 @@ function viewport() {
   curX += (PLAYGROUND_WIDTH / (zoom * 0.73)) / 2;
   curY += (PLAYGROUND_HEIGHT / (zoom * 0.75)) / 2;
 
-  if (curX > 0) {
-      curX = 0;
-  }
-  if (curX < DISPLAY_WIDTH * (1 - zoom)) {
-      curX = DISPLAY_WIDTH * (1 - zoom);
-  }
-
-  if (curY > 0) {
-      curY = 0;
-  }
-  if (curY < DISPLAY_HEIGHT * (1 - zoom)) {
-      curY = DISPLAY_HEIGHT * (1 - zoom);
-  }
-
   prevY.push(curY);
   var y = 0;
   for (var i = 0; i < prevY.length; i++) {
@@ -595,6 +581,21 @@ function viewport() {
   if (prevX.length >= CAM_Y_AVERAGE) {
     prevX.shift();
   }
+
+  if (x > 0) {
+      x = 0;
+  }
+  if (x < DISPLAY_WIDTH * (1 - zoom)) {
+      x = DISPLAY_WIDTH * (1 - zoom);
+  }
+
+  if (y > 0) {
+      y = 0;
+  }
+  if (y < DISPLAY_HEIGHT * (1 - zoom)) {
+      y = DISPLAY_HEIGHT * (1 - zoom);
+  }
+
 
   Crafty.viewport.scale((zoom * 0.286) / Crafty.viewport._zoom);
   Crafty.viewport.x = x;
