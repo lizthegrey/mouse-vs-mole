@@ -1,8 +1,10 @@
 body {
     background: tan;
+    font-family: Chewy, sans-serif;
+    margin: 0;
 }
 
-#metawrapper, #gamewrapper, #undergame {
+#metawrapper, #gamewrapper {
     margin: auto;
 }
 
@@ -23,7 +25,10 @@ body {
 {
     width: 1016px;
     height: 600px;
-    overflow:hidden;
+    overflow: hidden;
+    position: relative;
+    color: #a78b55;
+    text-shadow: 0 0 3px #553d2a;
 }
 #splash
 {
@@ -31,38 +36,59 @@ body {
     height: 600px;
     background: url('../sprites/title_screen.png');
 }
-#instructions, #credits
-{
-    width: 1016px;
-    height: 600px;
-    display: none;
-}
-#start-game
+#splash > div
 {
     position: absolute;
-    left: 700px;
-    top: 280px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1em;
 }
+#instructions
+{
+    top: 260px;
+    bottom: 30px;
+    left: 30px;
+    right: 500px;
+}
+#objectives
+{
+    top: 340px;
+    bottom: 30px;
+    left: 546px;
+    right: 320px;
+    font-size: 12pt;
+}
+#instructions > table
+{
+    width: 70%;
+    margin: auto;
+    table-layout: fixed;
+}
+#instructions > table td
+{
+    text-align: center;
+}
+#objectives > ul
+{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#objectives > ul li
+{
+    padding-bottom: 5px;
+}
+
 button
 {
-    font-family: "Chela One", sans-serif;
+    font-family: Chewy, sans-serif;
     font-size: 2em;
     border-width: 5px;
     border-color: #a78b55;
     border-radius: 15px;
     background-color: #ecaa5e;
-}
-#show-instructions
-{
     position: absolute;
-    left: 700px;
-    top: 350px;
-}
-#show-credits
-{
-    position: absolute;
-    left: 700px;
-    top: 420px;
+    left: 540px;
+    top: 260px;
 }
 #game
 {
@@ -214,29 +240,20 @@ h4
 }
 .key
 {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 2px solid black;
+    border-radius: 5px;
+    color: black;
+    text-align: center;
+    vertical-align: middle;
+    text-shadow: none;
     font-weight: bolder;
 }
-#start
+footer
 {
-    margin-left: 15px;
-    font-style: italic;
-}
-#undergame
-{
-    width: 910px;
-    font-family: sans-serif;
-}
-#left
-{
-    float: left;
-    width: 520px;
-}
-#controls{
-    float: left;
-}
-#p1controls{
-    float: left;
-}
-#p2controls{
-    float: right;
+    text-align: center;
+    font-size: 12pt;
 }
