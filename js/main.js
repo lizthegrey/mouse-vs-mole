@@ -11,6 +11,7 @@ var JETFIRE_WIDTH = 60;
 var JETFIRE_HEIGHT = 120;
 var BAZOOKA_DIAGONAL = Math.sqrt(Math.pow(BAZOOKA_WIDTH, 2) +
                        Math.pow(BAZOOKA_HEIGHT, 2));
+var BAZOOKA_FRAME_ROTATION = 7;
 var MISSILE_HEIGHT = 17;
 var MISSILE_WIDTH = 44;
 var MISSILE_DIAGONAL = Math.sqrt(Math.pow(MISSILE_WIDTH, 2) +
@@ -745,11 +746,11 @@ function bazookaMove(player) {
   }
   if ( Crafty.keydown[clockwise] &&
       p(player).firing ) {
-    p(player).firingAngle += 5;
+    p(player).firingAngle += BAZOOKA_FRAME_ROTATION;
   }
   if (Crafty.keydown[counterClock] &&
       p(player).firing ) {
-    p(player).firingAngle -= 5;
+    p(player).firingAngle -= BAZOOKA_FRAME_ROTATION;
   }
 
   p(player).firingAngle += 360;
