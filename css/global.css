@@ -130,20 +130,20 @@ button
     width: 70%;
     margin: auto;
     table-layout: fixed;
-    padding-top: 50px;
+    padding-top: 60px;
 }
 .side
 {
     width: 108px;
     height: 600px;
-    padding-top: 75px;
+    padding-top: 20px;
     background-color: black;
     text-align: center;
 }
 
 .powerup
 {
-    padding-top: 45px;
+    padding-top: 60px;
     width: 73px;
     text-align: center;
     display: inline-block;
