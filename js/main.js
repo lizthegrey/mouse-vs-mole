@@ -202,7 +202,6 @@ function buildPlayground() {
       }
     }
     if (this.isDown('M')) {
-      console.log(true);
       MUSIC.mute();
     }
   });
