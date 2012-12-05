@@ -107,6 +107,7 @@ var RESOURCE_GET = 'sounds/chime.ogg';
 var BAZOOKA_FIRE = 'sounds/shot.ogg';
 var BAZOOKA_IMPACT = 'sounds/boom.ogg';
 var PLAYER_JUMP = 'sounds/jump.ogg';
+var PLAYER_JET = 'sounds/boost.ogg';
 
 var PLAYER1_RUNNING = false;
 var PLAYER2_RUNNING = false;
@@ -341,6 +342,7 @@ function addSounds() {
     blockBreak: [BLOCK_BREAK],
     playerDeath: [PLAYER_DEATH],
     playerJump: [PLAYER_JUMP],
+    playerJet: [PLAYER_JET],
     bazookaFire: [BAZOOKA_FIRE],
     bazookaImpact: [BAZOOKA_IMPACT],
   });
@@ -807,7 +809,7 @@ function jet(player) {
     updatePoints(player, -1, JET_POINTS_TYPE);
     pspr(player)._gy = JET_VELOCITY;
     p(player).groundY = pspr(player)._y - JET_Y_OFFSET;
-    Crafty.audio.play('playerJump');
+    Crafty.audio.play('playerJet');
 
     p(player).jetfire = Crafty.e('2D, DOM, jetfire, Tween').attr({
         alpha: 1.0,
