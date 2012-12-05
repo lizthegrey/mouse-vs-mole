@@ -111,12 +111,26 @@ button
     float: left;
     background-image: url('../sprites/sidebar_p1.png');
 }
+#side1 > table
+{
+    width: 70%;
+    margin: auto;
+    table-layout: fixed;
+    padding-top: 50px;
+}
 #side2
 {
     display: inline-block;
     margin-left: -5px;
     float: right;
     background-image: url('../sprites/sidebar_p2.png');
+}
+#side2 > table
+{
+    width: 70%;
+    margin: auto;
+    table-layout: fixed;
+    padding-top: 50px;
 }
 .side
 {
