@@ -4,7 +4,6 @@ var PLAYER_WIDTH = 60;
 var HALF_PLAYER_WIDTH = PLAYER_WIDTH / 2;
 var P_X_ADJUSTMENT = PLAYER_WIDTH / 3;
 var P_RIGHTX_ADJUSTMENT = PLAYER_WIDTH / 6;
-var RESOURCE_SIZE = 11;
 var BAZOOKA_HEIGHT = 35;
 var BAZOOKA_WIDTH = 75;
 var JETFIRE_WIDTH = 60;
@@ -24,7 +23,6 @@ var EXPLOSION_RADIUS = 2;
 var EXPLOSION_SIZE = 138;
 var EXPLOSION_DURATION = 30;
 
-var RESOURCE_RANDOM_OFFSET = 2;
 var NUM_COLORS = 4;
 
 var GRID_WIDTH = 40;
@@ -85,7 +83,6 @@ var REBOOT_DELAY = 50;
 var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
 
-var RESOURCE_PROBABILITY = 0.05; // probably any block has a resource in it
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
 var BAZOOKA_POINTS_TYPE = 5;
@@ -105,7 +102,6 @@ var PLAYER1_RUN = 'sounds/running1.ogg';
 var PLAYER2_RUN = 'sounds/running2.ogg';
 var BLOCK_BREAK = 'sounds/crunch.ogg';
 var PLAYER_DEATH = 'sounds/splat.ogg';
-var RESOURCE_GET = 'sounds/chime.ogg';
 var BAZOOKA_FIRE = 'sounds/shot.ogg';
 var BAZOOKA_IMPACT = 'sounds/boom.ogg';
 var PLAYER_JUMP = 'sounds/jump.ogg';
@@ -132,22 +128,17 @@ var death_y = GRID_HEIGHT; // tracks the creeping death.
 
 var players = new Array(null, null);
 var bazookas = new Array(2);
-var resources = [];
 var missiles = [];
 var explosions = [];
 var lava_list = [];
 
 function buildPlayground() {
-  var asset_list = ['sprites/800x600.png', 'sprites/Resource.png'];
+  var asset_list = ['sprites/800x600.png'];
   asset_list += ['sprites/tiles_dmg_placeholder.png'];
   asset_list += ['sprites/player_sprites.png'];
   asset_list += ['sprites/explosion.png'];
   asset_list += ['sprites/lava_tiles.png'];
   Crafty.load(asset_list);
-
-  Crafty.sprite(RESOURCE_SIZE, 'sprites/Resource.png', {
-    resource: [0, 0]
-  });
 
   Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
       'sprites/player_sprites.png', {
@@ -213,7 +204,6 @@ function addActors() {
   levelGrid = new Array(GRID_WIDTH);
   bazookas = new Array(2);
   levelMap = simpleStage();
-  resources = [];
   missiles = [];
   explosions = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
@@ -356,17 +346,6 @@ function block(node, blockType, damage) {
   this.damage = damage;
 }
 
-function resource(node) {
-  this.node = node;
-  this.yVel = 0;
-  this.getX = function() {
-    return posToGrid(this.node._x);
-  };
-  this.getY = function() {
-    return posToGrid(this.node._y);
-  };
-}
-
 function missile(node, angle) {
   this.node = node;
   this.yVel = -Math.sin(toRadians(angle)) * MISSILE_VELOCITY;
@@ -432,55 +411,6 @@ function posToGrid(pos) {
   return Math.round(pos / BLOCK_SIZE);
 }
 
-function resourceRefresh() {
-  for (var n = 0; n < resources.length; n++) {
-    var resource = resources[n];
-    var x = resource.getX();
-    var y = resource.getY();
-
-    if (lg(x, y) && lg(x, y).node) {
-      // Elements inside an unbroken block can neither fall nor be picked up.
-      continue;
-    }
-    if (resource.node.y > PLAYGROUND_HEIGHT) {
-      resources.splice(n, 1);
-      resource.node.destroy();
-      continue;
-    }
-    var nextpos = parseInt(resource.node.y) + parseInt(resource.yVel);
-    var elem = lg(x, y + 1);
-    if (!elem || !elem.node ||
-        nextpos < elem.node.y - RESOURCE_SIZE) {
-      resource.node.y = nextpos;
-      resource.yVel += GRAVITY_ACCEL;
-    } else {
-      resource.node.y = elem.node.y - RESOURCE_SIZE;
-      resource.yVel = 0;
-    }
-
-    var rx = resource.node.x;
-    var ry = resource.node.y;
-
-    var popped = false;
-    for (var playerNum = 1; playerNum <= 2; playerNum++) {
-      var px = pspr(playerNum).x;
-      var py = pspr(playerNum).y;
-      if (resourceGet(rx, ry, px, py)) {
-        if (!popped) {
-          resources.splice(n, 1);
-        }
-        popped = true;
-        Crafty.audio.play('resourceGet');
-        // I thought about having a break statement in here, but if the players
-        // are occupying the same space, they both deserve the points for a
-        // resource as it falls on them.
-      }
-    }
-    if (popped) {
-      resource.node.destroy();
-    }
-  }
-}
 
 function frameFunctionality() {
   if (!restartNow) {
@@ -502,7 +432,6 @@ function frameFunctionality() {
   removeDestroyed();
   verticalMovement(1);
   verticalMovement(2);
-  resourceRefresh();
   gameOver();
   MUSIC.update();
   //viewport();
@@ -607,19 +536,6 @@ function viewport() {
   Crafty.viewport.x = x;
   Crafty.viewport.y = y;
   viewportDelay.delay(viewport, CAMERA_DELAY);
-}
-
-// did a player get the resource we are updating?
-function resourceGet(rx, ry, px, py) {
-  // screw the engine, I doubt this is any slower than theirs.
-  if ((px + PLAYER_WIDTH > rx && px < rx + RESOURCE_SIZE) ||
-      (px < rx + RESOURCE_SIZE && px + PLAYER_WIDTH >= rx)) {
-    if ((py + PLAYER_HEIGHT >= ry && py <= ry + RESOURCE_SIZE) ||
-        (py <= ry + RESOURCE_SIZE && py + PLAYER_HEIGHT >= ry)) {
-      return true;
-    }
-  }
-  return false;
 }
 
 function missileRefresh() {
@@ -1339,12 +1255,6 @@ function reboot() {
       if (newBlock.node != null) {
         newBlock.node.destroy();
       }
-    }
-  }
-  for (a = 0; a < resources.length; a++) {
-    var resource = resources[a];
-    if (resource.node != null) {
-      resource.node.destroy();
     }
   }
   for (a = 0; a < missiles.length; a++) {
