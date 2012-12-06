@@ -516,16 +516,19 @@ function addFunctionality() {
   frameDelay = Crafty.e('Delay');
   frameDelay.delay(frameFunctionality, FRAME_DELAY);
   timer = Crafty.e('Delay');
-
-  viewportDelay = Crafty.e('Delay');
-  viewportDelay.delay(viewport, CAMERA_DELAY);
 }
 
 var prevY = [];
 var prevX = [];
 var prevZoom = [];
 function viewport() {
-
+  if (restartNow) {
+      prevY = [];
+      prevX = [];
+      prevZoom = [];
+      viewportDelay.delay(viewport, CAMERA_DELAY);
+      return;
+  }
   if (!PLAYER1_DEAD && !PLAYER2_DEAD) {
     var curX = -1 * (pspr(1)._x + pspr(2)._x) / 2;
     var curY = -1 * (p(1).groundY + p(2).groundY) / 2;
@@ -603,9 +606,7 @@ function viewport() {
   Crafty.viewport.scale((zoom * 0.286) / Crafty.viewport._zoom);
   Crafty.viewport.x = x;
   Crafty.viewport.y = y;
-  if (!restartNow) {
-    frameDelay.delay(viewport, CAMERA_DELAY);
-  }
+  viewportDelay.delay(viewport, CAMERA_DELAY);
 }
 
 // did a player get the resource we are updating?
@@ -1417,6 +1418,8 @@ Crafty.scene('mainLevel', function() {
   addSounds();
   addFunctionality();
   stopMusic();
+  viewportDelay = Crafty.e('Delay');
+  viewportDelay.delay(viewport, CAMERA_DELAY);
 });
 
 $(document).ready(function() {
