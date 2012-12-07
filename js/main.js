@@ -305,7 +305,7 @@ function addActors() {
     for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
       var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
                           'lavaanim')
-          .attr({x: x, y: y + (GRID_HEIGHT - 0.5) * BLOCK_SIZE, z: 300})
+          .attr({x: x, y: y + (GRID_HEIGHT - 1.5) * BLOCK_SIZE, z: 300})
       if (y == 0) {
         lava.animate('bubble_surface', 30, -1);
       } else {
@@ -1229,10 +1229,10 @@ function deathFromBelow() {
   }
   should_creep = false;
 
-/*  for (var n = 0; n < lava_list.length; n++) {
+  for (var n = 0; n < lava_list.length; n++) {
     var lava = lava_list[n];
     lava.tween({y: lava.y - BLOCK_SIZE}, 60);
-  } */
+  }
 }
 
 function startMusic() {
