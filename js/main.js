@@ -1132,6 +1132,8 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   }
 
   if (MAXPOINTS[pointsType] != null) {
+    $('#_'+pointsType+"cnt"+playerNum).text(parseInt(p(playerNum).points[pointsType])
+                                            +' / '+parseInt(MAXPOINTS[pointsType]));
     var widthPerc = ((p(playerNum).points[pointsType] /
                     MAXPOINTS[pointsType])*100)+'%';
     $('#_'+pointsType+'Bar'+playerNum).animate({
