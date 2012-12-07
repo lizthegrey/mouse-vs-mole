@@ -411,10 +411,14 @@ function posToGrid(pos) {
 }
 
 
+var frame_count = 0;
+
 function frameFunctionality() {
   if (!restartNow) {
     frameDelay.delay(frameFunctionality, FRAME_DELAY);
   }
+
+  frame_count++;
   missileRefresh();
   explosionRefresh();
   showBazooka(1);
@@ -428,14 +432,13 @@ function frameFunctionality() {
   playerStop();
   doCreep();
   deathFromBelow();
-  if (Crafty.frame() % DESTROY_BLOCKS_INTERVAL == 0) {
+  if (frame_count % DESTROY_BLOCKS_INTERVAL == 0) {
     removeDestroyed();
   }
   verticalMovement(1);
   verticalMovement(2);
   gameOver();
   MUSIC.update();
-  //viewport();
 }
 
 function addFunctionality() {
