@@ -305,7 +305,7 @@ function addActors() {
     for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
       var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
                           'lavaanim')
-          .attr({x: x, y: y + (GRID_HEIGHT - 0.5) * BLOCK_SIZE, z: 300})
+          .attr({x: x, y: y + (GRID_HEIGHT - 1.5) * BLOCK_SIZE, z: 300})
       if (y == 0) {
         lava.animate('bubble_surface', 30, -1);
       } else {
