@@ -58,9 +58,6 @@ var DIRECT_HIT_MULTIPLIER = 3;
 
 var WINNING_POINTS = 35;
 
-var OUCH_VELOCITY = 999;
-var OUCH_DIVIDER = 3;
-
 var JET_Y_OFFSET = 0;
 var CAM_Y_AVERAGE = 30;
 var ZOOM_AVERAGE = 30;
@@ -71,6 +68,7 @@ var INDESTRUCTIBLE_BLOCK_ID = 8;
 var DAMAGE_JUMP = 5;
 var DAMAGE_DIG = 5;
 var DAMAGE_COLLIDE = 2;
+var DESTROY_BLOCKS_INTERVAL = 4;
 
 var POINT_RAMPING = 5;
 
@@ -413,10 +411,14 @@ function posToGrid(pos) {
 }
 
 
+var frame_count = 0;
+
 function frameFunctionality() {
   if (!restartNow) {
     frameDelay.delay(frameFunctionality, FRAME_DELAY);
   }
+
+  frame_count++;
   missileRefresh();
   explosionRefresh();
   showBazooka(1);
@@ -430,12 +432,13 @@ function frameFunctionality() {
   playerStop();
   doCreep();
   deathFromBelow();
-  removeDestroyed();
+  if (frame_count % DESTROY_BLOCKS_INTERVAL == 0) {
+    removeDestroyed();
+  }
   verticalMovement(1);
   verticalMovement(2);
   gameOver();
   MUSIC.update();
-  //viewport();
 }
 
 function addFunctionality() {
@@ -1192,7 +1195,7 @@ function removeDestroyed() {
       for (var y = 0; y < GRID_HEIGHT; y++) {
         if (levelGrid[x][y].damage &&
             levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
-          evaluateChainReaction = true;
+          //evaluateChainReaction = true;
 
           var type = levelGrid[x][y].blockType;
           var player = levelGrid[x][y].damagedBy;
