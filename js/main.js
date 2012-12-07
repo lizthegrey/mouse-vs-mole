@@ -184,7 +184,7 @@ function buildPlayground() {
     explosion: [0, 0]
   });
 
-  Crafty.sprite(LAVA_WIDTH, LAVA_HEIGHT
+  Crafty.sprite(LAVA_WIDTH, LAVA_HEIGHT,
     'sprites/lava_huge.png', {
     lava_surface: [0, 0],
     lava_deep: [0, 1]
