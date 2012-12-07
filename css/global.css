@@ -243,7 +243,9 @@ button
 {
     background-image: url('../sprites/powerup1_mouse_dis.png');
 }
-
+.scoreCount
+{
+}
 h2
 {
     margin-top: 0px;
