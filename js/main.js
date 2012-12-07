@@ -356,7 +356,7 @@ function addSounds() {
 function block(node, blockType, damage) {
   this.node = node;
   this.blockType = blockType;
-  this.damagedBy = null;
+  this.damagedBy = 0;
   this.damage = damage;
   this.chained = false;
   this.futureDamaged = 0;
@@ -917,7 +917,7 @@ function playerMove(player) {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
           processDamage(elem);
-          elem.damagedBy = player;
+          elem.damagedBy |= player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
         p(player).xVel = 0;
@@ -1216,7 +1216,7 @@ function removeDestroyed() {
         evaluateMore = true;
         var type = levelGrid[x][y].blockType;
         var player = levelGrid[x][y].damagedBy;
-        if (player != null && POINTS_PER_BLOCK[type]) {
+        if (player != 0 && POINTS_PER_BLOCK[type]) {
           updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
           updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
           maybeChain(x + 1, y, type, player);
@@ -1230,7 +1230,7 @@ function removeDestroyed() {
         Crafty.audio.play('blockBreak');
       }
       else if(levelGrid[x][y].node) {
-        levelGrid[x][y].damagedBy = null;
+        levelGrid[x][y].damagedBy = 0;
       }
     }
   }
