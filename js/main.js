@@ -46,12 +46,12 @@ var START_YCOORD = 15;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
 
 var GRAVITY_ACCEL = 2; // pixels/s^2 (down is positive)
-var BAZOOKA_GRAVITY = GRAVITY_ACCEL/2;
+var BAZOOKA_GRAVITY = 2.2;
 var JUMP_VELOCITY = -25;   // pixels/s
 var JET_VELOCITY = -25;   // pixels/s
 var MOVE_VELOCITY = 4.3;
 var DRAG_VELOCITY = 4; // Yes, I know drag isn't normally a velocity.
-var MISSILE_VELOCITY = 35;
+var MISSILE_VELOCITY = 55;
 var INITIAL_FIRE_ANGLE = 30;
 var EXPLOSION_VELOCITY = 100;
 var DIRECT_HIT_MULTIPLIER = 3;
@@ -75,7 +75,7 @@ var DAMAGE_COLLIDE = 2;
 var POINT_RAMPING = 5;
 
 var ENABLE_CREEPING = false;
-var CREEPING_DEATH_MS = 10000;
+var CREEPING_DEATH_MS = 2000;
 var FRAME_DELAY = 30;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
@@ -90,11 +90,11 @@ var JET_POINTS_TYPE = 4;
 var POINT_TYPES = [BAZOOKA_POINTS_TYPE, JET_POINTS_TYPE];
 
 var MAXPOINTS = {};
-MAXPOINTS[BAZOOKA_POINTS_TYPE] = 3;
+MAXPOINTS[BAZOOKA_POINTS_TYPE] = 9;
 MAXPOINTS[JET_POINTS_TYPE] = 15;
 
 var POINTS_PER_BLOCK = {}
-POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE] = 1;
+POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE] = 3;
 POINTS_PER_BLOCK[JET_POINTS_TYPE] = 5;
 
 var BG_MUSIC = 'sounds/bg.ogg';
@@ -193,7 +193,6 @@ function buildPlayground() {
       }
     }
     if (this.isDown('M')) {
-      console.log(true);
       MUSIC.mute();
     }
   });
