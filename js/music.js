@@ -40,6 +40,7 @@ var MUSIC = (function() {
             loaded: false
         };
     });
+    volume();
     
     return {
         mute: function() {

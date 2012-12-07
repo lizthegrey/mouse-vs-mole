@@ -1386,7 +1386,6 @@ Crafty.scene('mainLevel', function() {
   addActors();
   addSounds();
   addFunctionality();
-  stopMusic();
   viewportDelay = Crafty.e('Delay');
   viewportDelay.delay(viewport, CAMERA_DELAY);
 });
