@@ -356,8 +356,10 @@ function addSounds() {
 function block(node, blockType, damage) {
   this.node = node;
   this.blockType = blockType;
-  this.damagedBy = null;
+  this.damagedBy = 0;
   this.damage = damage;
+  this.chained = false;
+  this.futureDamaged = 0;
 }
 
 function missile(node, angle) {
@@ -915,7 +917,7 @@ function playerMove(player) {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
           processDamage(elem);
-          elem.damagedBy = player;
+          elem.damagedBy |= player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
         p(player).xVel = 0;
@@ -1179,9 +1181,12 @@ function lg(x, y) {
 function maybeChain(x, y, type, player) {
   var elem = lg(x, y);
   if (elem && elem.blockType == type) {
-    elem.damagedBy |= player;
-    elem.damage = DAMAGE_TO_EXPLODE;
-    processDamage(elem);
+    if (elem.damage < DAMAGE_TO_EXPLODE) {
+      elem.futureDamaged |= player;
+      elem.chained = true;
+      elem.damage = DAMAGE_TO_EXPLODE - 1;
+      processDamage(elem);
+    }
   }
 }
 
@@ -1203,34 +1208,40 @@ function processDamage(elem) {
 
 // Removes fully damaged blocks from the board.
 function removeDestroyed() {
-  var evaluateChainReaction = true;
-  while (evaluateChainReaction) {
-    evaluateChainReaction = false;
-    for (var x = 0; x < GRID_WIDTH; x++) {
-      for (var y = 0; y < GRID_HEIGHT; y++) {
-        if (levelGrid[x][y].damage &&
-            levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
-          //evaluateChainReaction = true;
-
-          var type = levelGrid[x][y].blockType;
-          var player = levelGrid[x][y].damagedBy;
-          if (player != null && POINTS_PER_BLOCK[type]) {
-            updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
-            updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
-          }
-
-          levelGrid[x][y].node.destroy();
-          delete levelGrid[x][y];
-          levelGrid[x][y] = new block(null, null, null);
-
-          Crafty.audio.play('blockBreak');
+  var evaluateMore = false;
+  for (var x = 0; x < GRID_WIDTH; x++) {
+    for (var y = 0; y < GRID_HEIGHT; y++) {
+      if (levelGrid[x][y].damage &&
+          levelGrid[x][y].damage >= DAMAGE_TO_EXPLODE) {
+        evaluateMore = true;
+        var type = levelGrid[x][y].blockType;
+        var player = levelGrid[x][y].damagedBy;
+        if (player != 0) {
           maybeChain(x + 1, y, type, player);
           maybeChain(x - 1, y, type, player);
           maybeChain(x, y + 1, type, player);
           maybeChain(x, y - 1, type, player);
+          if (POINTS_PER_BLOCK[type]) {
+            updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
+            updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
+          }
         }
-        else if(levelGrid[x][y].node) {
-          levelGrid[x][y].damagedBy = 0;
+        levelGrid[x][y].node.destroy();
+        delete levelGrid[x][y];
+        levelGrid[x][y] = new block(null, null, null);
+        Crafty.audio.play('blockBreak');
+      }
+      else if(levelGrid[x][y].node) {
+        levelGrid[x][y].damagedBy = 0;
+      }
+    }
+  }
+  if (evaluateMore) {
+    for (var x = 0; x < GRID_WIDTH; x++) {
+      for (var y = 0; y < GRID_HEIGHT; y++) {
+        if (levelGrid[x][y].chained) {
+          levelGrid[x][y].damagedBy = levelGrid[x][y].futureDamaged;
+          levelGrid[x][y].damage = DAMAGE_TO_EXPLODE;
         }
       }
     }
