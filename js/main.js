@@ -1147,8 +1147,8 @@ function resetPoints(playerNum) {
       width: '0%'}, 100);
   for(var i = 0; i < POINT_TYPES.length; i++) {
     var pointsType = POINT_TYPES[i];
-    $('#_'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
-    $('#_'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
+    $('#_'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType+'_'+playerNum);
+    $('#_'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_'+playerNum+'_dis');
   }
 }
 
