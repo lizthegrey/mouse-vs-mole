@@ -121,7 +121,7 @@ var levelGrid; // 2D array containing block objects
 var timer;
 var frameDelay;
 var viewportDelay;
-var restartNow = false;
+var restartNow = true;
 var should_creep = false;
 var creeping_death_timer = CREEPING_DEATH_MS;
 var death_y = GRID_HEIGHT; // tracks the creeping death.
@@ -206,6 +206,7 @@ function addActors() {
   levelMap = simpleStage();
   missiles = [];
   explosions = [];
+  lava_list = [];
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelGrid[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
@@ -579,6 +580,7 @@ function missileRefresh() {
         }
       }
       mspr.destroy();
+      delete missiles[n];
       Crafty.audio.play('bazookaImpact');
       missiles.splice(n, 1);
       
@@ -621,6 +623,7 @@ function missileRefresh() {
     if (mspr._x > PLAYGROUND_WIDTH || mspr._x < 0 ||
         mspr._y > PLAYGROUND_HEIGHT) {
       mspr.destroy();
+      delete missiles[n];
       missiles.splice(n,1);
       n -= 1;
       continue;
@@ -641,6 +644,7 @@ function explosionRefresh() {
       if (explosion.node != null) {
         explosion.node.destroy();
       }
+      delete explosions[n];
       explosions.splice(n, 1);
       n--;
     }
@@ -774,6 +778,7 @@ function showBazooka(player) {
             p(player).showingBazooka) {
       if (baz(player) && baz(player).node) {
         baz(player).node.destroy();
+        delete baz(player);
       }
 
       p(player).showingBazooka = false;
@@ -1193,6 +1198,7 @@ function removeDestroyed() {
           }
 
           levelGrid[x][y].node.destroy();
+          delete levelGrid[x][y];
           levelGrid[x][y] = new block(null, null, null);
 
           Crafty.audio.play('blockBreak');
@@ -1217,6 +1223,7 @@ function deathFromBelow() {
   for (var x = 0; x < GRID_WIDTH; x++) {
     if (levelGrid[x][death_y].node) {
       levelGrid[x][death_y].node.destroy();
+      delete levelGrid[x][death_y];
       levelGrid[x][death_y] = new block(null, null, null);
     }
   }
@@ -1255,6 +1262,7 @@ function reboot() {
       if (newBlock.node != null) {
         newBlock.node.destroy();
       }
+      delete levelGrid[a][b];
     }
   }
   for (a = 0; a < missiles.length; a++) {
@@ -1262,27 +1270,34 @@ function reboot() {
     if (missile.node != null) {
       missile.node.destroy();
     }
+    delete missiles[a];
   }
   for (a = 0; a < explosions.length; a++) {
     var explosion = explosions[a];
     if (explosion.node != null) {
       explosion.node.destroy();
     }
+    delete explosions[a];
   }
   for (a = 0; a < lava_list.length; a++) {
     var lava = lava_list[a];
     lava.destroy();
+    delete lava_list[a];
   }
   if (baz(1) != null && baz(1).node != null) {
     baz(1).node.destroy();
+    delete baz(1);
   }
   if (baz(2) != null && baz(2).node != null) {
     baz(2).node.destroy();
+    delete baz(2);
   }
   resetPoints(1);
   resetPoints(2);
   pspr(1).destroy();
+  delete p(1);
   pspr(2).destroy();
+  delete p(2);
   //$('#text').remove();
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.viewport.init();
