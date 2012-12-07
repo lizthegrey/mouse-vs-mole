@@ -356,7 +356,7 @@ function addSounds() {
 function block(node, blockType, damage) {
   this.node = node;
   this.blockType = blockType;
-  this.damagedBy = null;
+  this.damagedBy = 0;
   this.damage = damage;
   this.chained = false;
   this.futureDamaged = 0;
@@ -917,7 +917,7 @@ function playerMove(player) {
         if (elem && elem.node) {
           elem.damage += DAMAGE_COLLIDE;
           processDamage(elem);
-          elem.damagedBy = player;
+          elem.damagedBy |= player;
         }
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
         p(player).xVel = 0;
@@ -1216,18 +1216,20 @@ function removeDestroyed() {
         evaluateMore = true;
         var type = levelGrid[x][y].blockType;
         var player = levelGrid[x][y].damagedBy;
-        if (player != null && POINTS_PER_BLOCK[type]) {
-          updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
-          updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
+        if (player != 0) {
+          maybeChain(x + 1, y, type, player);
+          maybeChain(x - 1, y, type, player);
+          maybeChain(x, y + 1, type, player);
+          maybeChain(x, y - 1, type, player);
+          if (POINTS_PER_BLOCK[type]) {
+            updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
+            updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
+          }
         }
         levelGrid[x][y].node.destroy();
         delete levelGrid[x][y];
         levelGrid[x][y] = new block(null, null, null);
         Crafty.audio.play('blockBreak');
-        maybeChain(x + 1, y, type, player);
-        maybeChain(x - 1, y, type, player);
-        maybeChain(x, y + 1, type, player);
-        maybeChain(x, y - 1, type, player);
       }
       else if(levelGrid[x][y].node) {
         levelGrid[x][y].damagedBy = 0;
