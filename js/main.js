@@ -75,6 +75,8 @@ var POINT_RAMPING = 5;
 var ENABLE_CREEPING = false;
 var CREEPING_DEATH_MS = 2000;
 var FRAME_DELAY = 30;
+var FRAMES_PER_CREEP = parseInt(Math.ceil(CREEPING_DEATH_MS / FRAME_DELAY));
+var LAVA_PIXELS_PER_FRAME = 1.0 * BLOCK_SIZE / FRAMES_PER_CREEP;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
 
@@ -318,7 +320,7 @@ function addActors() {
     for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
       var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
                           'lavaanim')
-          .attr({x: x, y: y + (GRID_HEIGHT - 1.5) * BLOCK_SIZE, z: 300})
+          .attr({x: x, y: y + (GRID_HEIGHT - 0.5) * BLOCK_SIZE, z: 300})
       if (y == 0) {
         lava.animate('bubble_surface', 30, -1);
       } else {
@@ -336,6 +338,13 @@ function doCreep() {
   if (creeping_death_timer <= 0) {
     should_creep = true;
     creeping_death_timer = CREEPING_DEATH_MS;
+  }
+}
+
+function lavaCreep() {
+  for (var n = 0; n < lava_list.length; n++) {
+    var lava = lava_list[n];
+    lava.y = lava.y - LAVA_PIXELS_PER_FRAME;
   }
 }
 
@@ -448,6 +457,7 @@ function frameFunctionality() {
   jetFireMove(2);
   playerStop();
   doCreep();
+  lavaCreep();
   deathFromBelow();
   if (frame_count % DESTROY_BLOCKS_INTERVAL == 0) {
     removeDestroyed();
@@ -1141,15 +1151,9 @@ function updatePoints(playerNum, pointsInc, pointsType) {
 }
 
 function resetPoints(playerNum) {
-  p(playerNum).points = new Array();
+  p(playerNum).points = new Array(POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE], 
+                                  POINTS_PER_BLOCK[JET_POINTS_TYPE]);
   p(playerNum).enablePowerup = new Array();
-  $('.innerBar').animate({
-      width: '0%'}, 100);
-  for(var i = 0; i < POINT_TYPES.length; i++) {
-    var pointsType = POINT_TYPES[i];
-    $('#_'+pointsType+'Icon'+playerNum).removeClass('Icon'+pointsType);
-    $('#_'+pointsType+'Icon'+playerNum).addClass('Icon'+pointsType+'_dis');
-  }
 }
 
 // Returns the player object associated with a player number.
@@ -1261,11 +1265,6 @@ function deathFromBelow() {
     }
   }
   should_creep = false;
-
-  for (var n = 0; n < lava_list.length; n++) {
-    var lava = lava_list[n];
-    lava.tween({y: lava.y - BLOCK_SIZE}, 200);
-  }
 }
 
 function startMusic() {
