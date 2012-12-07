@@ -1395,5 +1395,4 @@ $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   //Crafty.canvas.init();
   Crafty.viewport.init();
-  Crafty.scene('mainLevel');
 });
