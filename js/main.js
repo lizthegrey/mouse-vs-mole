@@ -1182,7 +1182,7 @@ function maybeChain(x, y, type, player) {
   var elem = lg(x, y);
   if (elem && elem.blockType == type) {
     if (elem.damage < DAMAGE_TO_EXPLODE) {
-      elem.futureDamage |= player;
+      elem.futureDamaged |= player;
       elem.chained = true;
       elem.damage = DAMAGE_TO_EXPLODE - 1;
       processDamage(elem);
