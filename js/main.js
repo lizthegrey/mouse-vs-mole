@@ -314,7 +314,7 @@ function addActors() {
   updatePoints(2, POINTS_PER_BLOCK[JET_POINTS_TYPE], JET_POINTS_TYPE);
   pspr(2).flip('X');
   
-  for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE / 4; y += LAVA_SIZE) {
+  for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE; y += LAVA_SIZE) {
     for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
       var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
                           'lavaanim')
@@ -1182,7 +1182,7 @@ function maybeChain(x, y, type, player) {
   var elem = lg(x, y);
   if (elem && elem.blockType == type) {
     if (elem.damage < DAMAGE_TO_EXPLODE) {
-      elem.futureDamage |= player;
+      elem.futureDamaged |= player;
       elem.chained = true;
       elem.damage = DAMAGE_TO_EXPLODE - 1;
       processDamage(elem);
@@ -1216,13 +1216,15 @@ function removeDestroyed() {
         evaluateMore = true;
         var type = levelGrid[x][y].blockType;
         var player = levelGrid[x][y].damagedBy;
-        if (player != 0 && POINTS_PER_BLOCK[type]) {
-          updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
-          updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
+        if (player != 0) {
           maybeChain(x + 1, y, type, player);
           maybeChain(x - 1, y, type, player);
           maybeChain(x, y + 1, type, player);
           maybeChain(x, y - 1, type, player);
+          if (POINTS_PER_BLOCK[type]) {
+            updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
+            updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
+          }
         }
         levelGrid[x][y].node.destroy();
         delete levelGrid[x][y];
