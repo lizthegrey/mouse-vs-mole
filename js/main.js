@@ -130,6 +130,9 @@ var missiles = [];
 var explosions = [];
 var lava_list = [];
 
+var player1_wins = 0;
+var player2_wins = 0;
+
 function buildPlayground() {
   var asset_list = ['sprites/800x600.png'];
   asset_list += ['sprites/tiles_dmg_placeholder.png'];
@@ -187,6 +190,12 @@ function buildPlayground() {
   Crafty.e('Keyboard').bind('KeyDown', function () {
     if (this.isDown('R')) {
       if (!restartNow) {
+        player1_wins = 0;
+        player2_wins = 0;
+        var p1_counter = document.getElementById('points1');
+        p1_counter.innerHTML = player1_wins;
+        var p2_counter = document.getElementById('points2');
+        p2_counter.innerHTML = player2_wins;
         restart();
       }
     }
@@ -1263,6 +1272,17 @@ function restart() {
 }
 
 function reboot() {
+  if (PLAYER1_DEAD && PLAYER2_DEAD);
+  else if (PLAYER1_DEAD) {
+    player2_wins += 1;
+    var p2_counter = document.getElementById('points2');
+    p2_counter.innerHTML = player2_wins;
+  }
+  else if (PLAYER2_DEAD) {
+    player1_wins += 1;
+    var p1_counter = document.getElementById('points1');
+    p1_counter.innerHTML = player1_wins;
+  }
   PLAYER1_DEAD = false;
   PLAYER2_DEAD = false;
 
