@@ -141,9 +141,29 @@ button
     text-align: center;
 }
 
+.wincount
+{
+    width: 73px;
+    text-align:center;
+    display: inline-block;
+}
+.value
+{
+    display: inline-block;
+    width: 36px;
+    height: 24px;
+    background: silver;
+    border: 2px solid white;
+    border-radius: 3px;
+    color: black;
+    text-align: center;
+    vertical-align: middle;
+    text-shadow: none;
+}
+
 .powerup
 {
-    padding-top: 60px;
+    padding-top: 50px;
     width: 73px;
     text-align: center;
     display: inline-block;
