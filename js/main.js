@@ -1253,7 +1253,7 @@ function deathFromBelow() {
 
   for (var n = 0; n < lava_list.length; n++) {
     var lava = lava_list[n];
-    lava.tween({y: lava.y - BLOCK_SIZE}, 60);
+    lava.tween({y: lava.y - BLOCK_SIZE}, 200);
   }
 }
 
@@ -1272,13 +1272,12 @@ function restart() {
 }
 
 function reboot() {
-  if (PLAYER1_DEAD && PLAYER2_DEAD);
-  else if (PLAYER1_DEAD) {
+  if (PLAYER1_DEAD && !PLAYER2_DEAD) {
     player2_wins += 1;
     var p2_counter = document.getElementById('points2');
     p2_counter.innerHTML = player2_wins;
   }
-  else if (PLAYER2_DEAD) {
+  if (PLAYER2_DEAD && !PLAYER1_DEAD) {
     player1_wins += 1;
     var p1_counter = document.getElementById('points1');
     p1_counter.innerHTML = player1_wins;
