@@ -314,7 +314,7 @@ function addActors() {
   updatePoints(2, POINTS_PER_BLOCK[JET_POINTS_TYPE], JET_POINTS_TYPE);
   pspr(2).flip('X');
   
-  for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE; y += LAVA_SIZE) {
+  for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE / 4; y += LAVA_SIZE) {
     for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
       var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
                           'lavaanim')
@@ -1219,18 +1219,18 @@ function removeDestroyed() {
         if (player != null && POINTS_PER_BLOCK[type]) {
           updatePoints(player & 1, POINTS_PER_BLOCK[type], type);
           updatePoints(player & 2, POINTS_PER_BLOCK[type], type);
+          maybeChain(x + 1, y, type, player);
+          maybeChain(x - 1, y, type, player);
+          maybeChain(x, y + 1, type, player);
+          maybeChain(x, y - 1, type, player);
         }
         levelGrid[x][y].node.destroy();
         delete levelGrid[x][y];
         levelGrid[x][y] = new block(null, null, null);
         Crafty.audio.play('blockBreak');
-        maybeChain(x + 1, y, type, player);
-        maybeChain(x - 1, y, type, player);
-        maybeChain(x, y + 1, type, player);
-        maybeChain(x, y - 1, type, player);
       }
       else if(levelGrid[x][y].node) {
-        levelGrid[x][y].damagedBy = 0;
+        levelGrid[x][y].damagedBy = null;
       }
     }
   }
