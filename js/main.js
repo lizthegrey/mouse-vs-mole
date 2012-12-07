@@ -296,9 +296,15 @@ function addActors() {
 
   players[0] = new player(p1, 1,
                           START_XPOS_P1, START_YPOS);
+  updatePoints(1, POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE], BAZOOKA_POINTS_TYPE);
+  updatePoints(1, POINTS_PER_BLOCK[JET_POINTS_TYPE], JET_POINTS_TYPE);
+  pspr(1).flip('X');
   players[1] = new player(p2, 2,
                           START_XPOS_P2, START_YPOS);
-
+  updatePoints(2, POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE], BAZOOKA_POINTS_TYPE);
+  updatePoints(2, POINTS_PER_BLOCK[JET_POINTS_TYPE], JET_POINTS_TYPE);
+  pspr(2).flip('X');
+  
   for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE; y += LAVA_SIZE) {
     for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
       var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
