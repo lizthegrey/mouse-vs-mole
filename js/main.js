@@ -76,7 +76,7 @@ var POINT_RAMPING = 5;
 var ENABLE_CREEPING = false;
 var CREEPING_DEATH_MS = 2000;
 var FRAME_DELAY = 30;
-var FRAMES_PER_CREEP = parseInt(Math.ceil(CREEPING_DEATH_MS / FRAME_DELAY));
+var FRAMES_PER_CREEP = parseInt(Math.floor(CREEPING_DEATH_MS / FRAME_DELAY));
 var LAVA_PIXELS_PER_FRAME = 1.0 * BLOCK_SIZE / FRAMES_PER_CREEP;
 var CAMERA_DELAY = 5;
 var REBOOT_DELAY = 50;
@@ -125,7 +125,7 @@ var viewportDelay;
 var restartNow = true;
 var should_creep = false;
 var creeping_death_timer = CREEPING_DEATH_MS;
-var death_y = GRID_HEIGHT; // tracks the creeping death.
+var death_y = GRID_HEIGHT - 1; // tracks the creeping death.
 
 var players = new Array(null, null);
 var bazookas = new Array(2);
@@ -1258,10 +1258,13 @@ function removeDestroyed() {
 }
 
 function deathFromBelow() {
-  if (death_y == 1 || !should_creep || !ENABLE_CREEPING) {
+  if (!should_creep || !ENABLE_CREEPING) {
     return;
   }
-  death_y--;
+  else if (death_y < 2 && should_creep) {
+    death_y--;
+    return;
+  }
   for (var x = 0; x < GRID_WIDTH; x++) {
     if (levelGrid[x][death_y].node) {
       levelGrid[x][death_y].node.destroy();
@@ -1269,6 +1272,7 @@ function deathFromBelow() {
       levelGrid[x][death_y] = new block(null, null, null);
     }
   }
+  death_y--;
   should_creep = false;
 }
 
@@ -1300,7 +1304,7 @@ function reboot() {
   PLAYER1_DEAD = false;
   PLAYER2_DEAD = false;
 
-  death_y = GRID_HEIGHT;
+  death_y = GRID_HEIGHT - 1;
   ENABLE_CREEPING = false;
 
   for (var a = 0; a < levelGrid.length; a++) {
