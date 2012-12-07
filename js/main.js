@@ -31,7 +31,8 @@ var GRID_HEIGHT = 30;
 var PLAYGROUND_WIDTH = BLOCK_SIZE * GRID_WIDTH;
 var PLAYGROUND_HEIGHT = BLOCK_SIZE * GRID_HEIGHT;
 
-var LAVA_SIZE = 128;
+var LAVA_HEIGHT = 128;
+var LAVA_WIDTH = 2800;
 
 var DISPLAY_WIDTH = 800;
 var DISPLAY_HEIGHT = 600;
@@ -140,7 +141,7 @@ function buildPlayground() {
   asset_list += ['sprites/tiles_dmg_placeholder.png'];
   asset_list += ['sprites/player_sprites.png'];
   asset_list += ['sprites/explosion.png'];
-  asset_list += ['sprites/lava_tiles.png'];
+  asset_list += ['sprites/lava_huge.png'];
   Crafty.load(asset_list);
 
   Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
@@ -183,8 +184,8 @@ function buildPlayground() {
     explosion: [0, 0]
   });
 
-  Crafty.sprite(LAVA_SIZE,
-    'sprites/lava_tiles.png', {
+  Crafty.sprite(LAVA_WIDTH, LAVA_HEIGHT
+    'sprites/lava_huge.png', {
     lava_surface: [0, 0],
     lava_deep: [0, 1]
   });
@@ -316,18 +317,17 @@ function addActors() {
   updatePoints(2, POINTS_PER_BLOCK[JET_POINTS_TYPE], JET_POINTS_TYPE);
   pspr(2).flip('X');
   
-  for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE; y += LAVA_SIZE) {
-    for (var x = 0; x < GRID_WIDTH * BLOCK_SIZE; x += LAVA_SIZE) {
-      var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
-                          'lavaanim')
-          .attr({x: x, y: y + (GRID_HEIGHT - 0.5) * BLOCK_SIZE, z: 300})
-      if (y == 0) {
-        lava.animate('bubble_surface', 30, -1);
-      } else {
-        lava.animate('bubble_deep', 30, -1);
-      }
-      lava_list.push(lava);
+  for (var y = 0; y < GRID_HEIGHT * BLOCK_SIZE; y += LAVA_HEIGHT) {
+    var x = 0;
+    var lava = Crafty.e('2D, DOM, Tween, lava_surface, ' +
+                        'lavaanim')
+        .attr({x: x, y: y + (GRID_HEIGHT - 0.5) * BLOCK_SIZE, z: 300})
+    if (y == 0) {
+      lava.animate('bubble_surface', 30, -1);
+    } else {
+      lava.animate('bubble_deep', 30, -1);
     }
+    lava_list.push(lava);
   }
 }
 
@@ -342,6 +342,9 @@ function doCreep() {
 }
 
 function lavaCreep() {
+  if (!ENABLE_CREEPING) {
+    return;
+  }
   for (var n = 0; n < lava_list.length; n++) {
     var lava = lava_list[n];
     lava.y = lava.y - LAVA_PIXELS_PER_FRAME;
