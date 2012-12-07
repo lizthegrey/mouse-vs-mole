@@ -736,13 +736,17 @@ function jet(player) {
     pspr(player)._gy = JET_VELOCITY;
     p(player).groundY = pspr(player)._y - JET_Y_OFFSET;
     Crafty.audio.play('playerJet');
+    if (p(player).jetfire) {
+      p(player).jetfire.destroy();
+      delete p(player).jetfire;
+    }
 
     p(player).jetfire = Crafty.e('2D, DOM, jetfire, Tween').attr({
         alpha: 1.0,
         x: pspr(player)._x,
         y: pspr(player)._y,
         z: 200
-    }).tween({alpha: 0.0}, 5);
+    }).tween({alpha: 0.0}, 15);
 
     if(pspr(player)._flipX) {
       p(player).jetfire.flip('X');
@@ -1287,20 +1291,19 @@ function reboot() {
     lava.destroy();
     delete lava_list[a];
   }
-  if (baz(1) != null && baz(1).node != null) {
-    baz(1).node.destroy();
-    delete baz(1);
+  for (a = 1; a <= 2; a++) {
+    if (baz(a) != null && baz(a).node != null) {
+      baz(a).node.destroy();
+      delete baz(a);
+    }
+    resetPoints(a);
+    if (p(a).jetfire) {
+      p(a).jetfire.destroy();
+      delete p(a).jetfire;
+    }
+    pspr(a).destroy();
+    delete p(a);
   }
-  if (baz(2) != null && baz(2).node != null) {
-    baz(2).node.destroy();
-    delete baz(2);
-  }
-  resetPoints(1);
-  resetPoints(2);
-  pspr(1).destroy();
-  delete p(1);
-  pspr(2).destroy();
-  delete p(2);
   //$('#text').remove();
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.viewport.init();
