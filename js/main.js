@@ -1229,10 +1229,10 @@ function deathFromBelow() {
   }
   should_creep = false;
 
-/*  for (var n = 0; n < lava_list.length; n++) {
+  for (var n = 0; n < lava_list.length; n++) {
     var lava = lava_list[n];
     lava.tween({y: lava.y - BLOCK_SIZE}, 60);
-  } */
+  }
 }
 
 function startMusic() {
