@@ -1145,6 +1145,8 @@ function updatePoints(playerNum, pointsInc, pointsType) {
   }
 
   if (MAXPOINTS[pointsType] != null) {
+    $('#_'+pointsType+"cnt"+playerNum).text(parseInt(p(playerNum).points[pointsType])
+                                            +' / '+parseInt(MAXPOINTS[pointsType]));
     var widthPerc = ((p(playerNum).points[pointsType] /
                     MAXPOINTS[pointsType])*100)+'%';
     $('#_'+pointsType+'Bar'+playerNum).animate({
@@ -1386,7 +1388,6 @@ Crafty.scene('mainLevel', function() {
   addActors();
   addSounds();
   addFunctionality();
-  stopMusic();
   viewportDelay = Crafty.e('Delay');
   viewportDelay.delay(viewport, CAMERA_DELAY);
 });
@@ -1395,5 +1396,4 @@ $(document).ready(function() {
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   //Crafty.canvas.init();
   Crafty.viewport.init();
-  Crafty.scene('mainLevel');
 });

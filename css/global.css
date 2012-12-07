@@ -191,25 +191,25 @@ button
     height: 100%;
     background-image: url('../sprites/greenbar.png');
 }
-.bazookaIcon
-{
-    height: 48px;
-}
 .Icon5_1
 {
     background-image: url('../sprites/powerup2_mole.png');
+    height: 48px;
 }
 .Icon5_1_dis
 {
     background-image: url('../sprites/powerup2_mole_dis.png');
+    height: 54px;
 }
 .Icon5_2
 {
     background-image: url('../sprites/powerup2_mouse.png');
+    height: 54px;
 }
 .Icon5_2_dis
 {
     background-image: url('../sprites/powerup2_mouse_dis.png');
+    height: 48px;
 }
 
 
@@ -243,7 +243,9 @@ button
 {
     background-image: url('../sprites/powerup1_mouse_dis.png');
 }
-
+.scoreCount
+{
+}
 h2
 {
     margin-top: 0px;
