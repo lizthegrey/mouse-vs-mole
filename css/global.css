@@ -42,6 +42,12 @@ body {
     background: rgba(0, 0, 0, 0.7);
     padding: 1em;
 }
+#instruction_page
+{
+    width: 1016px;
+    height: 600px;
+    display: none;
+}
 #instructions
 {
     top: 260px;
@@ -56,12 +62,14 @@ body {
     left: 546px;
     right: 320px;
     font-size: 12pt;
+		color : black;
 }
 #instructions > table
 {
     width: 70%;
     margin: auto;
     table-layout: fixed;
+		color : black;
 }
 #instructions > table td
 {
@@ -90,6 +98,7 @@ button
     left: 540px;
     top: 260px;
 }
+
 #game
 {
     width: 1016px;
@@ -132,6 +141,13 @@ button
     table-layout: fixed;
     padding-top: 50px;
 }
+
+.top_right
+{
+    left: 540px;
+    top: 10px;
+}
+
 .side
 {
     width: 108px;
@@ -179,6 +195,29 @@ button
     height: 9px;
     background-image: url('../sprites/emptybar.png');
     display: inline-block;
+}
+
+.instuctions_1
+{
+    background-image: url('../sprites/instructions_walk.gif');
+    height: 140px;
+		width: 700px;
+}
+.instuctions_2
+{
+    background-image: url('../sprites/instructions_jump.gif');
+    height: 140px;
+		width: 700px;
+}.instuctions_3
+{
+    background-image: url('../sprites/instructions_rocketboots.gif');
+    height: 210px;
+		width: 700px;
+}.instuctions_4
+{
+    background-image: url('../sprites/instructions_bazooka.gif');
+    height: 140px;
+		width: 700px;
 }
 
 .bazookaPBar
