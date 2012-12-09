@@ -1379,12 +1379,34 @@ function gameOver() {
 var ar = new Array(32, 33, 34, 35, 36, 37, 38, 39, 40);
 
 $(document).keydown(function(e) {
-     var key = e.which;
-      if ($.inArray(key, ar) > -1) {
-          e.preventDefault();
-          return false;
-      }
-      return true;
+  $('.k' + e.which).addClass('pressed');
+  switch (e.which) {
+    case 67:
+      $('.k87,.k83').addClass('disabled');
+      break;
+    case 32:
+      $('.k38,.k40').addClass('disabled');
+      break;
+  }
+  
+  var key = e.which;
+  if ($.inArray(key, ar) > -1) {
+    e.preventDefault();
+    return false;
+  }
+  return true;
+});
+
+$(document).keyup(function(e) {
+  $('.k' + e.which).removeClass('pressed');
+  switch (e.which) {
+    case 67:
+      $('.k87,.k83').removeClass('disabled');
+      break;
+    case 32:
+      $('.k38,.k40').removeClass('disabled');
+      break;
+  }
 });
 
 Crafty.scene('mainLevel', function() {

@@ -130,7 +130,7 @@ button
     width: 70%;
     margin: auto;
     table-layout: fixed;
-    padding-top: 60px;
+    padding-top: 50px;
 }
 .side
 {
@@ -195,6 +195,7 @@ button
 {
     background-image: url('../sprites/powerup2_mole.png');
     height: 48px;
+    margin-top: 6px;
 }
 .Icon5_1_dis
 {
@@ -210,6 +211,7 @@ button
 {
     background-image: url('../sprites/powerup2_mouse_dis.png');
     height: 48px;
+    margin-top: 6px;
 }
 
 
@@ -287,6 +289,14 @@ h4
     vertical-align: middle;
     text-shadow: none;
     font-weight: bolder;
+}
+.key.pressed
+{
+    background: salmon;
+}
+.key.disabled
+{
+    background: darkgray;
 }
 footer
 {
