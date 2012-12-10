@@ -918,8 +918,7 @@ function playerMove(player) {
     }
     isRunning = true;
     p(player).xVel += Math.min(-1 * p(player).xVel, DRAG_VELOCITY);
-  }
-  else if (p(player).xVel > 0) {
+  } else if (p(player).xVel > 0) {
     var elem = lg(x + 1, y);
 
     if (nextpos < PLAYGROUND_WIDTH - PLAYER_WIDTH) {
@@ -950,6 +949,24 @@ function playerMove(player) {
     isRunning = true;
     p(player).xVel -= Math.min(p(player).xVel, DRAG_VELOCITY);
   }
+
+  // Ensure the player never gets stuck in a block.
+  var currentBlock = lg(x, y);
+  if (x == 0) {
+    p(player).x = BLOCK_SIZE;
+    p(player).xVel = 0;
+  } else if (x == GRID_WIDTH - 1) {
+    p(player).x = BLOCK_SIZE * (GRID_WIDTH - 1);
+    p(player).xVel = 0;
+  } else if (currentBlock && currentBlock.node) {
+    currentBlock.damage += DAMAGE_TO_EXPLODE;
+    processDamage(currentBlock);
+    currentBlock.damagedBy |= player;
+    // Stop the player but don't change their location.
+    p(player).xVel = 0;
+  }
+
+
   if (Crafty.keydown[up] && !p(player).firing) {
     ENABLE_CREEPING = true;
     p(player).jumped = true;
