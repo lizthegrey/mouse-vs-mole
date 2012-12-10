@@ -97,6 +97,7 @@ button
     width: 1016px;
     height: 600px;
     display: none;
+    cursor: none;
 }
 #gamewrapper
 {
