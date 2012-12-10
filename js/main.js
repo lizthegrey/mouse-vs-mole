@@ -1419,7 +1419,12 @@ Crafty.scene('mainLevel', function() {
 });
 
 $(document).ready(function() {
+  $('#instructions').hover(function(){$('#instructions').css({opacity: 1})},
+    function(){$('#instructions').css({opacity: 0.2})});
+
+  $('#objectives').hover(function(){$('#objectives').css({opacity: 1})},
+    function(){$('#objectives').css({opacity: 0.2})});
+
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
-  //Crafty.canvas.init();
   Crafty.viewport.init();
 });
