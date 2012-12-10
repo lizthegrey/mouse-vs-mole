@@ -161,6 +161,44 @@ button
     text-shadow: none;
 }
 
+.instuctions_1
+{
+    display: inline-block;
+    background-image: url('../sprites/instructions_walk_shrunk.gif');
+    height: 60px;
+    width: 300px;
+    vertical-align: middle;
+    margin-left: 80px;
+}
+.instuctions_2
+{
+    display: inline-block;
+    background-image: url('../sprites/instructions_jump.gif');
+    height: 140px;
+    width: 700px;
+    vertical-align: middle;
+}
+.instuctions_3
+{
+    display: inline-block;
+    background-image: url('../sprites/instructions_rocketboots_shrunk.gif');
+    height: 105px;
+    width: 300px;
+    vertical-align: middle;
+    padding-left: 30;
+    margin-left: 80px;
+}
+.instuctions_4
+{
+    display: inline-block;
+    background-image: url('../sprites/instructions_bazooka_shrunk.gif');
+    height: 60px;
+    width: 300px;
+    vertical-align: middle;
+    margin-left: 80px;
+}
+
+
 .powerup
 {
     padding-top: 50px;
