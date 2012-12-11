@@ -39,8 +39,11 @@ body {
 #splash > div
 {
     position: absolute;
-    background: rgba(0, 0, 0, 0.7);
     padding: 1em;
+}
+#objectives, #instructions > *
+{
+    background-color: rgba(0, 0, 0, 0.7);
 }
 #instructions
 {
@@ -49,7 +52,18 @@ body {
     left: 20px;
     right: 20px;
 }
-
+#instructions > div
+{
+    float: left;
+    height: 105px;
+    width: 300px;
+    vertical-align: middle;
+    padding: 0px 5px;
+}
+#instructions > div:not(:last-child)
+{
+    margin-right: 7px;
+}
 #objectives
 {
     top: 20px;
@@ -59,8 +73,7 @@ body {
 }
 #instructions > table
 {
-    width: 70%;
-    margin: auto;
+    width: 100%;
     table-layout: fixed;
 }
 #instructions > table td
@@ -164,40 +177,19 @@ button
 
 .instuctions_1
 {
-    float: left;
-    background-image: url('../sprites/instructions_walk_shrunk.gif');
-    height: 60px;
-    width: 300px;
-    vertical-align: middle;
-    margin-top: 28px;
-    margin-left: 10px;
+    background: url('../sprites/instructions_walk_shrunk.gif') 5px 28px no-repeat;
 }
 .instuctions_2
 {
-    float: left;
     background-image: url('../sprites/instructions_jump_shrunk.gif');
-    height: 60px;
-    width: 300px;
-    vertical-align: middle;
 }
 .instuctions_3
 {
-    float: left;
-    background-image: url('../sprites/instructions_rocketboots_shrunk.gif');
-    height: 105px;
-    width: 300px;
-    vertical-align: middle;
-    margin-left: 10px;
+    background: url('../sprites/instructions_rocketboots_shrunk.gif') 5px 0px no-repeat;
 }
 .instuctions_4
 {
-    float: left;
-    background-image: url('../sprites/instructions_bazooka_shrunk.gif');
-    height: 60px;
-    width: 300px;
-    vertical-align: middle;
-    margin-top: 28px;
-    margin-left: 10px;
+    background: url('../sprites/instructions_bazooka_shrunk.gif') 5px 28px no-repeat;
 }
 
 
