@@ -1410,11 +1410,13 @@ function gameOver() {
 }
 
 function flashBar(player, powerup) {
-  var element = $('#' + powerup + player).stop(true);
-  for(var i = 0; i < 3; ++i) {
-    element.animate({ left: 10 }, 60).animate({ left: -10 }, 60);
+  var element = $('#' + powerup + player);
+  if(!element.is(':animated')) {
+    for(var i = 0; i < 3; ++i) {
+      element.animate({ left: 10 }, 60).animate({ left: -10 }, 60);
+    }
+    element.animate({ left: 0 }, 100);
   }
-  element.animate({ left: 0 }, 100);
 }
 
 var ar = new Array(32, 33, 34, 35, 36, 37, 38, 39, 40);
