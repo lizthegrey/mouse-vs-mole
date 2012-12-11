@@ -1,3 +1,11 @@
+a:visited, a {
+  color: black;
+}
+
+a:hover {
+  color: salmon;
+}
+
 body {
     background: tan;
     font-family: Chewy, sans-serif;
@@ -341,5 +349,5 @@ h4
 footer
 {
     text-align: center;
-    font-size: 12pt;
+    font-size: 11pt;
 }
