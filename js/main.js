@@ -39,9 +39,9 @@ var DISPLAY_HEIGHT = 600;
 
 // XPOS_P2 and YPOS get a modifier based on sizes to make the board symmetric
 // and to begin with a block for a floor
-var START_XCOORD_P1 = 16;
+var START_XCOORD_P1 = 13;
 var START_XPOS_P1 = START_XCOORD_P1 * BLOCK_SIZE;
-var START_XCOORD_P2 = 24;
+var START_XCOORD_P2 = 25;
 var START_XPOS_P2 = START_XCOORD_P2 * BLOCK_SIZE + (BLOCK_SIZE - PLAYER_WIDTH);
 var START_YCOORD = 15;
 var START_YPOS = BLOCK_SIZE * START_YCOORD + (BLOCK_SIZE - PLAYER_HEIGHT);
