@@ -1,4 +1,11 @@
-spelunker-deathmatch
+Mouse vs. Mole
 ====================
 
-It has spelunking! It has death! What more could you want?
+A two-player competitive mining game by:
+
+* Kai Ma
+* Liz Fong-Jones
+* Alan Huang
+* Nathan Arce
+* Alex Goins
+* Tommy Liu
