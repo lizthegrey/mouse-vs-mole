@@ -44,19 +44,17 @@ body {
 }
 #instructions
 {
-    opacity: .2;
-    top: 260px;
-    bottom: 30px;
-    left: 30px;
-    right: 500px;
+    top: 420px;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
 }
+
 #objectives
 {
-    opacity: .2;
-    top: 340px;
-    bottom: 30px;
-    left: 546px;
-    right: 320px;
+    top: 20px;
+    left: 780px;
+    right: 20px;
     font-size: 12pt;
 }
 #instructions > table
@@ -89,8 +87,8 @@ button
     border-radius: 15px;
     background-color: #ecaa5e;
     position: absolute;
-    left: 540px;
-    top: 260px;
+    right: 50px;
+    top: 200px;
 }
 #game
 {
@@ -166,39 +164,40 @@ button
 
 .instuctions_1
 {
-    display: inline-block;
+    float: left;
     background-image: url('../sprites/instructions_walk_shrunk.gif');
     height: 60px;
     width: 300px;
     vertical-align: middle;
-    margin-left: 80px;
+    margin-top: 28px;
+    margin-left: 10px;
 }
 .instuctions_2
 {
-    display: inline-block;
-    background-image: url('../sprites/instructions_jump.gif');
-    height: 140px;
-    width: 700px;
+    float: left;
+    background-image: url('../sprites/instructions_jump_shrunk.gif');
+    height: 60px;
+    width: 300px;
     vertical-align: middle;
 }
 .instuctions_3
 {
-    display: inline-block;
+    float: left;
     background-image: url('../sprites/instructions_rocketboots_shrunk.gif');
     height: 105px;
     width: 300px;
     vertical-align: middle;
-    padding-left: 30;
-    margin-left: 80px;
+    margin-left: 10px;
 }
 .instuctions_4
 {
-    display: inline-block;
+    float: left;
     background-image: url('../sprites/instructions_bazooka_shrunk.gif');
     height: 60px;
     width: 300px;
     vertical-align: middle;
-    margin-left: 80px;
+    margin-top: 28px;
+    margin-left: 10px;
 }
 
 
