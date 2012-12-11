@@ -1447,10 +1447,10 @@ Crafty.scene('mainLevel', function() {
 });
 
 $(document).ready(function() {
-  $('#instructions').fadeTo(1000, 0.2);
+  $('#instructions').fadeTo(1000, 0.6);
   $('#instructions').hover(
     function(){$('#instructions').fadeTo('fast', 1.0)},
-    function(){$('#instructions').fadeTo('slow', 0.2)});
+    function(){$('#instructions').fadeTo('slow', 0.6)});
 
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.viewport.init();
