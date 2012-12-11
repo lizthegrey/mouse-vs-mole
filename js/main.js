@@ -308,11 +308,13 @@ function addActors() {
 
   players[0] = new player(p1, 1,
                           START_XPOS_P1, START_YPOS);
+  
   updatePoints(1, POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE], BAZOOKA_POINTS_TYPE);
   updatePoints(1, POINTS_PER_BLOCK[JET_POINTS_TYPE], JET_POINTS_TYPE);
   pspr(1).flip('X');
   players[1] = new player(p2, 2,
                           START_XPOS_P2, START_YPOS);
+  
   updatePoints(2, POINTS_PER_BLOCK[BAZOOKA_POINTS_TYPE], BAZOOKA_POINTS_TYPE);
   updatePoints(2, POINTS_PER_BLOCK[JET_POINTS_TYPE], JET_POINTS_TYPE);
   pspr(2).flip('X');
@@ -776,7 +778,7 @@ function jet(player) {
         x: pspr(player)._x,
         y: pspr(player)._y,
         z: 200
-    }).tween({alpha: 0.0}, 15);
+    });
 
     if(pspr(player)._flipX) {
       p(player).jetfire.flip('X');
@@ -796,6 +798,11 @@ function jetFireMove(player) {
       }
       else {
         p(player).jetfire.unflip('X');
+      }
+      p(player).jetfire.alpha -= 0.1;
+      if (p(player).jetfire.alpha <= 0) {
+        p(player).jetfire.destroy();
+        p(player).jetfire = null;
       }
     }
 }
