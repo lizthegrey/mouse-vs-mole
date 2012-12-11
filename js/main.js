@@ -23,6 +23,8 @@ var EXPLOSION_RADIUS = 2;
 var EXPLOSION_SIZE = 138;
 var EXPLOSION_DURATION = 30;
 
+var POWERUP_SHAKE_AMPLITUDE = 5;
+
 var NUM_COLORS = 4;
 
 var GRID_WIDTH = 40;
@@ -1413,7 +1415,7 @@ function flashBar(player, powerup) {
   var element = $('#' + powerup + player);
   if(!element.is(':animated')) {
     for(var i = 0; i < 3; ++i) {
-      element.animate({ left: 10 }, 60).animate({ left: -10 }, 60);
+      element.animate({ left: POWERUP_SHAKE_AMPLITUDE }, 60).animate({ left: -POWERUP_SHAKE_AMPLITUDE }, 60);
     }
     element.animate({ left: 0 }, 100);
   }
