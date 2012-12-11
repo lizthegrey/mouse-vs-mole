@@ -142,6 +142,10 @@ function buildPlayground() {
   asset_list += ['sprites/player_sprites.png'];
   asset_list += ['sprites/explosion.png'];
   asset_list += ['sprites/lava_huge.png'];
+  asset_list += ['sprites/instructions_walk_shrunk.gif',
+                 'sprites/instructions_bazooka_shrunk.gif',
+                 'sprites/instructions_rocketboots_shrunk.gif'];
+  asset_list += ['sprites/title_screen.png'];
   Crafty.load(asset_list);
 
   Crafty.sprite(PLAYER_WIDTH, PLAYER_HEIGHT,
@@ -1443,11 +1447,10 @@ Crafty.scene('mainLevel', function() {
 });
 
 $(document).ready(function() {
-  $('#instructions').hover(function(){$('#instructions').css({opacity: 1})},
-    function(){$('#instructions').css({opacity: 0.2})});
-
-  $('#objectives').hover(function(){$('#objectives').css({opacity: 1})},
-    function(){$('#objectives').css({opacity: 0.2})});
+  $('#instructions').fadeTo(1000, 0.2);
+  $('#instructions').hover(
+    function(){$('#instructions').fadeTo('fast', 1.0)},
+    function(){$('#instructions').fadeTo('slow', 0.2)});
 
   Crafty.init(PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
   Crafty.viewport.init();

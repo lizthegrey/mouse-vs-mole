@@ -44,15 +44,18 @@ body {
 }
 #instructions
 {
-    opacity: .2;
     top: 260px;
     bottom: 30px;
     left: 30px;
     right: 500px;
 }
+
+.heading {
+    font-size: 16pt;
+}
+
 #objectives
 {
-    opacity: .2;
     top: 340px;
     bottom: 30px;
     left: 546px;
