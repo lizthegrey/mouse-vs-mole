@@ -1,7 +1,7 @@
-crunch.ogg: by Robinhood76, http://www.freesound.org/people/Robinhood76/sounds/55690/
-running.ogg: by bevangoldswain, http://www.freesound.org/people/bevangoldswain/sounds/54779/
-splat.ogg: by SlykMrByches, http://www.freesound.org/people/SlykMrByches/sounds/55234/
-jump.ogg: by JCH321, http://www.freesound.org/people/JCH321/sounds/66206/
-shot.ogg: by Syna-Max, http://www.freesound.org/people/Syna-Max/sounds/56600/
-boom.ogg: by qubodup, http://www.freesound.org/people/qubodup/sounds/162258/
-boost.ogg: by elmomo, http://www.freesound.org/people/elmomo/sounds/755/
+crunch.ogg: by Robinhood76, http://www.freesound.org/people/Robinhood76/sounds/55690/ (CC-BY-NC)
+running.ogg: by bevangoldswain, http://www.freesound.org/people/bevangoldswain/sounds/54779/ (CC-Sampling+)
+splat.ogg: by SlykMrByches, http://www.freesound.org/people/SlykMrByches/sounds/55234/ (CC-0)
+jump.ogg: by JCH321, http://www.freesound.org/people/JCH321/sounds/66206/ (CC-BY)
+shot.ogg: by Syna-Max, http://www.freesound.org/people/Syna-Max/sounds/56600/ (CC-BY-NC)
+boom.ogg: by qubodup, http://www.freesound.org/people/qubodup/sounds/162258/ (CC-0)
+boost.ogg: by elmomo, http://www.freesound.org/people/elmomo/sounds/755/ (CC-BY-NC)
