@@ -199,6 +199,7 @@ button
     width: 73px;
     text-align: center;
     display: inline-block;
+    position: relative;
 }
 .powerupIcon
 {
