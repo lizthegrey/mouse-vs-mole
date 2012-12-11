@@ -764,31 +764,33 @@ function missileFire(player) {
 }
 
 function jet(player) {
-  if(p(player).enablePowerup[JET_POINTS_TYPE] &&
-     PLAYER_INAIR[player - 1] &&
-     !p(player).jumped ) {
+  if(PLAYER_INAIR[player - 1] && !p(player).jumped ) {
+    if(p(player).enablePowerup[JET_POINTS_TYPE]) {
 
-    updatePoints(player, -1, JET_POINTS_TYPE);
-    pspr(player)._gy = JET_VELOCITY;
-    p(player).groundY = pspr(player)._y - JET_Y_OFFSET;
-    Crafty.audio.play('playerJet');
-    if (p(player).jetfire) {
-      p(player).jetfire.destroy();
-      delete p(player).jetfire;
+      updatePoints(player, -1, JET_POINTS_TYPE);
+      pspr(player)._gy = JET_VELOCITY;
+      p(player).groundY = pspr(player)._y - JET_Y_OFFSET;
+      Crafty.audio.play('playerJet');
+      if (p(player).jetfire) {
+        p(player).jetfire.destroy();
+        delete p(player).jetfire;
+      }
+
+      p(player).jetfire = Crafty.e('2D, DOM, jetfire, Tween').attr({
+          alpha: 1.0,
+          x: pspr(player)._x,
+          y: pspr(player)._y,
+          z: 200
+      });
+
+      if(pspr(player)._flipX) {
+        p(player).jetfire.flip('X');
+      }
+
+      p(player).jumped = true;
+    } else {
+      flashBar(player, 'jet');
     }
-
-    p(player).jetfire = Crafty.e('2D, DOM, jetfire, Tween').attr({
-        alpha: 1.0,
-        x: pspr(player)._x,
-        y: pspr(player)._y,
-        z: 200
-    });
-
-    if(pspr(player)._flipX) {
-      p(player).jetfire.flip('X');
-    }
-
-    p(player).jumped = true;
   }
 }
 
@@ -875,10 +877,13 @@ function playerMove(player) {
         p(player).firing = false;
       }
     }
-  } else if (Crafty.keydown[fire] &&
-             p(player).enablePowerup[BAZOOKA_POINTS_TYPE]) {
-    ENABLE_CREEPING = true;
-    p(player).firing = true;
+  } else if (Crafty.keydown[fire]) {
+    if (p(player).enablePowerup[BAZOOKA_POINTS_TYPE]) {
+      ENABLE_CREEPING = true;
+      p(player).firing = true;
+    } else {
+      flashBar(player, 'bazooka');
+    }
   }
   var x = p(player).getX();
   var rx = p(player).getRightX();
@@ -1401,6 +1406,16 @@ function gameOver() {
     Crafty.audio.stop();
     Crafty.audio.play('playerDeath');
     setTimeout(restart, 3000);
+  }
+}
+
+function flashBar(player, powerup) {
+  var element = $('#' + powerup + player);
+  if(!element.is(':animated')) {
+    for(var i = 0; i < 3; ++i) {
+      element.animate({ left: 10 }, 60).animate({ left: -10 }, 60);
+    }
+    element.animate({ left: 0 }, 100);
   }
 }
 
