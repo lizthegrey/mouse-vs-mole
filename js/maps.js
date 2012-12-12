@@ -69,10 +69,10 @@ function stageGenerate() {
   for (var x = 0; x < GRID_WIDTH; x++) {
     levelMap[x] = new Array(GRID_HEIGHT);
     for (var y = 0; y < GRID_HEIGHT; y++) {
-    if (y<5){
-    levelMap[x][y]=null
-    continue;
-    }
+      if (y<5) {
+        levelMap[x][y]=null;
+        continue;
+      }
     levelMap[x][y] = Math.floor(Math.random() * 4);
     }
   }
@@ -90,7 +90,7 @@ function powerUpScatter(levelMap) {
             i -= 1;
         }
   }
-    return levelMap;
+  return levelMap;
 }
 
 function powerUpExpand(levelMap) {
@@ -139,7 +139,7 @@ function distance(x1,y1,x2,y2) {
 
 function holeMaker(levelMap, r, centerX, centerY) {
   for (var x = 0; x < GRID_WIDTH; x++) {
-    for (var y = 0; y < GRID_HEIGHT - 1; y++) {
+    for (var y = 0; y < GRID_HEIGHT - 4; y++) {
       if (distance(x, y, centerX, centerY) < r) {
         levelMap[x][y] = null;
       }
