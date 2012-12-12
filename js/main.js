@@ -85,6 +85,9 @@ var REBOOT_DELAY = 50;
 
 var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
+var ZOOM_DIST_COEFF_I = 0.0000055;
+var ZOOM_DIST_COEFF_MOVE = 0.0000025;
+var ZOOM_DIST_COEFF = ZOOM_DIST_COEFF_I;
 
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
@@ -506,7 +509,7 @@ function viewport() {
     var x_scale = pspr(1)._x - pspr(2)._x;
     var y_scale = p(1).groundY - p(2).groundY;
     //var y_scale = pspr(1)._y - pspr(2)._y;
-    var curZoom = MAX_ZOOM - 0.0000025 *
+    var curZoom = MAX_ZOOM - ZOOM_DIST_COEFF *
         Math.max(x_scale * x_scale, y_scale * y_scale);
 
     if (curZoom < MIN_ZOOM) {
@@ -882,6 +885,7 @@ function playerMove(player) {
   } else if (Crafty.keydown[fire]) {
     if (p(player).enablePowerup[BAZOOKA_POINTS_TYPE]) {
       ENABLE_CREEPING = true;
+      ZOOM_DIST_COEFF = ZOOM_DIST_COEFF_MOVE;
       p(player).firing = true;
     } else {
       flashBar(player, 'bazooka');
@@ -896,11 +900,13 @@ function playerMove(player) {
   if (!p(player).firing) {
     if (Crafty.keydown[left]) {
       ENABLE_CREEPING = true;
+      ZOOM_DIST_COEFF = ZOOM_DIST_COEFF_MOVE;
 
       p(player).xVel -= MOVE_VELOCITY;
     }
     if (Crafty.keydown[right]) {
       ENABLE_CREEPING = true;
+      ZOOM_DIST_COEFF = ZOOM_DIST_COEFF_MOVE;
 
       p(player).xVel += MOVE_VELOCITY;
     }
@@ -987,6 +993,7 @@ function playerMove(player) {
 
   if (Crafty.keydown[up] && !p(player).firing) {
     ENABLE_CREEPING = true;
+    ZOOM_DIST_COEFF = ZOOM_DIST_COEFF_MOVE;
     p(player).jumped = true;
     // Ensure the player is standing on solid ground.
     var elem = lg(x, y + 1);
@@ -1002,6 +1009,8 @@ function playerMove(player) {
   }
   if (Crafty.keydown[dig] && !p(player).firing) {
     ENABLE_CREEPING = true;
+    ZOOM_DIST_COEFF = ZOOM_DIST_COEFF_MOVE;
+
     // Dig down.
     var elem = lg(x, y + 1);
     var elem2 = lg(rx, y + 1);
@@ -1341,6 +1350,7 @@ function reboot() {
 
   death_y = GRID_HEIGHT - 1;
   ENABLE_CREEPING = false;
+  ZOOM_DIST_COEFF = ZOOM_DIST_COEFF_I;
 
   for (var a = 0; a < levelGrid.length; a++) {
     for (var b = 0; b < levelGrid[a].length; b++) {
