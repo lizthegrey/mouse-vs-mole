@@ -85,6 +85,7 @@ var REBOOT_DELAY = 50;
 
 var MAX_ZOOM = 2.5;
 var MIN_ZOOM = 1.0;
+var Y_BIAS = 100;
 
 var SPRITE_GRAPHIC_INDEXES = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
@@ -548,6 +549,7 @@ function viewport() {
   if (prevY.length >= CAM_Y_AVERAGE) {
     prevY.shift();
   }
+  y += Y_BIAS;
 
   prevX.push(curX);
   var x = 0;
