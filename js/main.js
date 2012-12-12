@@ -909,7 +909,7 @@ function playerMove(player) {
   if (p(player).xVel < 0) {
     var elem = lg(x - 1, y);
 
-    if (nextpos > 0) {
+    if (nextpos > BLOCK_SIZE) {
       if (!elem || !elem.node ||
           nextpos > elem.node._x + BLOCK_SIZE) {
         pspr(player).x = nextpos;
@@ -922,6 +922,9 @@ function playerMove(player) {
         pspr(player).x = elem.node._x + BLOCK_SIZE;
         p(player).xVel = 0;
       }
+    } else {
+      pspr(player).x = BLOCK_SIZE;
+      p(player).xVel = 0
     }
     if (!p(player).runningLeft) {
       pspr(player).unflip('X');
@@ -939,7 +942,7 @@ function playerMove(player) {
   } else if (p(player).xVel > 0) {
     var elem = lg(x + 1, y);
 
-    if (nextpos < PLAYGROUND_WIDTH - PLAYER_WIDTH) {
+    if (nextpos < PLAYGROUND_WIDTH - PLAYER_WIDTH - BLOCK_SIZE) {
       if (!elem || !elem.node ||
           nextpos < elem.node._x - PLAYER_WIDTH) {
         pspr(player).x = nextpos;
@@ -952,6 +955,9 @@ function playerMove(player) {
         pspr(player).x = elem.node._x - PLAYER_WIDTH;
         p(player).xVel = 0;
       }
+    } else {
+      pspr(player).x = PLAYGROUND_WIDTH - PLAYER_WIDTH - BLOCK_SIZE;
+      p(player).xVel = 0;
     }
     if (!p(player).runningRight) {
       pspr(player).flip('X');
@@ -970,13 +976,7 @@ function playerMove(player) {
 
   // Ensure the player never gets stuck in a block.
   var currentBlock = lg(x, y);
-  if (x == 0) {
-    p(player).x = BLOCK_SIZE;
-    p(player).xVel = 0;
-  } else if (x == GRID_WIDTH - 1) {
-    p(player).x = BLOCK_SIZE * (GRID_WIDTH - 1);
-    p(player).xVel = 0;
-  } else if (currentBlock && currentBlock.node) {
+  if (currentBlock && currentBlock.node) {
     currentBlock.damage += DAMAGE_TO_EXPLODE;
     processDamage(currentBlock);
     currentBlock.damagedBy |= player;
