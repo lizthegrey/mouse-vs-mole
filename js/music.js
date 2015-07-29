@@ -18,6 +18,9 @@ var MUSIC = (function() {
     }
 
     function loaded(event) {
+        if(start) {
+            return;
+        }
         tracks[this.src].loaded = true;
         for(var name in tracks) {
             if(!tracks[name].loaded) {
